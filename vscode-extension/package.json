@@ -1,0 +1,50 @@
+{
+  "name": "ifc-vscode",
+  "publisher": "local",
+  "displayName": "Ifc",
+  "description": "VS Code support for Ifc",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "ifc",
+        "aliases": [
+          "Ifc",
+          "Ifc"
+        ],
+        "extensions": [
+          ".ifc"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ifc",
+        "scopeName": "source.ifc",
+        "path": "./syntaxes/ifc.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "npm run check-types && node esbuild.js && npm run build-server",
+    "bundle": "node esbuild.js --production",
+    "package": "vsce package --no-dependencies --allow-missing-repository --skip-license -o ifc-vscode.vsix",
+    "watch": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch",
+    "vscode:prepublish": "npm run check-types && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "build-server": "go build -o dist/server.exe ../cmd/ifc-lsp"
+  },
+  "dependencies": {
+    "vscode-languageclient": "~9.0.1"
+  }
+}

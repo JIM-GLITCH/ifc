@@ -1,0 +1,21 @@
+module ifc
+
+go 1.26.3
+
+require typefox.dev/fastbelt v0.1.0
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/spf13/cobra v1.10.2 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/stretchr/testify v1.11.1 // indirect
+	golang.org/x/exp/event v0.0.0-20260312153236-7ab1446f8b90 // indirect
+	golang.org/x/exp/jsonrpc2 v0.0.0-20260312153236-7ab1446f8b90 // indirect
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+	typefox.dev/lsp v0.0.4 // indirect
+)
+
+tool typefox.dev/fastbelt/cmd/fastbelt

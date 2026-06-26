@@ -1,0 +1,205 @@
+grammar Ifc;
+
+// ------------------------------------------------------------------
+// ISO 10303-21:2002(E) Table 2 - WSN of token definitions
+// ------------------------------------------------------------------
+token KEYWORD: /(?:!(?:[A-Z_])((?:[A-Z_])|(?:[0-9]))*)|(?:(?:[A-Z_])((?:[A-Z_])|(?:[0-9]))*)/;
+token REAL: /(?:\+|-)?(?:[0-9])+\.(?:[0-9])*(E(?:\+|-)?(?:[0-9])+)?/;
+token INTEGER: /(?:\+|-)?(?:[0-9])+/;
+
+token STRING: /'((?:(?:[!\"*$%&.#+(),?/:;<=>@\[\]{|}\^`~-])|(?:[0-9])|(?: )|(?:[a-z])|(?:[A-Z_]))|((?:')(?:'))|((?:\\)(?:\\))|(?:(?:(?:\\)S(?:\\)(?:(?: )|(?:[0-9])|(?:[a-z])|(?:[A-Z_])|(?:[!\"*$%&.#+(),?/:;<=>@\[\]{|}\^`~-])|(?:\\)|(?:')))|(?:(?:\\)P(?:[A-Z_])(?:\\))|(?:(?:\\)X2(?:\\)(?:(?:(?:[0-9A-F])(?:[0-9A-F]))(?:(?:[0-9A-F])(?:[0-9A-F])))+(?:(?:\\)X0(?:\\)))|(?:(?:\\)X4(?:\\)(?:(?:(?:(?:[0-9A-F])(?:[0-9A-F]))(?:(?:[0-9A-F])(?:[0-9A-F])))(?:(?:(?:[0-9A-F])(?:[0-9A-F]))(?:(?:[0-9A-F])(?:[0-9A-F]))))+(?:(?:\\)X0(?:\\)))|(?:(?:\\)X(?:\\)(?:(?:[0-9A-F])(?:[0-9A-F])))))*'/;
+token ENTITY_INSTANCE_NAME: /#(?:[0-9])+/;
+token ENUMERATION: /\.(?:[A-Z_])((?:[A-Z_])|(?:[0-9]))*\./;
+token BINARY: /"[0-3](?:[0-9A-F])*"/;
+
+// ------------------------------------------------------------------
+// ISO 10303-21:2002(E) Table 3 - WSN of the exchange structure
+// ------------------------------------------------------------------
+interface EXCHANGE_FILE {
+    HeaderSection HEADER_SECTION
+    DataSections []DATA_SECTION
+}
+
+entry EXCHANGE_FILE:
+    "ISO-10303-21;"
+    HeaderSection=HEADER_SECTION
+    DataSections+=DATA_SECTION*
+    "END-ISO-10303-21;"
+
+interface HEADER_SECTION {
+    HeaderEntityList []HEADER_ENTITY
+}
+
+HEADER_SECTION:
+    "HEADER;"
+    HeaderEntityList+=HEADER_ENTITY
+    HeaderEntityList+=HEADER_ENTITY
+    HeaderEntityList+=HEADER_ENTITY
+    (HeaderEntityList+=HEADER_ENTITY)*
+    "ENDSEC;"
+
+interface HEADER_ENTITY {
+    Keyword string
+    ParameterList PARAMETER_LIST
+}
+
+HEADER_ENTITY:
+    Keyword=KEYWORD
+    "("
+    (ParameterList=PARAMETER_LIST)?
+    ")"
+    ";"
+
+interface PARAMETER_LIST {
+    Parameters []PARAMETER
+}
+
+PARAMETER_LIST:
+    Parameters+=PARAMETER
+    ("," Parameters+=PARAMETER)*
+
+interface PARAMETER {}
+
+PARAMETER:
+    TYPED_PARAMETER | UNTYPED_PARAMETER | OMITTED_PARAMETER
+
+interface TYPED_PARAMETER extends PARAMETER {
+    Keyword string
+    Parameter PARAMETER
+}
+
+TYPED_PARAMETER:
+    Keyword=KEYWORD "(" Parameter=PARAMETER ")"
+
+interface UNTYPED_PARAMETER extends PARAMETER {}
+
+UNTYPED_PARAMETER:
+     DEFAULT_PARAMETER 
+    |INTEGER_LITERAL
+    |REAL_LITERAL 
+    |STRING_LITERAL  
+    |ENUMERATION_LITERAL 
+    |BINARY_LITERAL 
+    |LIST
+    |ENTITY_REFERENCE
+
+interface DEFAULT_PARAMETER extends UNTYPED_PARAMETER {
+    Value string
+}
+
+DEFAULT_PARAMETER: Value = "$"
+
+interface INTEGER_LITERAL extends UNTYPED_PARAMETER {
+    Value string
+}
+
+INTEGER_LITERAL: Value = INTEGER
+
+interface REAL_LITERAL extends UNTYPED_PARAMETER {
+    Value string
+}
+
+REAL_LITERAL: Value = REAL
+
+interface STRING_LITERAL extends UNTYPED_PARAMETER {
+    Value string
+}
+
+STRING_LITERAL: Value = STRING
+
+interface ENUMERATION_LITERAL extends UNTYPED_PARAMETER {
+    Value string
+}
+
+ENUMERATION_LITERAL: Value = ENUMERATION
+
+interface BINARY_LITERAL extends UNTYPED_PARAMETER {
+    Value string
+}
+
+BINARY_LITERAL: Value = BINARY
+
+interface ENTITY_REFERENCE extends UNTYPED_PARAMETER {
+    Value *SIMPLE_ENTITY_INSTANCE
+}
+
+ENTITY_REFERENCE: Value = [SIMPLE_ENTITY_INSTANCE:ENTITY_INSTANCE_NAME]
+
+interface OMITTED_PARAMETER extends PARAMETER {
+    Value string
+}
+
+OMITTED_PARAMETER:
+    Value="*"
+
+interface LIST extends UNTYPED_PARAMETER {
+    Parameters []PARAMETER
+}
+
+LIST:
+    "(" (Parameters+=PARAMETER ("," Parameters+=PARAMETER)*)? ")"
+
+interface DATA_SECTION {
+    DataParameters PARAMETER_LIST
+    EntityInstances []ENTITY_INSTANCE
+}
+
+DATA_SECTION:
+    "DATA"
+    ("(" DataParameters=PARAMETER_LIST ")")?
+    ";"
+    (EntityInstances+=ENTITY_INSTANCE)*
+    "ENDSEC;"
+
+interface ENTITY_INSTANCE {}
+
+ENTITY_INSTANCE:
+    SIMPLE_ENTITY_INSTANCE
+    |COMPLEX_ENTITY_INSTANCE
+
+interface SIMPLE_ENTITY_INSTANCE extends ENTITY_INSTANCE {
+    Name string
+    Record SIMPLE_RECORD
+}
+
+SIMPLE_ENTITY_INSTANCE:
+    Name=ENTITY_INSTANCE_NAME
+    "="
+    Record=SIMPLE_RECORD
+    ";"
+
+interface COMPLEX_ENTITY_INSTANCE extends ENTITY_INSTANCE {
+    Name string
+    Record SUBSUPER_RECORD
+}
+
+COMPLEX_ENTITY_INSTANCE:
+    Name=ENTITY_INSTANCE_NAME
+    "="
+    Record=SUBSUPER_RECORD
+    ";"
+
+interface SIMPLE_RECORD {
+    Keyword string
+    Parameters PARAMETER_LIST
+}
+
+SIMPLE_RECORD:
+    Keyword=KEYWORD
+    "("
+    (Parameters=PARAMETER_LIST)?
+    ")"
+
+interface SUBSUPER_RECORD {
+    Records []SIMPLE_RECORD
+}
+
+SUBSUPER_RECORD:
+    "(" Records+=SIMPLE_RECORD+ ")"
+
+// -------------------------------------------------------
+// ISO 10303-21:2002(E) 5.6  Token separators
+// -------------------------------------------------------
+hidden token COMMENTS: /\/\*[\s\S]*?\*\//;
+
+hidden token WHITESPACE: /\s+/;

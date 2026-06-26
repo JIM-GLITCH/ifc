@@ -1,0 +1,47 @@
+{
+  "name": "ifc",
+  "scopeName": "source.ifc",
+  "fileTypes": [
+    ".ifc"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "name": "keyword.control.ifc",
+      "match": "\\bhello\\b"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.ifc",
+          "begin": "/\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.ifc"
+            }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.ifc"
+            }
+          }
+        },
+        {
+          "begin": "//",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.ifc"
+            }
+          },
+          "end": "(?=$)",
+          "name": "comment.line.ifc"
+        }
+      ]
+    }
+  }
+}
