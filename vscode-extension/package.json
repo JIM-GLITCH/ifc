@@ -1,9 +1,10 @@
 {
   "name": "ifc-vscode",
-  "publisher": "local",
+  "publisher": "lilr",
   "displayName": "Ifc",
   "description": "VS Code support for Ifc",
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.104.0"
   },
@@ -37,7 +38,7 @@
   "scripts": {
     "build": "npm run check-types && node esbuild.js && npm run build-server",
     "bundle": "node esbuild.js --production",
-    "package": "vsce package --no-dependencies --allow-missing-repository --skip-license -o ifc-vscode.vsix",
+    "package": "vsce package --no-dependencies --allow-missing-repository --skip-license",
     "watch": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch",
     "vscode:prepublish": "npm run check-types && node esbuild.js --production",
