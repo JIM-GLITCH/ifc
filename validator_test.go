@@ -55,6 +55,273 @@ END-ISO-10303-21;`
 		}
 	}
 }
+func TestValidateEntityReferenceType(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCCARTESIANPOINT((0.,0.,0.));
+#2=IFCPERSONANDORGANIZATION(#1,#1,$);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	found := false
+	for _, d := range diagnostics {
+		if d.Code == "ifc-entity-type" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("expected ifc-entity-type diagnostic for wrong entity reference")
+	}
+}
+
+func TestValidateDirectionAggregateType(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCDIRECTION('not-a-list');
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	found := false
+	for _, d := range diagnostics {
+		if d.Code == "ifc-param-type" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("expected ifc-param-type diagnostic for IFCDIRECTION string parameter")
+	}
+}
+
+func TestValidateInvalidEnumValue(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCOWNERHISTORY(#2,#3,$,.NOTAVALUE.,0,$,$,0);
+#2=IFCPERSON($,$,$,$,$,$,$,$);
+#3=IFCAPPLICATION(#4,$,$,$);
+#4=IFCORGANIZATION($,$,$,$,$);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	found := false
+	for _, d := range diagnostics {
+		if d.Code == "ifc-enum-value" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("expected ifc-enum-value diagnostic")
+	}
+}
+
+func TestValidateTypedParameterKeyword(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCPROPERTYSINGLEVALUE('Name',$,IFCCARDINALPOINTREFERENCE(2),$);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	found := false
+	for _, d := range diagnostics {
+		if d.Code == "ifc-typed-keyword" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("expected ifc-typed-keyword diagnostic")
+	}
+}
+
+func TestValidateMeasureWithUnitNestedSelect(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#53=IFCCONVERSIONBASEDUNIT(#54,.PLANEANGLEUNIT.,$,.RADIAN.);
+#54=IFCDIMENSIONALEXPONENTS(0,0,0,0,0,0,0);
+#55=IFCMEASUREWITHUNIT(IFCRATIOMEASURE(0.0174532925199433),#53);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	for _, d := range diagnostics {
+		if d.Code == "ifc-typed-keyword" {
+			t.Fatalf("unexpected ifc-typed-keyword: %s", d.Message)
+		}
+	}
+}
+
+func TestValidateListElementTypes(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCDIRECTION(('not','real'));
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	found := false
+	for _, d := range diagnostics {
+		if d.Code == "ifc-param-type" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("expected ifc-param-type diagnostic for list elements")
+	}
+}
+
+func TestValidateSIUnitDerivedParameter(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#49=IFCSIUNIT(*,.LENGTHUNIT.,.MILLI.,.METRE.);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	def, ok := LookupEntity("IFCSIUNIT")
+	if !ok {
+		t.Fatal("expected IFCSIUNIT in schema")
+	}
+	if len(def.Attrs) < 1 || !def.Attrs[0].Derived {
+		t.Fatal("expected first IFCSIUNIT attribute to be marked derived")
+	}
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	for _, d := range diagnostics {
+		if d.Code == "ifc-param-required" || d.Code == "ifc-param-derived" {
+			t.Fatalf("unexpected diagnostic: %s", d.Message)
+		}
+	}
+}
+
+func TestValidateSiteCompoundPlaneAngleMeasure(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#48=IFCOWNERHISTORY($,$,$,$,$);
+#178=IFCLOCALPLACEMENT($,$);
+#179=IFCSITE('2_ZvelcG11tRIbYc4wxe3f',#48,'74',$,$,#178,$,$,.ELEMENT.,(42,21,31,181945),(-71,-3,-24,-263305),0.,$,$);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	def, ok := LookupEntity("IFCSITE")
+	if !ok {
+		t.Fatal("expected IFCSITE in schema")
+	}
+	if len(def.Attrs) < 10 || def.Attrs[9].Kind != ParamAggregate {
+		t.Fatalf("expected RefLatitude to be ParamAggregate, got %v", def.Attrs[9].Kind)
+	}
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	for _, d := range diagnostics {
+		if d.Code == "ifc-param-type" {
+			t.Fatalf("unexpected diagnostic: %s", d.Message)
+		}
+	}
+}
 
 func TestValidateCartesianPointList2DTrailingOptional(t *testing.T) {
 	sc := CreateServices()
@@ -67,7 +334,7 @@ FILE_NAME('','2022-01-01',(),(),'','','');
 FILE_SCHEMA(('IFC4'));
 ENDSEC;
 DATA;
-#1=IFCCARTESIANPOINTLIST2D(((1.,2.),(3.,4.)));
+#206=IFCCARTESIANPOINTLIST2D(((5948.27662514854,19918.8467334511),(5510.01489411603,20894.9751343863),(4433.53684448654,20411.6584590421),(4871.79857551905,19435.5300581068),(5948.27662514854,19918.8467334511)));
 ENDSEC;
 END-ISO-10303-21;`
 
@@ -78,7 +345,7 @@ END-ISO-10303-21;`
 	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
 
 	for _, d := range diagnostics {
-		if d.Code == "ifc-param-count" || d.Code == "ifc-unknown-entity" {
+		if d.Code == "ifc-param-type" || d.Code == "ifc-param-count" || d.Code == "ifc-unknown-entity" {
 			t.Fatalf("unexpected diagnostic: %s (%s)", d.Message, d.Code)
 		}
 	}
