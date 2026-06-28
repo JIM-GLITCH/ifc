@@ -8,6 +8,8 @@
   },
   "scripts": {
     "clean": "shx rm -rf ./vscode-extension/dist ./vscode-extension/*.tsbuildinfo",
+    "generate:schema": "npm run build --prefix ../EXPRESS && node ../EXPRESS/packages/cli/bin/generate-schema.js ../EXPRESS/t.exp -o schema_gen.go",
+    "generate": "npm run generate:schema && go generate ./...",
     "build": "npm run build --workspace=vscode-extension",
     "bundle": "npm run bundle --workspace=vscode-extension",
     "package": "npm run build --workspace=vscode-extension && npm run package --workspace=vscode-extension"
