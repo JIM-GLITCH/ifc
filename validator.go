@@ -7,6 +7,17 @@ import (
 )
 
 func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeyword string, keywordToken *core.Token, params []PARAMETER, accept core.ValidationAcceptor) {
+	def, ok := validateEntityName(owner, recordKeyword, keywordToken, accept)
+	if !ok {
+		return
+	}
+	if !validateEntityParameters(ctx, owner, def, params, keywordToken, accept) {
+		return
+	}
+	validateEntityWhereConstraints(ctx, owner, recordKeyword, params, accept)
+}
+
+func validateEntityName(owner core.AstNode, recordKeyword string, keywordToken *core.Token, accept core.ValidationAcceptor) (EntityDef, bool) {
 	def, ok := LookupEntity(recordKeyword)
 	if !ok {
 		accept(core.NewDiagnostic(
@@ -16,9 +27,8 @@ func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeywo
 			core.WithToken(keywordToken),
 			core.WithCode("ifc-unknown-entity"),
 		))
-		return
+		return EntityDef{}, false
 	}
-
 	if def.Abstract {
 		accept(core.NewDiagnostic(
 			core.SeverityWarning,
@@ -28,9 +38,11 @@ func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeywo
 			core.WithCode("ifc-abstract-entity"),
 		))
 	}
+	return def, true
+}
 
-	paramCount := len(params)
-	if valid, message := validateParameterCount(def, paramCount); !valid {
+func validateEntityParameters(ctx context.Context, owner core.AstNode, def EntityDef, params []PARAMETER, keywordToken *core.Token, accept core.ValidationAcceptor) bool {
+	if valid, message := validateParameterCount(def, len(params)); !valid {
 		accept(core.NewDiagnostic(
 			core.SeverityError,
 			message,
@@ -38,10 +50,18 @@ func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeywo
 			core.WithToken(keywordToken),
 			core.WithCode("ifc-param-count"),
 		))
+		return false
+	}
+	validateParameterTypes(ctx, owner, def, params, accept)
+	return true
+}
+
+func validateEntityWhereConstraints(ctx context.Context, owner core.AstNode, recordKeyword string, params []PARAMETER, accept core.ValidationAcceptor) {
+	simple, ok := owner.(SIMPLE_ENTITY_INSTANCE)
+	if !ok {
 		return
 	}
-
-	validateParameterTypes(ctx, owner, def, params, accept)
+	validateEntityWhereRules(ctx, owner, recordKeyword, simple, params, accept)
 }
 
 func (i *SIMPLE_ENTITY_INSTANCEImpl) Validate(ctx context.Context, _ string, accept core.ValidationAcceptor) {
