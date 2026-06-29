@@ -320,6 +320,9 @@ END-ISO-10303-21;`
 		if d.Code == "ifc-param-type" {
 			t.Fatalf("unexpected diagnostic: %s", d.Message)
 		}
+		if d.Code == "ifc-type-where" {
+			t.Fatalf("unexpected type WHERE diagnostic: %s", d.Message)
+		}
 	}
 }
 
@@ -383,5 +386,74 @@ END-ISO-10303-21;`
 	}
 	if !found {
 		t.Fatal("expected ifc-param-count diagnostic")
+	}
+}
+
+func TestValidateTypeWherePositiveInteger(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCCARTESIANPOINT((0.,0.,0.));
+#2=IFCAXIS2PLACEMENT3D(#1,$,$);
+#3=IFCLOCALPLACEMENT($,#2);
+#4=IFCBUILDING('id',$,'',$,$,#3,$,$,.ELEMENT.,$,$,$);
+#5=IFCBUILDINGSTOREY('id',$,'',$,$,#3,$,$,.ELEMENT.,0);
+#6=IFCRELAGGREGATES('id',$,$,$,#4,(#5));
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	for _, d := range diagnostics {
+		if d.Code == "ifc-type-where" {
+			t.Fatalf("unexpected type WHERE diagnostic: %s", d.Message)
+		}
+	}
+}
+
+func TestValidateTypeWhereViolations(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCCARTESIANPOINT((0.,0.,0.));
+#2=IFCAXIS2PLACEMENT3D(#1,$,$);
+#3=IFCLOCALPLACEMENT($,#2);
+#4=IFCSITE('id',$,'',$,$,#3,$,$,.ELEMENT.,(1,90,0,0),(0,0,0,0),0.,$,$);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	found := false
+	for _, d := range diagnostics {
+		if d.Code == "ifc-type-where" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatal("expected ifc-type-where diagnostic for invalid compound plane angle")
 	}
 }

@@ -18,6 +18,7 @@ func SetupServices(sc *service.Container) {
 	textdoc.SetupDefaultServices(sc)
 	linking.SetupDefaultServices(sc)
 	workspace.SetupDefaultServices(sc)
+	service.Override[workspace.DocumentValidator](sc, NewIfcDocumentValidator(sc))
 	SetupGeneratedServices(sc)
 }
 

@@ -357,6 +357,18 @@ func validateParameterValue(
 		return
 	}
 
+	validateParameterValueCore(ctx, owner, attr, param, position, accept)
+	validateTypeWhereForParameter(ctx, owner, attr, param, accept)
+}
+
+func validateParameterValueCore(
+	ctx context.Context,
+	owner core.AstNode,
+	attr SchemaAttr,
+	param PARAMETER,
+	position int,
+	accept core.ValidationAcceptor,
+) {
 	info := parameterInfoFrom(param)
 	diagnosticNode := info.node
 	if diagnosticNode == nil {
