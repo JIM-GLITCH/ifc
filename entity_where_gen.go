@@ -59,14 +59,14 @@ func whereIFCADVANCEDBREPWITHVOIDS_VoidsHaveAdvancedFaces(ec *EntityWhereEval) (
 }
 
 func whereIFCADVANCEDFACE_ApplicableEdgeCurves(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcFace"), "Bounds", 0), func(Bnds WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEDGELOOP"), wvTypeOf(ec.QualAttr(Bnds, "Bound", 0))) }), func(ElpFbnds WhereValue) WhereValue { return wvNot(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.QualAttr(ElpFbnds, "Bound", 0), "IfcEdgeLoop"), "EdgeList", 0), func(Oe WhereValue) WhereValue { return wvNot(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCLINE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCCONIC'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCPOLYLINE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCBSPLINECURVE'")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.QualEntity(Oe, "IfcOrientedEdge"), "EdgeElement", 0), "IfcEdgeCurve"), "EdgeGeometry", 0)))), parseLiteralNumber("1"), "=")) })), parseLiteralNumber("0"), "=")) })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcFace"), "Bounds", 0), func(Bnds WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEDGELOOP"), wvTypeOf(ec.QualAttr(Bnds, "Bound", 0))) }), func(ElpFbnds WhereValue) WhereValue { return wvNot(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.QualAttr(ElpFbnds, "Bound", 0), "IfcEdgeLoop"), "EdgeList", 0), func(Oe WhereValue) WhereValue { return wvNot(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCLINE"), wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCPOLYLINE"), wvFromString("IFC4X3_DEV_73740fe4.IFCBSPLINECURVE")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.QualEntity(Oe, "IfcOrientedEdge"), "EdgeElement", 0), "IfcEdgeCurve"), "EdgeGeometry", 0)))), parseLiteralNumber("1"), "=")) })), parseLiteralNumber("0"), "=")) })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE ApplicableEdgeCurves: ApplicableEdgeCurves : SIZEOF(QUERY (ElpFbnds <* \r\n  QUERY (Bnds <* SELF\\IfcFace.Bounds |\r\n    'IFC4X3_DEV_73740fe4.IFCEDGELOOP' IN TYPEOF(Bnds.Bound)) |\r\n     NOT (SIZEOF (QUERY (Oe <* ElpFbnds.Bound\\IfcEdgeLoop.EdgeList |\r\n       NOT (SIZEOF (['IFC4X3_DEV_73740fe4.IFCLINE',\r\n                     'IFC4X3_DEV_73740fe4.IFCCONIC',\r\n                     'IFC4X3_DEV_73740fe4.IFCPOLYLINE',\r\n                     'IFC4X3_DEV_73740fe4.IFCBSPLINECURVE'] *\r\n         TYPEOF(Oe\\IfcOrientedEdge.EdgeElement\\IfcEdgeCurve.EdgeGeometry)) = 1 )\r\n  )) = 0\r\n))) = 0"
 	}
 	return true, ""
 }
 
 func whereIFCADVANCEDFACE_ApplicableSurface(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCELEMENTARYSURFACE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCSWEPTSURFACE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCBSPLINESURFACE'")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcFaceSurface"), "FaceSurface", 0)))), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENTARYSURFACE"), wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTSURFACE"), wvFromString("IFC4X3_DEV_73740fe4.IFCBSPLINESURFACE")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcFaceSurface"), "FaceSurface", 0)))), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE ApplicableSurface: ApplicableSurface : SIZEOF (\r\n['IFC4X3_DEV_73740fe4.IFCELEMENTARYSURFACE',\r\n 'IFC4X3_DEV_73740fe4.IFCSWEPTSURFACE',\r\n 'IFC4X3_DEV_73740fe4.IFCBSPLINESURFACE'] *\r\nTYPEOF(SELF\\IfcFaceSurface.FaceSurface)) = 1"
 	}
 	return true, ""
@@ -206,7 +206,7 @@ func whereIFCARBITRARYOPENPROFILEDEF_WR12(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCARBITRARYPROFILEDEFWITHVOIDS_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcProfileDef"), "ProfileType", 0), ec.Attr("AREA"), "="))) {
+	if !(wvTruthy(wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcProfileDef"), "ProfileType", 0), wvFromEnumStepLiteral("AREA"), "="))) {
 		return false, "WHERE WR1: WR1 : SELF\\IfcProfileDef.ProfileType = AREA"
 	}
 	return true, ""
@@ -227,7 +227,7 @@ func whereIFCARBITRARYPROFILEDEFWITHVOIDS_WR3(ec *EntityWhereEval) (bool, string
 }
 
 func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidBottomFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("BottomFlangeFilletRadius"))), wvCompareRel(ec.Attr("BottomFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("BottomFlangeWidth"), ec.Attr("WebThickness")), wvFromEnumStepLiteral("")), "<=")))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("BottomFlangeFilletRadius"))), wvCompareRel(ec.Attr("BottomFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("BottomFlangeWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=")))) {
 		return false, "WHERE ValidBottomFilletRadius: ValidBottomFilletRadius : (NOT(EXISTS(BottomFlangeFilletRadius))) OR \r\n(BottomFlangeFilletRadius <= (BottomFlangeWidth - WebThickness)/2.)"
 	}
 	return true, ""
@@ -241,7 +241,7 @@ func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidFlangeThickness(ec *EntityWhereEval
 }
 
 func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidTopFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("TopFlangeFilletRadius"))), wvCompareRel(ec.Attr("TopFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("TopFlangeWidth"), ec.Attr("WebThickness")), wvFromEnumStepLiteral("")), "<=")))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("TopFlangeFilletRadius"))), wvCompareRel(ec.Attr("TopFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("TopFlangeWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=")))) {
 		return false, "WHERE ValidTopFilletRadius: ValidTopFilletRadius : (NOT(EXISTS(TopFlangeFilletRadius))) OR \r\n(TopFlangeFilletRadius <= (TopFlangeWidth - WebThickness)/2.)"
 	}
 	return true, ""
@@ -332,7 +332,7 @@ func whereIFCAXIS2PLACEMENT3D_AxisIs3D(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCAXIS2PLACEMENT3D_AxisToRefDirPosition(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvNot(wvExists(ec.Attr("RefDirection")))), wvCompareRel(schemaIfcCrossProductMagnitude(ec, []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), wvFromEnumStepLiteral("0"), ">")))) {
+	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvNot(wvExists(ec.Attr("RefDirection")))), wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), "Magnitude", 0), parseLiteralNumber("0.0"), ">")))) {
 		return false, "WHERE AxisToRefDirPosition: AxisToRefDirPosition : (NOT (EXISTS (Axis))) OR (NOT (EXISTS (RefDirection))) OR (IfcCrossProduct(Axis,RefDirection).Magnitude > 0.0)"
 	}
 	return true, ""
@@ -367,7 +367,7 @@ func whereIFCAXIS2PLACEMENTLINEAR_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCAXIS2PLACEMENTLINEAR_WR2(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvNot(wvExists(ec.Attr("RefDirection")))), wvCompareRel(schemaIfcCrossProductMagnitude(ec, []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), wvFromEnumStepLiteral("0"), ">")))) {
+	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvNot(wvExists(ec.Attr("RefDirection")))), wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), "Magnitude", 0), parseLiteralNumber("0.0"), ">")))) {
 		return false, "WHERE WR2: WR2 : (NOT (EXISTS (Axis))) OR (NOT (EXISTS (RefDirection))) OR (IfcCrossProduct(Axis,RefDirection).Magnitude > 0.0)"
 	}
 	return true, ""
@@ -423,7 +423,7 @@ func whereIFCBLOBTEXTURE_RasterCodeByteStream(ec *EntityWhereEval) (bool, string
 }
 
 func whereIFCBLOBTEXTURE_SupportedRasterFormat(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvIn(ec.QualAttr(ec.Self(), "RasterFormat", 0), wvFromList([]WhereValue{wvFromString("'BMP'"), wvFromString("'JPG'"), wvFromString("'GIF'"), wvFromString("'PNG'")})))) {
+	if !(wvTruthy(wvIn(ec.QualAttr(ec.Self(), "RasterFormat", 0), wvFromList([]WhereValue{wvFromString("BMP"), wvFromString("JPG"), wvFromString("GIF"), wvFromString("PNG")})))) {
 		return false, "WHERE SupportedRasterFormat: SupportedRasterFormat : SELF.RasterFormat IN ['BMP', 'JPG', 'GIF', 'PNG']"
 	}
 	return true, ""
@@ -458,7 +458,7 @@ func whereIFCBOOLEANCLIPPINGRESULT_FirstOperandType(ec *EntityWhereEval) (bool, 
 }
 
 func whereIFCBOOLEANCLIPPINGRESULT_OperatorType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Operator"), ec.Attr("DIFFERENCE"), "="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Operator"), wvFromEnumStepLiteral("DIFFERENCE"), "="))) {
 		return false, "WHERE OperatorType: OperatorType : Operator = DIFFERENCE"
 	}
 	return true, ""
@@ -773,7 +773,7 @@ func whereIFCCARTESIANPOINT_CP2Dor3D(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR_ScaleGreaterZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Scl"), wvFromEnumStepLiteral("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Scl"), parseLiteralNumber("0.0"), ">"))) {
 		return false, "WHERE ScaleGreaterZero: ScaleGreaterZero : Scl > 0.0"
 	}
 	return true, ""
@@ -801,7 +801,7 @@ func whereIFCCARTESIANTRANSFORMATIONOPERATOR2D_DimEqual2(ec *EntityWhereEval) (b
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR2DNONUNIFORM_Scale2GreaterZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Scl2"), wvFromEnumStepLiteral("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Scl2"), parseLiteralNumber("0.0"), ">"))) {
 		return false, "WHERE Scale2GreaterZero: Scale2GreaterZero : Scl2 > 0.0"
 	}
 	return true, ""
@@ -836,14 +836,14 @@ func whereIFCCARTESIANTRANSFORMATIONOPERATOR3D_DimIs3D(ec *EntityWhereEval) (boo
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR3DNONUNIFORM_Scale2GreaterZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Scl2"), wvFromEnumStepLiteral("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Scl2"), parseLiteralNumber("0.0"), ">"))) {
 		return false, "WHERE Scale2GreaterZero: Scale2GreaterZero : Scl2 > 0.0"
 	}
 	return true, ""
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR3DNONUNIFORM_Scale3GreaterZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Scl3"), wvFromEnumStepLiteral("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Scl3"), parseLiteralNumber("0.0"), ">"))) {
 		return false, "WHERE Scale3GreaterZero: Scale3GreaterZero : Scl3 > 0.0"
 	}
 	return true, ""
@@ -990,7 +990,7 @@ func whereIFCCOMPLEXPROPERTYTEMPLATE_UniquePropertyNames(ec *EntityWhereEval) (b
 }
 
 func whereIFCCOMPOSITECURVE_CurveContinuous(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvNot(ec.Attr("ClosedCurve")), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), ec.Attr("Discontinuous"), "=") })), parseLiteralNumber("1"), "=")), wvAnd(ec.Attr("ClosedCurve"), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), ec.Attr("Discontinuous"), "=") })), parseLiteralNumber("0"), "="))))) {
+	if !(wvTruthy(wvOr(wvAnd(wvNot(ec.Attr("ClosedCurve")), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "=") })), parseLiteralNumber("1"), "=")), wvAnd(ec.Attr("ClosedCurve"), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "=") })), parseLiteralNumber("0"), "="))))) {
 		return false, "WHERE CurveContinuous: CurveContinuous : ((NOT ClosedCurve) AND (SIZEOF(QUERY(Temp <* Segments | Temp.Transition = Discontinuous)) = 1)) OR ((ClosedCurve) AND (SIZEOF(QUERY(Temp <* Segments | Temp.Transition = Discontinuous)) = 0))"
 	}
 	return true, ""
@@ -1270,21 +1270,21 @@ func whereIFCCREWRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, 
 }
 
 func whereIFCCSHAPEPROFILEDEF_ValidGirth(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Girth"), wvDiv(ec.Attr("Depth"), wvFromEnumStepLiteral("")), "<"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Girth"), wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), "<"))) {
 		return false, "WHERE ValidGirth: ValidGirth : Girth < (Depth / 2.)"
 	}
 	return true, ""
 }
 
 func whereIFCCSHAPEPROFILEDEF_ValidInternalFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InternalFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Width"), wvFromEnumStepLiteral("")), ec.Attr("WallThickness")), "<="), wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Depth"), wvFromEnumStepLiteral("")), ec.Attr("WallThickness")), "<="))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InternalFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Width"), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="), wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="))))) {
 		return false, "WHERE ValidInternalFilletRadius: ValidInternalFilletRadius : NOT(EXISTS(InternalFilletRadius)) OR\r\n((InternalFilletRadius <= Width/2. - WallThickness) AND (InternalFilletRadius <= Depth/2. - WallThickness))"
 	}
 	return true, ""
 }
 
 func whereIFCCSHAPEPROFILEDEF_ValidWallThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Width"), wvFromEnumStepLiteral("")), "<"), wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Depth"), wvFromEnumStepLiteral("")), "<")))) {
+	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Width"), parseLiteralNumber("2.")), "<"), wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), "<")))) {
 		return false, "WHERE ValidWallThickness: ValidWallThickness : (WallThickness < Width/2.) AND (WallThickness < Depth/2.)"
 	}
 	return true, ""
@@ -1319,14 +1319,14 @@ func whereIFCCURVESTYLE_IdentifiableCurveStyle(ec *EntityWhereEval) (bool, strin
 }
 
 func whereIFCCURVESTYLE_MeasureOfWidth(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("CurveWidth"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOSITIVELENGTHMEASURE"), wvTypeOf(ec.Attr("CurveWidth")))), wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDESCRIPTIVEMEASURE"), wvTypeOf(ec.Attr("CurveWidth"))), wvCompareRel(ec.Attr("CurveWidth"), wvFromString("'by layer'"), "="))))) {
+	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("CurveWidth"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOSITIVELENGTHMEASURE"), wvTypeOf(ec.Attr("CurveWidth")))), wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDESCRIPTIVEMEASURE"), wvTypeOf(ec.Attr("CurveWidth"))), wvCompareRel(ec.Attr("CurveWidth"), wvFromString("by layer"), "="))))) {
 		return false, "WHERE MeasureOfWidth: MeasureOfWidth : (NOT(EXISTS(CurveWidth))) OR\r\n('IFC4X3_DEV_73740fe4.IFCPOSITIVELENGTHMEASURE' IN TYPEOF(CurveWidth)) OR \r\n (('IFC4X3_DEV_73740fe4.IFCDESCRIPTIVEMEASURE' IN TYPEOF(CurveWidth)) AND\r\n (CurveWidth = 'by layer'))"
 	}
 	return true, ""
 }
 
 func whereIFCCURVESTYLEFONTPATTERN_VisibleLengthGreaterEqualZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("VisibleSegmentLength"), wvFromEnumStepLiteral(""), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("VisibleSegmentLength"), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE VisibleLengthGreaterEqualZero: VisibleLengthGreaterEqualZero : VisibleSegmentLength >= 0."
 	}
 	return true, ""
@@ -1382,14 +1382,14 @@ func whereIFCDERIVEDUNIT_WR2(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCDIRECTION_MagnitudeGreaterZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("DirectionRatios"), func(Tmp WhereValue) WhereValue { return wvCompareRel(Tmp, wvFromEnumStepLiteral("0"), "<>") })), parseLiteralNumber("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("DirectionRatios"), func(Tmp WhereValue) WhereValue { return wvCompareRel(Tmp, parseLiteralNumber("0.0"), "<>") })), parseLiteralNumber("0"), ">"))) {
 		return false, "WHERE MagnitudeGreaterZero: MagnitudeGreaterZero : SIZEOF(QUERY(Tmp <* DirectionRatios | Tmp <> 0.0)) > 0"
 	}
 	return true, ""
 }
 
 func whereIFCDIRECTRIXCURVESWEPTAREASOLID_DirectrixBounded(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvExists(ec.Attr("StartParam")), wvExists(ec.Attr("EndParam"))), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCCONIC'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE'")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=")))) {
+	if !(wvTruthy(wvOr(wvAnd(wvExists(ec.Attr("StartParam")), wvExists(ec.Attr("EndParam"))), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=")))) {
 		return false, "WHERE DirectrixBounded: DirectrixBounded : (EXISTS(StartParam) AND EXISTS(EndParam)) OR \r\n(SIZEOF(['IFC4X3_DEV_73740fe4.IFCCONIC', 'IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE'] * TYPEOF(Directrix)) = 1)"
 	}
 	return true, ""
@@ -1536,14 +1536,14 @@ func whereIFCDOORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) 
 }
 
 func whereIFCDRAUGHTINGPREDEFINEDCOLOUR_PreDefinedColourNames(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvIn(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPreDefinedItem"), "Name", 0), wvFromList([]WhereValue{wvFromString("'black'"), wvFromString("'red'"), wvFromString("'green'"), wvFromString("'blue'"), wvFromString("'yellow'"), wvFromString("'magenta'"), wvFromString("'cyan'"), wvFromString("'white'"), wvFromString("'by layer'")})))) {
+	if !(wvTruthy(wvIn(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPreDefinedItem"), "Name", 0), wvFromList([]WhereValue{wvFromString("black"), wvFromString("red"), wvFromString("green"), wvFromString("blue"), wvFromString("yellow"), wvFromString("magenta"), wvFromString("cyan"), wvFromString("white"), wvFromString("by layer")})))) {
 		return false, "WHERE PreDefinedColourNames: PreDefinedColourNames : SELF\\IfcPreDefinedItem.Name IN ['black','red','green','blue','yellow',\r\n     'magenta','cyan','white','by layer']"
 	}
 	return true, ""
 }
 
 func whereIFCDRAUGHTINGPREDEFINEDCURVEFONT_PreDefinedCurveFontNames(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvIn(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPredefinedItem"), "Name", 0), wvFromList([]WhereValue{wvFromString("'continuous'"), wvFromString("'chain'"), wvFromString("'chain double dash'"), wvFromString("'dashed'"), wvFromString("'dotted'"), wvFromString("'by layer'")})))) {
+	if !(wvTruthy(wvIn(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPredefinedItem"), "Name", 0), wvFromList([]WhereValue{wvFromString("continuous"), wvFromString("chain"), wvFromString("chain double dash"), wvFromString("dashed"), wvFromString("dotted"), wvFromString("by layer")})))) {
 		return false, "WHERE PreDefinedCurveFontNames: PreDefinedCurveFontNames : SELF\\IfcPredefinedItem.Name IN\r\n       ['continuous',\r\n        'chain',\r\n        'chain double dash',\r\n        'dashed',\r\n        'dotted',\r\n        'by layer']"
 	}
 	return true, ""
@@ -1627,7 +1627,7 @@ func whereIFCEARTHWORKSFILL_CorrectPredefinedType(ec *EntityWhereEval) (bool, st
 }
 
 func whereIFCEDGELOOP_IsClosed(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvInstSame(ec.QualAttr(ec.QualIndex(ec.Attr("EdgeList"), 1), "EdgeStart", 0), ec.QualAttr(ec.QualIndex(ec.Attr("EdgeList"), 1), "EdgeEnd", 0)))) {
+	if !(wvTruthy(wvInstSame(ec.QualAttr(ec.QualIndex(ec.Attr("EdgeList"), 1), "EdgeStart", 0), ec.QualAttr(ec.QualIndex(ec.Attr("EdgeList"), wvAsInt(ec.Attr("Ne"))), "EdgeEnd", 0)))) {
 		return false, "WHERE IsClosed: IsClosed : (EdgeList[1].EdgeStart) :=: (EdgeList[Ne].EdgeEnd)"
 	}
 	return true, ""
@@ -1914,7 +1914,7 @@ func whereIFCEXTERNALREFERENCE_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCEXTRUDEDAREASOLID_ValidExtrusionDirection(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.CallSchema("IfcDotProduct", []WhereValue{wvFromList([]WhereValue{wvFromEnumStepLiteral("0"), wvFromEnumStepLiteral("0"), wvFromEnumStepLiteral("0")}), ec.QualAttr(ec.Self(), "ExtrudedDirection", 0)}), wvFromEnumStepLiteral("0"), "<>"))) {
+	if !(wvTruthy(wvCompareRel(ec.CallSchema("IfcDotProduct", []WhereValue{wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("0.0"), parseLiteralNumber("1.0")}))), ec.QualAttr(ec.Self(), "ExtrudedDirection", 0)}), parseLiteralNumber("0.0"), "<>"))) {
 		return false, "WHERE ValidExtrusionDirection: ValidExtrusionDirection : IfcDotProduct(IfcRepresentationItem() || IfcGeometricRepresentationItem() || IfcDirection([0.0,0.0,1.0]), SELF.ExtrudedDirection) <> 0.0"
 	}
 	return true, ""
@@ -2369,14 +2369,14 @@ func whereIFCINTERSECTIONCURVE_TwoPCurves(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCISHAPEPROFILEDEF_ValidFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("FilletRadius"))), wvAnd(wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallWidth"), ec.Attr("WebThickness")), wvFromEnumStepLiteral("")), "<="), wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallDepth"), wvMul(wvFromEnumStepLiteral(""), ec.Attr("FlangeThickness"))), wvFromEnumStepLiteral("")), "<="))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("FilletRadius"))), wvAnd(wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<="), wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallDepth"), wvMul(parseLiteralNumber("2."), ec.Attr("FlangeThickness"))), parseLiteralNumber("2.")), "<="))))) {
 		return false, "WHERE ValidFilletRadius: ValidFilletRadius : NOT(EXISTS(FilletRadius)) OR\r\n((FilletRadius <= (OverallWidth - WebThickness)/2.) AND \r\n (FilletRadius <= (OverallDepth - (2. * FlangeThickness))/2.))"
 	}
 	return true, ""
 }
 
 func whereIFCISHAPEPROFILEDEF_ValidFlangeThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvMul(wvFromEnumStepLiteral(""), ec.Attr("FlangeThickness")), ec.Attr("OverallDepth"), "<"))) {
+	if !(wvTruthy(wvCompareRel(wvMul(parseLiteralNumber("2."), ec.Attr("FlangeThickness")), ec.Attr("OverallDepth"), "<"))) {
 		return false, "WHERE ValidFlangeThickness: ValidFlangeThickness : (2. * FlangeThickness) < OverallDepth"
 	}
 	return true, ""
@@ -3013,7 +3013,7 @@ func whereIFCPOLYGONALBOUNDEDHALFSPACE_BoundaryDim(ec *EntityWhereEval) (bool, s
 }
 
 func whereIFCPOLYGONALBOUNDEDHALFSPACE_BoundaryType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvTypeOf(ec.Attr("PolygonalBoundary")), wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCPOLYLINE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE'")}))), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvTypeOf(ec.Attr("PolygonalBoundary")), wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCPOLYLINE"), wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVE"), wvFromString("IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE")}))), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE BoundaryType: BoundaryType : SIZEOF(TYPEOF(PolygonalBoundary) * [\r\n    'IFC4X3_DEV_73740fe4.IFCPOLYLINE',\r\n    'IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVE',\r\n    'IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE'\r\n  ]) = 1"
 	}
 	return true, ""
@@ -3062,14 +3062,14 @@ func whereIFCPOSTALADDRESS_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPRESENTATIONLAYERASSIGNMENT_ApplicableItems(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("AssignedItems"), func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCSHAPEREPRESENTATION'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCGEOMETRICREPRESENTATIONITEM'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCMAPPEDITEM'")}))), parseLiteralNumber("1"), "=") })), wvSizeOf(ec.Attr("AssignedItems")), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("AssignedItems"), func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCSHAPEREPRESENTATION"), wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICREPRESENTATIONITEM"), wvFromString("IFC4X3_DEV_73740fe4.IFCMAPPEDITEM")}))), parseLiteralNumber("1"), "=") })), wvSizeOf(ec.Attr("AssignedItems")), "="))) {
 		return false, "WHERE ApplicableItems: ApplicableItems : SIZEOF(QUERY(temp <* AssignedItems | (\r\n  SIZEOF(TYPEOF(temp) * [\r\n    'IFC4X3_DEV_73740fe4.IFCSHAPEREPRESENTATION',\r\n    'IFC4X3_DEV_73740fe4.IFCGEOMETRICREPRESENTATIONITEM',\r\n    'IFC4X3_DEV_73740fe4.IFCMAPPEDITEM']) = 1)\r\n)) = SIZEOF(AssignedItems)"
 	}
 	return true, ""
 }
 
 func whereIFCPRESENTATIONLAYERWITHSTYLE_ApplicableOnlyToItems(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("AssignedItems"), func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IfcGeometricRepresentationItem'"), wvFromString("'IFC4X3_DEV_73740fe4.IfcMappedItem'")}))), parseLiteralNumber("1"), ">=") })), wvSizeOf(ec.Attr("AssignedItems")), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("AssignedItems"), func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IfcGeometricRepresentationItem"), wvFromString("IFC4X3_DEV_73740fe4.IfcMappedItem")}))), parseLiteralNumber("1"), ">=") })), wvSizeOf(ec.Attr("AssignedItems")), "="))) {
 		return false, "WHERE ApplicableOnlyToItems: ApplicableOnlyToItems : SIZEOF(QUERY(temp <* AssignedItems | (SIZEOF(TYPEOF(temp) * ['IFC4X3_DEV_73740fe4.IfcGeometricRepresentationItem','IFC4X3_DEV_73740fe4.IfcMappedItem']) >= 1))) = SIZEOF(AssignedItems)"
 	}
 	return true, ""
@@ -3314,7 +3314,7 @@ func whereIFCQUANTITYAREA_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYAREA_WR22(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("AreaValue"), wvFromEnumStepLiteral(""), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("AreaValue"), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE WR22: WR22 : AreaValue >= 0."
 	}
 	return true, ""
@@ -3335,7 +3335,7 @@ func whereIFCQUANTITYLENGTH_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYLENGTH_WR22(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("LengthValue"), wvFromEnumStepLiteral(""), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("LengthValue"), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE WR22: WR22 : LengthValue >= 0."
 	}
 	return true, ""
@@ -3349,7 +3349,7 @@ func whereIFCQUANTITYTIME_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYTIME_WR22(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("TimeValue"), wvFromEnumStepLiteral(""), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("TimeValue"), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE WR22: WR22 : TimeValue >= 0."
 	}
 	return true, ""
@@ -3363,7 +3363,7 @@ func whereIFCQUANTITYVOLUME_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYVOLUME_WR22(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("VolumeValue"), wvFromEnumStepLiteral(""), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("VolumeValue"), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE WR22: WR22 : VolumeValue >= 0."
 	}
 	return true, ""
@@ -3377,7 +3377,7 @@ func whereIFCQUANTITYWEIGHT_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYWEIGHT_WR22(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("WeightValue"), wvFromEnumStepLiteral(""), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("WeightValue"), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE WR22: WR22 : WeightValue >= 0."
 	}
 	return true, ""
@@ -3510,21 +3510,21 @@ func whereIFCRATIONALBSPLINESURFACEWITHKNOTS_WeightValuesGreaterZero(ec *EntityW
 }
 
 func whereIFCRECTANGLEHOLLOWPROFILEDEF_ValidInnerRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InnerFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), wvFromEnumStepLiteral("")), ec.Attr("WallThickness")), "<="), wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), wvFromEnumStepLiteral("")), ec.Attr("WallThickness")), "<="))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InnerFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="), wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="))))) {
 		return false, "WHERE ValidInnerRadius: ValidInnerRadius : NOT(EXISTS(InnerFilletRadius)) OR \r\n((InnerFilletRadius <= (SELF\\IfcRectangleProfileDef.XDim/2. - WallThickness)) AND \r\n (InnerFilletRadius <= (SELF\\IfcRectangleProfileDef.YDim/2. - WallThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCRECTANGLEHOLLOWPROFILEDEF_ValidOuterRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("OuterFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), wvFromEnumStepLiteral("")), "<="), wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), wvFromEnumStepLiteral("")), "<="))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("OuterFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<="), wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<="))))) {
 		return false, "WHERE ValidOuterRadius: ValidOuterRadius : NOT(EXISTS(OuterFilletRadius)) OR \r\n((OuterFilletRadius <= (SELF\\IfcRectangleProfileDef.XDim/2.)) AND \r\n (OuterFilletRadius <= (SELF\\IfcRectangleProfileDef.YDim/2.)))"
 	}
 	return true, ""
 }
 
 func whereIFCRECTANGLEHOLLOWPROFILEDEF_ValidWallThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), wvFromEnumStepLiteral("")), "<"), wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), wvFromEnumStepLiteral("")), "<")))) {
+	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<"), wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<")))) {
 		return false, "WHERE ValidWallThickness: ValidWallThickness : (WallThickness < (SELF\\IfcRectangleProfileDef.XDim/2.)) AND \r\n(WallThickness < (SELF\\IfcRectangleProfileDef.YDim/2.))"
 	}
 	return true, ""
@@ -3671,7 +3671,7 @@ func whereIFCRELASSIGNSTORESOURCE_NoSelfReference(ec *EntityWhereEval) (bool, st
 }
 
 func whereIFCRELASSOCIATESMATERIAL_AllowedElements(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRelAssociates"), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCELEMENT'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCELEMENTTYPE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALMEMBER'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCPORT'")}))), parseLiteralNumber("0"), "=") })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRelAssociates"), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENT"), wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENTTYPE"), wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALMEMBER"), wvFromString("IFC4X3_DEV_73740fe4.IFCPORT")}))), parseLiteralNumber("0"), "=") })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE AllowedElements: AllowedElements : SIZEOF(QUERY(temp <* SELF\\IfcRelAssociates.RelatedObjects | (\r\n  SIZEOF(TYPEOF(temp) * [   \r\n    'IFC4X3_DEV_73740fe4.IFCELEMENT', \r\n    'IFC4X3_DEV_73740fe4.IFCELEMENTTYPE',\r\n    'IFC4X3_DEV_73740fe4.IFCSTRUCTURALMEMBER',\r\n    'IFC4X3_DEV_73740fe4.IFCPORT']) = 0) \r\n)) = 0"
 	}
 	return true, ""
@@ -3783,7 +3783,7 @@ func whereIFCRELSPACEBOUNDARY_CorrectPhysOrVirt(ec *EntityWhereEval) (bool, stri
 }
 
 func whereIFCREPARAMETRISEDCOMPOSITECURVESEGMENT_PositiveLengthParameter(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("ParamLength"), wvFromEnumStepLiteral("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("ParamLength"), parseLiteralNumber("0.0"), ">"))) {
 		return false, "WHERE PositiveLengthParameter: PositiveLengthParameter : ParamLength > 0.0"
 	}
 	return true, ""
@@ -3797,14 +3797,14 @@ func whereIFCREPRESENTATIONMAP_ApplicableMappedRepr(ec *EntityWhereEval) (bool, 
 }
 
 func whereIFCREVOLVEDAREASOLID_AxisDirectionInXY(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.QualIndex(ec.QualAttr(ec.QualAttr(ec.Attr("Axis"), "Z", 0), "DirectionRatios", 0), 3), wvFromEnumStepLiteral("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(ec.QualIndex(ec.QualAttr(ec.QualAttr(ec.Attr("Axis"), "Z", 0), "DirectionRatios", 0), 3), parseLiteralNumber("0.0"), "="))) {
 		return false, "WHERE AxisDirectionInXY: AxisDirectionInXY : Axis.Z.DirectionRatios[3] = 0.0"
 	}
 	return true, ""
 }
 
 func whereIFCREVOLVEDAREASOLID_AxisStartInXY(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT"), wvTypeOf(ec.QualAttr(ec.Attr("Axis"), "Location", 0))), wvCompareRel(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.Attr("Axis"), "Location", 0), "IfcCartesianPoint"), "Coordinates", 0), 3), wvFromEnumStepLiteral("0"), "=")))) {
+	if !(wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT"), wvTypeOf(ec.QualAttr(ec.Attr("Axis"), "Location", 0))), wvCompareRel(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.Attr("Axis"), "Location", 0), "IfcCartesianPoint"), "Coordinates", 0), 3), parseLiteralNumber("0.0"), "=")))) {
 		return false, "WHERE AxisStartInXY: AxisStartInXY : ('IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT' IN TYPEOF(Axis.Location)) AND (Axis.Location\\IfcCartesianPoint.Coordinates[3] = 0.0)"
 	}
 	return true, ""
@@ -3860,7 +3860,7 @@ func whereIFCROOFTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) 
 }
 
 func whereIFCROUNDEDRECTANGLEPROFILEDEF_ValidRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), wvFromEnumStepLiteral("")), "<="), wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), wvFromEnumStepLiteral("")), "<=")))) {
+	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<="), wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<=")))) {
 		return false, "WHERE ValidRadius: ValidRadius : ((RoundingRadius <= (SELF\\IfcRectangleProfileDef.XDim/2.)) AND \r\n (RoundingRadius <= (SELF\\IfcRectangleProfileDef.YDim/2.)))"
 	}
 	return true, ""
@@ -4070,7 +4070,7 @@ func whereIFCSHAPEREPRESENTATION_HasRepresentationType(ec *EntityWhereEval) (boo
 }
 
 func whereIFCSHAPEREPRESENTATION_NoTopologicalItem(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Items"), func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTOPOLOGICALREPRESENTATIONITEM"), wvTypeOf(temp)), wvNot(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCVERTEXPOINT'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCEDGECURVE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCFACESURFACE'")}), wvTypeOf(temp))), parseLiteralNumber("1"), "="))) })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Items"), func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTOPOLOGICALREPRESENTATIONITEM"), wvTypeOf(temp)), wvNot(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCVERTEXPOINT"), wvFromString("IFC4X3_DEV_73740fe4.IFCEDGECURVE"), wvFromString("IFC4X3_DEV_73740fe4.IFCFACESURFACE")}), wvTypeOf(temp))), parseLiteralNumber("1"), "="))) })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE NoTopologicalItem: NoTopologicalItem : SIZEOF(QUERY(temp <* Items | \r\n  ('IFC4X3_DEV_73740fe4.IFCTOPOLOGICALREPRESENTATIONITEM' IN TYPEOF(temp))\r\n    AND (NOT(SIZEOF(\r\n      ['IFC4X3_DEV_73740fe4.IFCVERTEXPOINT',\r\n       'IFC4X3_DEV_73740fe4.IFCEDGECURVE',\r\n       'IFC4X3_DEV_73740fe4.IFCFACESURFACE'] * TYPEOF(temp)) = 1))\r\n)) = 0"
 	}
 	return true, ""
@@ -4308,7 +4308,7 @@ func whereIFCSTRUCTURALCURVEACTION_HasObjectType(ec *EntityWhereEval) (bool, str
 }
 
 func whereIFCSTRUCTURALCURVEACTION_ProjectedIsGlobal(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ProjectedOrTrue"))), wvOr(wvCompareRel(ec.Attr("ProjectedOrTrue"), ec.Attr("PROJECTED_LENGTH"), "<>"), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), ec.Attr("GLOBAL_COORDS"), "="))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ProjectedOrTrue"))), wvOr(wvCompareRel(ec.Attr("ProjectedOrTrue"), wvFromEnumStepLiteral("PROJECTED_LENGTH"), "<>"), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), wvFromEnumStepLiteral("GLOBAL_COORDS"), "="))))) {
 		return false, "WHERE ProjectedIsGlobal: ProjectedIsGlobal : (NOT EXISTS(ProjectedOrTrue)) OR\r\n((ProjectedOrTrue <> PROJECTED_LENGTH) OR\r\n (SELF\\IfcStructuralActivity.GlobalOrLocal = GLOBAL_COORDS))"
 	}
 	return true, ""
@@ -4350,7 +4350,7 @@ func whereIFCSTRUCTURALLINEARACTION_ConstPredefinedType(ec *EntityWhereEval) (bo
 }
 
 func whereIFCSTRUCTURALLINEARACTION_SuitableLoadType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADLINEARFORCE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADTEMPERATURE'")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADLINEARFORCE"), wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADTEMPERATURE")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE SuitableLoadType: SuitableLoadType : SIZEOF(['IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADLINEARFORCE', 'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADTEMPERATURE'] * TYPEOF(SELF\\IfcStructuralActivity.AppliedLoad)) = 1"
 	}
 	return true, ""
@@ -4385,21 +4385,21 @@ func whereIFCSTRUCTURALPLANARACTION_ConstPredefinedType(ec *EntityWhereEval) (bo
 }
 
 func whereIFCSTRUCTURALPLANARACTION_SuitableLoadType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADPLANARFORCE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADTEMPERATURE'")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADPLANARFORCE"), wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADTEMPERATURE")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE SuitableLoadType: SuitableLoadType : SIZEOF(['IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADPLANARFORCE', 'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADTEMPERATURE'] * TYPEOF(SELF\\IfcStructuralActivity.AppliedLoad)) = 1"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALPOINTACTION_SuitableLoadType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEFORCE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEDISPLACEMENT'")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEFORCE"), wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEDISPLACEMENT")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE SuitableLoadType: SuitableLoadType : SIZEOF(['IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEFORCE', 'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEDISPLACEMENT'] * TYPEOF(SELF\\IfcStructuralActivity.AppliedLoad)) = 1"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALPOINTREACTION_SuitableLoadType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEFORCE'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEDISPLACEMENT'")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEFORCE"), wvFromString("IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEDISPLACEMENT")}), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "AppliedLoad", 0)))), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE SuitableLoadType: SuitableLoadType : SIZEOF(['IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEFORCE', 'IFC4X3_DEV_73740fe4.IFCSTRUCTURALLOADSINGLEDISPLACEMENT'] * TYPEOF(SELF\\IfcStructuralActivity.AppliedLoad)) = 1"
 	}
 	return true, ""
@@ -4420,7 +4420,7 @@ func whereIFCSTRUCTURALSURFACEACTION_HasObjectType(ec *EntityWhereEval) (bool, s
 }
 
 func whereIFCSTRUCTURALSURFACEACTION_ProjectedIsGlobal(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ProjectedOrTrue"))), wvOr(wvCompareRel(ec.Attr("ProjectedOrTrue"), ec.Attr("PROJECTED_LENGTH"), "<>"), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), ec.Attr("GLOBAL_COORDS"), "="))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ProjectedOrTrue"))), wvOr(wvCompareRel(ec.Attr("ProjectedOrTrue"), wvFromEnumStepLiteral("PROJECTED_LENGTH"), "<>"), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), wvFromEnumStepLiteral("GLOBAL_COORDS"), "="))))) {
 		return false, "WHERE ProjectedIsGlobal: ProjectedIsGlobal : (NOT EXISTS(ProjectedOrTrue)) OR\r\n((ProjectedOrTrue <> PROJECTED_LENGTH) OR\r\n (SELF\\IfcStructuralActivity.GlobalOrLocal = GLOBAL_COORDS))"
 	}
 	return true, ""
@@ -4490,28 +4490,28 @@ func whereIFCSURFACEFEATURE_CorrectPredefinedType(ec *EntityWhereEval) (bool, st
 }
 
 func whereIFCSURFACEOFLINEAREXTRUSION_DepthGreaterZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Depth"), wvFromEnumStepLiteral(""), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Depth"), parseLiteralNumber("0."), ">"))) {
 		return false, "WHERE DepthGreaterZero: DepthGreaterZero : Depth > 0."
 	}
 	return true, ""
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_NonnegativeArea1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("SurfaceReinforcement1"))), wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), wvFromEnumStepLiteral(""), ">="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 2), wvFromEnumStepLiteral(""), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement1")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), wvFromEnumStepLiteral(""), ">=")))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("SurfaceReinforcement1"))), wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), parseLiteralNumber("0."), ">="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 2), parseLiteralNumber("0."), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement1")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), parseLiteralNumber("0."), ">=")))))) {
 		return false, "WHERE NonnegativeArea1: NonnegativeArea1 : (NOT EXISTS(SurfaceReinforcement1)) OR (\r\n    (SurfaceReinforcement1[1] >= 0.) AND\r\n    (SurfaceReinforcement1[2] >= 0.) AND\r\n    ((SIZEOF(SurfaceReinforcement1) = 1) OR (SurfaceReinforcement1[1] >= 0.))\r\n)"
 	}
 	return true, ""
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_NonnegativeArea2(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("SurfaceReinforcement2"))), wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), wvFromEnumStepLiteral(""), ">="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 2), wvFromEnumStepLiteral(""), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement2")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), wvFromEnumStepLiteral(""), ">=")))))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("SurfaceReinforcement2"))), wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), parseLiteralNumber("0."), ">="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 2), parseLiteralNumber("0."), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement2")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), parseLiteralNumber("0."), ">=")))))) {
 		return false, "WHERE NonnegativeArea2: NonnegativeArea2 : (NOT EXISTS(SurfaceReinforcement2)) OR (\r\n    (SurfaceReinforcement2[1] >= 0.) AND\r\n    (SurfaceReinforcement2[2] >= 0.) AND\r\n    ((SIZEOF(SurfaceReinforcement2) = 1) OR (SurfaceReinforcement2[1] >= 0.))\r\n)"
 	}
 	return true, ""
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_NonnegativeArea3(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ShearReinforcement"))), wvCompareRel(ec.Attr("ShearReinforcement"), wvFromEnumStepLiteral(""), ">=")))) {
+	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ShearReinforcement"))), wvCompareRel(ec.Attr("ShearReinforcement"), parseLiteralNumber("0."), ">=")))) {
 		return false, "WHERE NonnegativeArea3: NonnegativeArea3 : (NOT EXISTS(ShearReinforcement)) OR (ShearReinforcement >= 0.)"
 	}
 	return true, ""
@@ -4567,7 +4567,7 @@ func whereIFCSWEPTAREASOLID_SweptAreaType(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCSWEPTDISKSOLID_DirectrixBounded(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvExists(ec.Attr("StartParam")), wvExists(ec.Attr("EndParam"))), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("'IFC4X3_DEV_73740fe4.IFCCONIC'"), wvFromString("'IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE'")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=")))) {
+	if !(wvTruthy(wvOr(wvAnd(wvExists(ec.Attr("StartParam")), wvExists(ec.Attr("EndParam"))), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=")))) {
 		return false, "WHERE DirectrixBounded: DirectrixBounded : (EXISTS(StartParam) AND EXISTS(EndParam)) OR \r\n(SIZEOF(['IFC4X3_DEV_73740fe4.IFCCONIC', 'IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE'] * TYPEOF(Directrix)) = 1)"
 	}
 	return true, ""
@@ -4784,7 +4784,7 @@ func whereIFCTEXTLITERALWITHEXTENT_WR31(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCTEXTSTYLEFONTMODEL_MeasureOfFontSize(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.QualAttr(ec.Self(), "FontSize", 0))), wvCompareRel(ec.QualAttr(ec.Self(), "FontSize", 0), wvFromEnumStepLiteral(""), ">")))) {
+	if !(wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.QualAttr(ec.Self(), "FontSize", 0))), wvCompareRel(ec.QualAttr(ec.Self(), "FontSize", 0), parseLiteralNumber("0."), ">")))) {
 		return false, "WHERE MeasureOfFontSize: MeasureOfFontSize : ('IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE' IN TYPEOF(SELF.FontSize)) AND\r\n(SELF.FontSize > 0.)"
 	}
 	return true, ""
@@ -5015,7 +5015,7 @@ func whereIFCUNITASSIGNMENT_WR01(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCUSHAPEPROFILEDEF_ValidFlangeThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("FlangeThickness"), wvDiv(ec.Attr("Depth"), wvFromEnumStepLiteral("")), "<"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("FlangeThickness"), wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), "<"))) {
 		return false, "WHERE ValidFlangeThickness: ValidFlangeThickness : FlangeThickness < (Depth / 2.)"
 	}
 	return true, ""
@@ -5050,7 +5050,7 @@ func whereIFCVALVETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string)
 }
 
 func whereIFCVECTOR_MagGreaterOrEqualZero(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("Magnitude"), wvFromEnumStepLiteral("0"), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("Magnitude"), parseLiteralNumber("0.0"), ">="))) {
 		return false, "WHERE MagGreaterOrEqualZero: MagGreaterOrEqualZero : Magnitude >= 0.0"
 	}
 	return true, ""
@@ -5267,7 +5267,7 @@ func whereIFCZONE_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCZSHAPEPROFILEDEF_ValidFlangeThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Attr("FlangeThickness"), wvDiv(ec.Attr("Depth"), wvFromEnumStepLiteral("")), "<"))) {
+	if !(wvTruthy(wvCompareRel(ec.Attr("FlangeThickness"), wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), "<"))) {
 		return false, "WHERE ValidFlangeThickness: ValidFlangeThickness : FlangeThickness < (Depth / 2.)"
 	}
 	return true, ""

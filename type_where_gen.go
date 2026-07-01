@@ -94,7 +94,7 @@ func typeWhereIfcFontWeight_WR1(ec *TypeWhereEval) (bool, string) {
 }
 
 func typeWhereIfcHeatingValueMeasure_WR1(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0."), ">"))) {
 		return false, "WHERE WR1: WR1 : SELF > 0."
 	}
 	return true, ""
@@ -108,7 +108,7 @@ func typeWhereIfcMonthInYearNumber_ValidRange(ec *TypeWhereEval) (bool, string) 
 }
 
 func typeWhereIfcNonNegativeLengthMeasure_NotNegative(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0"), ">="))) {
+	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0."), ">="))) {
 		return false, "WHERE NotNegative: NotNegative : SELF >= 0."
 	}
 	return true, ""
@@ -136,21 +136,21 @@ func typeWhereIfcPositiveInteger_WR1(ec *TypeWhereEval) (bool, string) {
 }
 
 func typeWhereIfcPositiveLengthMeasure_WR1(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0."), ">"))) {
 		return false, "WHERE WR1: WR1 : SELF > 0."
 	}
 	return true, ""
 }
 
 func typeWhereIfcPositivePlaneAngleMeasure_WR1(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0."), ">"))) {
 		return false, "WHERE WR1: WR1 : SELF > 0."
 	}
 	return true, ""
 }
 
 func typeWhereIfcPositiveRatioMeasure_WR1(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0"), ">"))) {
+	if !(wvTruthy(wvCompareRel(ec.Self(), parseLiteralNumber("0."), ">"))) {
 		return false, "WHERE WR1: WR1 : SELF > 0."
 	}
 	return true, ""

@@ -140,9 +140,42 @@ func instanceRecordFrom(simple SIMPLE_ENTITY_INSTANCE) *InstanceRecord {
 	}
 }
 
+func mergedForwardInverses(stepName string) map[int][]ForwardInverseTarget {
+	stepName = strings.ToUpper(strings.TrimSpace(stepName))
+	seen := map[string]bool{}
+	result := make(map[int][]ForwardInverseTarget)
+	var walk func(string)
+	walk = func(step string) {
+		step = strings.ToUpper(strings.TrimSpace(step))
+		if step == "" || seen[step] {
+			return
+		}
+		seen[step] = true
+		if forwardMap := ForwardInverses[step]; forwardMap != nil {
+			for attrIndex, targets := range forwardMap {
+				if _, ok := result[attrIndex]; !ok {
+					result[attrIndex] = targets
+				}
+			}
+		}
+		def, ok := LookupEntity(step)
+		if !ok {
+			return
+		}
+		for _, super := range def.SuperTypes {
+			walk(super)
+		}
+	}
+	walk(stepName)
+	if len(result) == 0 {
+		return nil
+	}
+	return result
+}
+
 func (pop *Population) buildInverseLinks(ctx context.Context) {
 	for _, rec := range pop.byName {
-		forwardMap := ForwardInverses[rec.StepName]
+		forwardMap := mergedForwardInverses(rec.StepName)
 		if forwardMap == nil {
 			continue
 		}
@@ -168,6 +201,12 @@ func (pop *Population) addInverseLink(targetName, inverseName string, source SIM
 	if !ok {
 		byInverse = make(map[string][]SIMPLE_ENTITY_INSTANCE)
 		pop.inverseLinks[targetName] = byInverse
+	}
+	sourceName := source.Name()
+	for _, existing := range byInverse[inverseName] {
+		if existing != nil && existing.Name() == sourceName {
+			return
+		}
 	}
 	byInverse[inverseName] = append(byInverse[inverseName], source)
 }

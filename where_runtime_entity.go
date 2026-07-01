@@ -25,6 +25,57 @@ func wvFromEntityInstances(items []SIMPLE_ENTITY_INSTANCE) WhereValue {
 	return WhereValue{kind: wvKindEntityList, entities: copyItems}
 }
 
+func whereValueExpressType(v WhereValue) (string, bool) {
+	if inst := v.entityInstance(); inst != nil {
+		return instanceStepName(inst)
+	}
+	if v.kind == wvKindRecord && v.recordType != "" {
+		return expressNameToStep(v.recordType), true
+	}
+	return "", false
+}
+
+func wvEntityInstanceAsRecord(inst SIMPLE_ENTITY_INSTANCE) (WhereValue, bool) {
+	step, ok := instanceStepName(inst)
+	if !ok {
+		return WhereValue{}, false
+	}
+	def, ok := LookupEntity(step)
+	if !ok {
+		return WhereValue{}, false
+	}
+	names := entityAttrNames[step]
+	params := instanceParams(inst)
+	if len(names) == 0 || len(params) == 0 {
+		return WhereValue{}, false
+	}
+	attrs := make(map[string]WhereValue, len(names))
+	for i, name := range names {
+		if i >= len(params) {
+			break
+		}
+		value, ok := parameterToWhereValue(params[i])
+		if !ok {
+			return WhereValue{}, false
+		}
+		attrs[name] = value
+	}
+	return WhereValue{
+		kind:        wvKindRecord,
+		recordType:  def.ExpressName,
+		recordAttrs: attrs,
+	}, true
+}
+
+func wvNormalizeForCompare(v WhereValue) WhereValue {
+	if inst := v.entityInstance(); inst != nil {
+		if rec, ok := wvEntityInstanceAsRecord(inst); ok {
+			return rec
+		}
+	}
+	return v
+}
+
 func (v WhereValue) entityInstance() SIMPLE_ENTITY_INSTANCE {
 	if v.kind == wvKindEntityInst {
 		return v.entity
@@ -73,6 +124,12 @@ func (ec *EntityWhereEval) parameterToWhereValue(param PARAMETER) (WhereValue, b
 }
 
 func (ec *EntityWhereEval) Attr(name string) WhereValue {
+	if entityHasDerivedAttr(ec.stepName, name) {
+		if ec.self == nil {
+			return wvUnknownVal()
+		}
+		return evalDerivedAttr(ec, ec.self, name)
+	}
 	idx := attrIndex(ec.stepName, name)
 	if idx < 0 {
 		if def, ok := LookupType(name); ok && def.ValueKind == ParamEnum {
@@ -98,6 +155,12 @@ func (ec *EntityWhereEval) Derived(name string) WhereValue {
 }
 
 func (ec *EntityWhereEval) QualEntity(v WhereValue, entityName string) WhereValue {
+	if v.kind == wvKindRecord && v.recordType != "" {
+		if entityIsOrSubtypes(v.recordType, entityName) {
+			return v
+		}
+		return wvUnknownVal()
+	}
 	if ec.self != nil && entityIsOrSubtypes(ec.stepName, entityName) {
 		return wvFromEntityInstance(ec.self)
 	}
@@ -132,6 +195,25 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 	if attrName == "" && index > 0 {
 		return ec.QualIndex(v, index)
 	}
+	if v.kind == wvKindRecord {
+		if attr, ok := v.recordAttrs[attrName]; ok {
+			if index > 0 {
+				return ec.QualIndex(attr, index)
+			}
+			return attr
+		}
+		if strings.EqualFold(attrName, "Dim") {
+			if entityIsOrSubtypes(v.recordType, "IfcVector") {
+				if orientation, ok := v.recordAttrs["Orientation"]; ok {
+					return ec.QualAttr(orientation, "Dim", 0)
+				}
+			}
+			if ratios, ok := v.recordAttrs["DirectionRatios"]; ok && ratios.kind == wvKindList {
+				return wvFromInt(len(ratios.list))
+			}
+		}
+		return wvUnknownVal()
+	}
 	if v.kind == wvKindEnumType {
 		return wvFromEnumStepLiteral(attrName)
 	}
@@ -143,11 +225,11 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 	if !ok {
 		return wvUnknownVal()
 	}
+	if entityHasDerivedAttr(step, attrName) {
+		return evalDerivedAttr(ec, inst, attrName)
+	}
 	idx := attrIndex(step, attrName)
 	if idx < 0 {
-		if entityHasDerivedAttr(step, attrName) {
-			return evalDerivedAttr(ec, inst, attrName)
-		}
 		if entityHasInverse(step, attrName) {
 			return ec.inverseOn(inst, attrName)
 		}
@@ -165,7 +247,20 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 }
 
 func (ec *EntityWhereEval) CallSchema(name string, args []WhereValue) WhereValue {
-	return dispatchSchemaFunction(ec, name, args)
+	result := dispatchSchemaFunction(ec, name, args)
+	if result.kind != wvKindUnknown {
+		return result
+	}
+	return constructEntityRecord(name, args)
+}
+
+func constructEntityRecord(expressName string, args []WhereValue) WhereValue {
+	step := expressNameToStep(expressName)
+	names := entityAttrNames[step]
+	if len(names) == 0 || len(args) == 0 {
+		return wvUnknownVal()
+	}
+	return wvNewEntityRecord(expressName, names, args)
 }
 
 func parseUsedInRole(rolePath string) (relationStep, forwardAttr string, ok bool) {

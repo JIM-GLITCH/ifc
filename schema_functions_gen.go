@@ -2,73 +2,448 @@
 
 package ifc
 
-func schemaIfcAssociatedSurface(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcAssociatedSurface(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Attr("Surf")
+	var Surf WhereValue
+	Surf = ec.QualAttr(ec.QualEntity(args[0], "IfcPcurve"), "BasisSurface", 0)
+	return Surf
 }
 
-func schemaIfcBuild2Axes(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcBaseAxis(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 4 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return wvFromList([]WhereValue{sub.Attr("D"), sub.CallSchema("IfcOrthogonalComplement", []WhereValue{sub.Attr("D")})})
+	var U WhereValue
+	var Factor WhereValue
+	var D1, D2 WhereValue
+	if wvTruthy(wvCompareRel(args[0], parseLiteralNumber("3"), "=")) {
+		D1 = wvNVL(ec.CallSchema("IfcNormalise", []WhereValue{args[3]}), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("0.0"), parseLiteralNumber("1.0")}))))
+		D2 = ec.CallSchema("IfcFirstProjAxis", []WhereValue{D1, args[1]})
+		U = wvFromList([]WhereValue{D2, ec.CallSchema("IfcSecondProjAxis", []WhereValue{D1, D2, args[2]}), D1})
+	} else {
+		if wvTruthy(wvExists(args[1])) {
+			D1 = ec.CallSchema("IfcNormalise", []WhereValue{args[1]})
+			U = wvFromList([]WhereValue{D1, ec.CallSchema("IfcOrthogonalComplement", []WhereValue{D1})})
+			if wvTruthy(wvExists(args[2])) {
+				Factor = ec.CallSchema("IfcDotProduct", []WhereValue{args[2], ec.QualIndex(U, 2)})
+				if wvTruthy(wvCompareRel(Factor, parseLiteralNumber("0.0"), "<")) {
+					U = wvAssignListElem(U, "DirectionRatios", 1, wvSub(parseLiteralNumber("0"), ec.QualIndex(ec.QualAttr(ec.QualIndex(U, 2), "DirectionRatios", 0), 1)))
+					U = wvAssignListElem(U, "DirectionRatios", 2, wvSub(parseLiteralNumber("0"), ec.QualIndex(ec.QualAttr(ec.QualIndex(U, 2), "DirectionRatios", 0), 2)))
+				}
+			}
+		} else {
+			if wvTruthy(wvExists(args[2])) {
+				D1 = ec.CallSchema("IfcNormalise", []WhereValue{args[2]})
+				U = wvFromList([]WhereValue{ec.CallSchema("IfcOrthogonalComplement", []WhereValue{D1}), D1})
+				U = wvAssignListElem(U, "DirectionRatios", 1, wvSub(parseLiteralNumber("0"), ec.QualIndex(ec.QualAttr(ec.QualIndex(U, 1), "DirectionRatios", 0), 1)))
+				U = wvAssignListElem(U, "DirectionRatios", 2, wvSub(parseLiteralNumber("0"), ec.QualIndex(ec.QualAttr(ec.QualIndex(U, 1), "DirectionRatios", 0), 2)))
+			} else {
+				U = wvFromList([]WhereValue{wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("1.0"), parseLiteralNumber("0.0")}))), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("1.0")})))})
+			}
+		}
+	}
+	return U
 }
 
-func schemaIfcConsecutiveSegments(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcBooleanChoose(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Attr("Result")
+	if wvTruthy(args[0]) {
+		return args[1]
+	} else {
+		return args[2]
+	}
+	return wvUnknownVal()
 }
 
-func schemaIfcConvertDirectionInto2D(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcBuild2Axes(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Attr("Direction2D")
+	var D WhereValue
+	D = wvNVL(ec.CallSchema("IfcNormalise", []WhereValue{args[0]}), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("1.0"), parseLiteralNumber("0.0")}))))
+	return wvFromList([]WhereValue{D, ec.CallSchema("IfcOrthogonalComplement", []WhereValue{D})})
 }
 
-func schemaIfcCorrectFillAreaStyle(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcBuildAxes(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	if wvTruthy(wvCompareRel(sub.Attr("External"), parseLiteralNumber("1"), ">")) {
+	var D1, D2 WhereValue
+	D1 = wvNVL(ec.CallSchema("IfcNormalise", []WhereValue{args[0]}), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("0.0"), parseLiteralNumber("1.0")}))))
+	D2 = ec.CallSchema("IfcFirstProjAxis", []WhereValue{D1, args[1]})
+	return wvFromList([]WhereValue{D2, ec.QualAttr(ec.QualEntity(ec.CallSchema("IfcNormalise", []WhereValue{ec.CallSchema("IfcCrossProduct", []WhereValue{D1, D2})}), "IfcVector"), "Orientation", 0), D1})
+}
+
+func schemaIfcConsecutiveSegments(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	var Result WhereValue
+	Result = parseLiteralLogical("TRUE")
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvSub(wvHiIndex(args[0]), parseLiteralNumber("1"))); i++ {
+		if wvTruthy(wvCompareRel(ec.QualIndex(ec.QualIndex(args[0], i), wvAsInt(wvHiIndex(ec.QualIndex(args[0], i)))), ec.QualIndex(ec.QualIndex(args[0], wvAsInt(wvAdd(wvFromInt(i), parseLiteralNumber("1")))), 1), "<>")) {
+			Result = parseLiteralLogical("FALSE")
+			break
+		}
+	}
+	return Result
+}
+
+func schemaIfcConstraintsParamBSpline(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 5 {
+		return wvUnknownVal()
+	}
+	var Result WhereValue
+	Result = parseLiteralLogical("TRUE")
+	var K, Sum WhereValue
+	Sum = ec.QualIndex(args[3], 1)
+	for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(args[1]); i++ {
+		Sum = wvAdd(Sum, ec.QualIndex(args[3], i))
+	}
+	if wvTruthy(wvOr(wvOr(wvOr(wvCompareRel(args[0], parseLiteralNumber("1"), "<"), wvCompareRel(args[1], parseLiteralNumber("2"), "<")), wvCompareRel(args[2], args[0], "<")), wvCompareRel(Sum, wvAdd(wvAdd(args[0], args[2]), parseLiteralNumber("2")), "<>"))) {
+		Result = parseLiteralLogical("FALSE")
+		return Result
+	}
+	K = ec.QualIndex(args[3], 1)
+	if wvTruthy(wvOr(wvCompareRel(K, parseLiteralNumber("1"), "<"), wvCompareRel(K, wvAdd(args[0], parseLiteralNumber("1")), ">"))) {
+		Result = parseLiteralLogical("FALSE")
+		return Result
+	}
+	for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(args[1]); i++ {
+		if wvTruthy(wvOr(wvCompareRel(ec.QualIndex(args[3], i), parseLiteralNumber("1"), "<"), wvCompareRel(ec.QualIndex(args[4], i), ec.QualIndex(args[4], wvAsInt(wvSub(wvFromInt(i), parseLiteralNumber("1")))), "<="))) {
+			Result = parseLiteralLogical("FALSE")
+			return Result
+		}
+		K = ec.QualIndex(args[3], i)
+		if wvTruthy(wvAnd(wvCompareRel(wvFromInt(i), args[1], "<"), wvCompareRel(K, args[0], ">"))) {
+			Result = parseLiteralLogical("FALSE")
+			return Result
+		}
+		if wvTruthy(wvAnd(wvCompareRel(wvFromInt(i), args[1], "="), wvCompareRel(K, wvAdd(args[0], parseLiteralNumber("1")), ">"))) {
+			Result = parseLiteralLogical("FALSE")
+			return Result
+		}
+	}
+	return Result
+}
+
+func schemaIfcConvertDirectionInto2D(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	var Direction2D WhereValue
+	Direction2D = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0."), parseLiteralNumber("1.")})))
+	Direction2D = wvAssignListElem(Direction2D, "DirectionRatios", 1, ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 1))
+	Direction2D = wvAssignListElem(Direction2D, "DirectionRatios", 2, ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 2))
+	return Direction2D
+}
+
+func schemaIfcCorrectDimensions(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("LENGTHUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("MASSUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("TIMEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ELECTRICCURRENTUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("THERMODYNAMICTEMPERATUREUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("AMOUNTOFSUBSTANCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("LUMINOUSINTENSITYUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("PLANEANGLEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("SOLIDANGLEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("AREAUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("VOLUMEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("3"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ABSORBEDDOSEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("RADIOACTIVITYUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ELECTRICCAPACITANCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("4"), parseLiteralNumber("2"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("DOSEEQUIVALENTUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ELECTRICCHARGEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ELECTRICCONDUCTANCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("3"), parseLiteralNumber("2"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ELECTRICVOLTAGEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("3")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ELECTRICRESISTANCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("3")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ENERGYUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("FORCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("1"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("FREQUENCYUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("INDUCTANCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("ILLUMINANCEUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("LUMINOUSFLUXUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("MAGNETICFLUXUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("MAGNETICFLUXDENSITYUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("POWERUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("3")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("PRESSUREUNIT"), "=")) {
+		if wvTruthy(wvCompareRel(args[1], ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")}), "=")) {
+			return parseLiteralLogical("TRUE")
+		} else {
+			return parseLiteralLogical("FALSE")
+		}
+	} else {
+		return parseLiteralLogical("UNKNOWN")
+	}
+	return wvUnknownVal()
+}
+
+func schemaIfcCorrectFillAreaStyle(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	var Hatching WhereValue
+	Hatching = parseLiteralNumber("0")
+	var Tiles WhereValue
+	Tiles = parseLiteralNumber("0")
+	var Colour WhereValue
+	Colour = parseLiteralNumber("0")
+	var External WhereValue
+	External = parseLiteralNumber("0")
+	External = wvSizeOf(wvQuery(args[0], func(Style WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEXTERNALLYDEFINEDHATCHSTYLE"), wvTypeOf(Style)) }))
+	Hatching = wvSizeOf(wvQuery(args[0], func(Style WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFILLAREASTYLEHATCHING"), wvTypeOf(Style)) }))
+	Tiles = wvSizeOf(wvQuery(args[0], func(Style WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFILLAREASTYLETILES"), wvTypeOf(Style)) }))
+	Colour = wvSizeOf(wvQuery(args[0], func(Style WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOLOUR"), wvTypeOf(Style)) }))
+	if wvTruthy(wvCompareRel(External, parseLiteralNumber("1"), ">")) {
 		return parseLiteralLogical("FALSE")
 	}
-	if wvTruthy(wvAnd(wvCompareRel(sub.Attr("External"), parseLiteralNumber("1"), "="), wvOr(wvOr(wvCompareRel(sub.Attr("Hatching"), parseLiteralNumber("0"), ">"), wvCompareRel(sub.Attr("Tiles"), parseLiteralNumber("0"), ">")), wvCompareRel(sub.Attr("Colour"), parseLiteralNumber("0"), ">")))) {
+	if wvTruthy(wvAnd(wvCompareRel(External, parseLiteralNumber("1"), "="), wvOr(wvOr(wvCompareRel(Hatching, parseLiteralNumber("0"), ">"), wvCompareRel(Tiles, parseLiteralNumber("0"), ">")), wvCompareRel(Colour, parseLiteralNumber("0"), ">")))) {
 		return parseLiteralLogical("FALSE")
 	}
-	if wvTruthy(wvCompareRel(sub.Attr("Colour"), parseLiteralNumber("1"), ">")) {
+	if wvTruthy(wvCompareRel(Colour, parseLiteralNumber("1"), ">")) {
 		return parseLiteralLogical("FALSE")
 	}
-	if wvTruthy(wvAnd(wvCompareRel(sub.Attr("Hatching"), parseLiteralNumber("0"), ">"), wvCompareRel(sub.Attr("Tiles"), parseLiteralNumber("0"), ">"))) {
+	if wvTruthy(wvAnd(wvCompareRel(Hatching, parseLiteralNumber("0"), ">"), wvCompareRel(Tiles, parseLiteralNumber("0"), ">"))) {
 		return parseLiteralLogical("FALSE")
 	}
 	return parseLiteralLogical("TRUE")
 }
 
-func schemaIfcCorrectUnitAssignment(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcCorrectLocalPlacement(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return wvAnd(wvAnd(wvCompareRel(wvSizeOf(sub.Attr("NamedUnitNames")), sub.Attr("NamedUnitNumber"), "="), wvCompareRel(wvSizeOf(sub.Attr("DerivedUnitNames")), sub.Attr("DerivedUnitNumber"), "=")), wvCompareRel(sub.Attr("MonetaryUnitNumber"), parseLiteralNumber("1"), "<="))
+	if wvTruthy(wvExists(args[1])) {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGRIDPLACEMENT"), wvTypeOf(args[1]))) {
+			return wvUnknownVal()
+		}
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLOCALPLACEMENT"), wvTypeOf(args[1]))) {
+			if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAXIS2PLACEMENT2D"), wvTypeOf(args[0]))) {
+				return parseLiteralLogical("TRUE")
+			}
+			if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAXIS2PLACEMENT3D"), wvTypeOf(args[0]))) {
+				if wvTruthy(wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(args[1], "IfcLocalPlacement"), "RelativePlacement", 0), "Dim", 0), parseLiteralNumber("3"), "=")) {
+					return parseLiteralLogical("TRUE")
+				} else {
+					return parseLiteralLogical("FALSE")
+				}
+			}
+		}
+	} else {
+		return parseLiteralLogical("TRUE")
+	}
+	return wvUnknownVal()
 }
 
-func schemaIfcCurveDim(ec *EntityWhereEval, arg WhereValue) WhereValue {
+func schemaIfcCorrectUnitAssignment(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	var NamedUnitNumber WhereValue
+	NamedUnitNumber = parseLiteralNumber("0")
+	var DerivedUnitNumber WhereValue
+	DerivedUnitNumber = parseLiteralNumber("0")
+	var MonetaryUnitNumber WhereValue
+	MonetaryUnitNumber = parseLiteralNumber("0")
+	var NamedUnitNames WhereValue
+	NamedUnitNames = wvFromList([]WhereValue{})
+	var DerivedUnitNames WhereValue
+	DerivedUnitNames = wvFromList([]WhereValue{})
+	NamedUnitNumber = wvSizeOf(wvQuery(args[0], func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCNAMEDUNIT"), wvTypeOf(temp)), wvNot(wvCompareRel(ec.QualAttr(ec.QualEntity(temp, "IfcNamedUnit"), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "USERDEFINED", 0), "="))) }))
+	DerivedUnitNumber = wvSizeOf(wvQuery(args[0], func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDERIVEDUNIT"), wvTypeOf(temp)), wvNot(wvCompareRel(ec.QualAttr(ec.QualEntity(temp, "IfcDerivedUnit"), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcDerivedUnitEnum"), "USERDEFINED", 0), "="))) }))
+	MonetaryUnitNumber = wvSizeOf(wvQuery(args[0], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMONETARYUNIT"), wvTypeOf(temp)) }))
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvSizeOf(args[0])); i++ {
+		if wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCNAMEDUNIT"), wvTypeOf(ec.QualIndex(args[0], i))), wvNot(wvCompareRel(ec.QualAttr(ec.QualEntity(ec.QualIndex(args[0], i), "IfcNamedUnit"), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "USERDEFINED", 0), "=")))) {
+			NamedUnitNames = wvAdd(NamedUnitNames, ec.QualAttr(ec.QualEntity(ec.QualIndex(args[0], i), "IfcNamedUnit"), "UnitType", 0))
+		}
+		if wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDERIVEDUNIT"), wvTypeOf(ec.QualIndex(args[0], i))), wvNot(wvCompareRel(ec.QualAttr(ec.QualEntity(ec.QualIndex(args[0], i), "IfcDerivedUnit"), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcDerivedUnitEnum"), "USERDEFINED", 0), "=")))) {
+			DerivedUnitNames = wvAdd(DerivedUnitNames, ec.QualAttr(ec.QualEntity(ec.QualIndex(args[0], i), "IfcDerivedUnit"), "UnitType", 0))
+		}
+	}
+	return wvAnd(wvAnd(wvCompareRel(wvSizeOf(NamedUnitNames), NamedUnitNumber, "="), wvCompareRel(wvSizeOf(DerivedUnitNames), DerivedUnitNumber, "=")), wvCompareRel(MonetaryUnitNumber, parseLiteralNumber("1"), "<="))
+}
+
+func schemaIfcCrossProduct(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	var Mag WhereValue
+	var Res WhereValue
+	var V1, V2 WhereValue
+	var Result WhereValue
+	if wvTruthy(wvOr(wvOr(wvNot(wvExists(args[0])), wvCompareRel(ec.QualAttr(args[0], "Dim", 0), parseLiteralNumber("2"), "=")), wvOr(wvNot(wvExists(args[1])), wvCompareRel(ec.QualAttr(args[1], "Dim", 0), parseLiteralNumber("2"), "=")))) {
+		return wvUnknownVal()
+	} else {
+		V1 = ec.QualAttr(ec.QualEntity(ec.CallSchema("IfcNormalise", []WhereValue{args[0]}), "IfcDirection"), "DirectionRatios", 0)
+		V2 = ec.QualAttr(ec.QualEntity(ec.CallSchema("IfcNormalise", []WhereValue{args[1]}), "IfcDirection"), "DirectionRatios", 0)
+		Res = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{wvSub(wvMul(ec.QualIndex(V1, 2), ec.QualIndex(V2, 3)), wvMul(ec.QualIndex(V1, 3), ec.QualIndex(V2, 2))), wvSub(wvMul(ec.QualIndex(V1, 3), ec.QualIndex(V2, 1)), wvMul(ec.QualIndex(V1, 1), ec.QualIndex(V2, 3))), wvSub(wvMul(ec.QualIndex(V1, 1), ec.QualIndex(V2, 2)), wvMul(ec.QualIndex(V1, 2), ec.QualIndex(V2, 1)))})))
+		Mag = parseLiteralNumber("0.0")
+		for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(parseLiteralNumber("3")); i++ {
+			Mag = wvAdd(Mag, wvMul(ec.QualIndex(ec.QualAttr(Res, "DirectionRatios", 0), i), ec.QualIndex(ec.QualAttr(Res, "DirectionRatios", 0), i)))
+		}
+		if wvTruthy(wvCompareRel(Mag, parseLiteralNumber("0.0"), ">")) {
+			Result = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(Res, wvSqrt(Mag)))
+		} else {
+			Result = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(args[0], parseLiteralNumber("0.0")))
+		}
+		return Result
+	}
+	return wvUnknownVal()
+}
+
+func schemaIfcCurveDim(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	arg := args[0]
 	inst := arg.entityInstance()
 	if inst == nil {
 		return wvUnknownVal()
@@ -78,50 +453,56 @@ func schemaIfcCurveDim(ec *EntityWhereEval, arg WhereValue) WhereValue {
 		return wvUnknownVal()
 	}
 	sub := ec.withInstance(inst)
-	if entityIsOrSubtypes(step, "IfcLine") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcLine"), "Pnt", 0), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLINE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcLine"), "Pnt", 0), "Dim", 0)
 	}
-	if entityIsOrSubtypes(step, "IfcConic") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcConic"), "Position", 0), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcConic"), "Position", 0), "Dim", 0)
 	}
-	if entityIsOrSubtypes(step, "IfcPolyline") {
-		return sub.QualAttr(sub.QualIndex(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcPolyline"), "Points", 0), 1), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOLYLINE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcPolyline"), "Points", 0), 1), "Dim", 0)
 	}
-	if entityIsOrSubtypes(step, "IfcTrimmedCurve") {
-		return sub.CallSchema("IfcCurveDim", []WhereValue{sub.QualAttr(sub.QualEntity(sub.Self(), "IfcTrimmedCurve"), "BasisCurve", 0)})
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRIMMEDCURVE"), wvTypeOf(args[0]))) {
+		return ec.CallSchema("IfcCurveDim", []WhereValue{ec.QualAttr(ec.QualEntity(args[0], "IfcTrimmedCurve"), "BasisCurve", 0)})
 	}
-	if entityIsOrSubtypes(step, "IfcGradientCurve") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGRADIENTCURVE"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("3")
 	}
-	if entityIsOrSubtypes(step, "IfcSegmentedReferenceCurve") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSEGMENTEDREFERENCECURVE"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("3")
 	}
-	if entityIsOrSubtypes(step, "IfcCompositeCurve") {
-		return sub.QualAttr(sub.QualIndex(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCompositeCurve"), "Segments", 0), 1), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1), "Dim", 0)
 	}
-	if entityIsOrSubtypes(step, "IfcBSplineCurve") {
-		return sub.QualAttr(sub.QualIndex(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcBSplineCurve"), "ControlPointsList", 0), 1), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBSPLINECURVE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcBSplineCurve"), "ControlPointsList", 0), 1), "Dim", 0)
 	}
-	if entityIsOrSubtypes(step, "IfcOffsetCurve2D") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOFFSETCURVE2D"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("2")
 	}
-	if entityIsOrSubtypes(step, "IfcOffsetCurve3D") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOFFSETCURVE3D"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("3")
 	}
-	if entityIsOrSubtypes(step, "IfcOffsetCurveByDistances") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOFFSETCURVEBYDISTANCES"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("3")
 	}
-	if entityIsOrSubtypes(step, "IfcCurvesegment2d") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVESEGMENT2D"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("2")
 	}
-	if entityIsOrSubtypes(step, "IfcPcurve") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOLYNOMIALCURVE"), wvTypeOf(args[0]))) {
+		if wvTruthy(wvAnd(wvNot(wvExists(ec.QualAttr(ec.QualEntity(args[0], "IfcPolynomialCurve"), "CoefficientsZ", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcPolynomialCurve"), "Position", 0), "Dim", 0), parseLiteralNumber("2"), "="))) {
+			return parseLiteralNumber("2")
+		}
 		return parseLiteralNumber("3")
 	}
-	if entityIsOrSubtypes(step, "IfcIndexedPolyCurve") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcIndexedPolyCurve"), "Points", 0), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPCURVE"), wvTypeOf(args[0]))) {
+		return parseLiteralNumber("3")
 	}
-	if entityIsOrSubtypes(step, "IfcSpiral") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcSpiral"), "Position", 0), "Dim", 0)
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcIndexedPolyCurve"), "Points", 0), "Dim", 0)
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPIRAL"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcSpiral"), "Position", 0), "Dim", 0)
 	}
 	if entityIsOrSubtypes(step, "IfcPolynomialCurve") {
 		if wvTruthy(wvAnd(wvNot(wvExists(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcPolynomialCurve"), "CoefficientsZ", 0))), wvCompareRel(sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcPolynomialCurve"), "Position", 0), "Dim", 0), parseLiteralNumber("2"), "="))) {
@@ -132,296 +513,832 @@ func schemaIfcCurveDim(ec *EntityWhereEval, arg WhereValue) WhereValue {
 	return wvUnknownVal()
 }
 
-func schemaIfcCurveWeightsPositive(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcCurveWeightsPositive(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Attr("Result")
+	var Result WhereValue
+	Result = parseLiteralLogical("TRUE")
+	for i := wvAsInt(parseLiteralNumber("0")); i <= wvAsInt(ec.QualAttr(args[0], "UpperIndexOnControlPoints", 0)); i++ {
+		if wvTruthy(wvCompareRel(ec.QualIndex(ec.QualAttr(args[0], "Weights", 0), i), parseLiteralNumber("0.0"), "<=")) {
+			Result = parseLiteralLogical("FALSE")
+			return Result
+		}
+	}
+	return Result
 }
 
-func schemaIfcDeriveDimensionalExponents(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcDeriveDimensionalExponents(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Attr("Result")
+	var Result WhereValue
+	Result = ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	for i := wvAsInt(wvLoIndex(args[0])); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		Result = wvAssignAttr(Result, "LengthExponent", wvAdd(ec.QualAttr(Result, "LengthExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "LengthExponent", 0))))
+		Result = wvAssignAttr(Result, "MassExponent", wvAdd(ec.QualAttr(Result, "MassExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "MassExponent", 0))))
+		Result = wvAssignAttr(Result, "TimeExponent", wvAdd(ec.QualAttr(Result, "TimeExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "TimeExponent", 0))))
+		Result = wvAssignAttr(Result, "ElectricCurrentExponent", wvAdd(ec.QualAttr(Result, "ElectricCurrentExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "ElectricCurrentExponent", 0))))
+		Result = wvAssignAttr(Result, "ThermodynamicTemperatureExponent", wvAdd(ec.QualAttr(Result, "ThermodynamicTemperatureExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "ThermodynamicTemperatureExponent", 0))))
+		Result = wvAssignAttr(Result, "AmountOfSubstanceExponent", wvAdd(ec.QualAttr(Result, "AmountOfSubstanceExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "AmountOfSubstanceExponent", 0))))
+		Result = wvAssignAttr(Result, "LuminousIntensityExponent", wvAdd(ec.QualAttr(Result, "LuminousIntensityExponent", 0), wvMul(ec.QualAttr(ec.QualIndex(args[0], i), "Exponent", 0), ec.QualAttr(ec.QualAttr(ec.QualAttr(ec.QualIndex(args[0], i), "Unit", 0), "Dimensions", 0), "LuminousIntensityExponent", 0))))
+	}
+	return Result
 }
 
-func schemaIfcDimensionsForSIUnit(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcDimensionsForSIUnit(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
+	}
+	if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("METRE"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("SQUARE_METRE"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("CUBIC_METRE"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("3"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("GRAM"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("SECOND"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("AMPERE"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("KELVIN"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("MOLE"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("CANDELA"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("RADIAN"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("STERADIAN"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("HERTZ"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("NEWTON"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("1"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("PASCAL"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("JOULE"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("WATT"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("3")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("COULOMB"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("VOLT"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("3")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("FARAD"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("4"), parseLiteralNumber("2"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("OHM"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("3")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("SIEMENS"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("3"), parseLiteralNumber("2"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("WEBER"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("TESLA"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("HENRY"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("1"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("DEGREE_CELSIUS"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("LUMEN"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("LUX"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("1")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("BECQUEREL"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("1")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("GRAY"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else if wvTruthy(wvCompareRel(args[0], wvFromEnumStepLiteral("SIEVERT"), "=")) {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("2"), parseLiteralNumber("0"), wvSub(parseLiteralNumber("0"), parseLiteralNumber("2")), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
+	} else {
+		return ec.CallSchema("IfcDimensionalExponents", []WhereValue{parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0"), parseLiteralNumber("0")})
 	}
 	return wvUnknownVal()
 }
 
-func schemaIfcGetBasisSurface(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcDotProduct(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	step, ok := instanceStepName(inst)
+	var Scalar WhereValue
+	var Vec1, Vec2 WhereValue
+	var Ndim WhereValue
+	if wvTruthy(wvOr(wvNot(wvExists(args[0])), wvNot(wvExists(args[1])))) {
+		Scalar = wvUnknownVal()
+	} else {
+		if wvTruthy(wvCompareRel(ec.QualAttr(args[0], "Dim", 0), ec.QualAttr(args[1], "Dim", 0), "<>")) {
+			Scalar = wvUnknownVal()
+		} else {
+			Vec1 = ec.CallSchema("IfcNormalise", []WhereValue{args[0]})
+			Vec2 = ec.CallSchema("IfcNormalise", []WhereValue{args[1]})
+			Ndim = ec.QualAttr(args[0], "Dim", 0)
+			Scalar = parseLiteralNumber("0.0")
+			for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(Ndim); i++ {
+				Scalar = wvAdd(Scalar, wvMul(ec.QualIndex(ec.QualAttr(Vec1, "DirectionRatios", 0), i), ec.QualIndex(ec.QualAttr(Vec2, "DirectionRatios", 0), i)))
+			}
+		}
+	}
+	return Scalar
+}
+
+func schemaIfcFirstProjAxis(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	var XAxis WhereValue
+	var V WhereValue
+	var Z WhereValue
+	var XVec WhereValue
+	if wvTruthy(wvNot(wvExists(args[0]))) {
+		return wvUnknownVal()
+	} else {
+		Z = ec.CallSchema("IfcNormalise", []WhereValue{args[0]})
+		if wvTruthy(wvNot(wvExists(args[1]))) {
+			if wvTruthy(wvCompareRel(ec.QualAttr(Z, "DirectionRatios", 0), wvFromList([]WhereValue{parseLiteralNumber("1.0"), parseLiteralNumber("0.0"), parseLiteralNumber("0.0")}), "<>")) {
+				V = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("1.0"), parseLiteralNumber("0.0"), parseLiteralNumber("0.0")})))
+			} else {
+				V = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("1.0"), parseLiteralNumber("0.0")})))
+			}
+		} else {
+			if wvTruthy(wvCompareRel(ec.QualAttr(args[1], "Dim", 0), parseLiteralNumber("3"), "<>")) {
+				return wvUnknownVal()
+			}
+			if wvTruthy(wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{args[1], Z}), "Magnitude", 0), parseLiteralNumber("0.0"), "=")) {
+				return wvUnknownVal()
+			} else {
+				V = ec.CallSchema("IfcNormalise", []WhereValue{args[1]})
+			}
+		}
+		XVec = ec.CallSchema("IfcScalarTimesVector", []WhereValue{ec.CallSchema("IfcDotProduct", []WhereValue{V, Z}), Z})
+		XAxis = ec.QualAttr(ec.CallSchema("IfcVectorDifference", []WhereValue{V, XVec}), "Orientation", 0)
+		XAxis = ec.CallSchema("IfcNormalise", []WhereValue{XAxis})
+	}
+	return XAxis
+}
+
+func schemaIfcGetBasisSurface(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	step, ok := whereValueExpressType(args[0])
 	if !ok {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
+	var Surfs WhereValue
+	var N WhereValue
+	Surfs = wvFromList([]WhereValue{})
 	if entityIsOrSubtypes(step, "IfcPcurve") {
+		Surfs = ec.QualAttr(ec.QualEntity(args[0], "IfcPCurve"), "BasisSurface", 0)
+	} else {
+		if entityIsOrSubtypes(step, "IfcSurfaceCurve") {
+			N = wvSizeOf(ec.QualAttr(ec.QualEntity(args[0], "IfcSurfaceCurve"), "AssociatedGeometry", 0))
+			for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(N); i++ {
+				Surfs = wvAdd(Surfs, ec.CallSchema("IfcAssociatedSurface", []WhereValue{ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcSurfaceCurve"), "AssociatedGeometry", 0), i)}))
+			}
+		}
 	}
 	if entityIsOrSubtypes(step, "IfcCompositeCurveOnSurface") {
-		if entityIsOrSubtypes(step, "IfcCurveSegment") {
+		N = wvSizeOf(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0))
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVESEGMENT"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1)))) {
+			Surfs = ec.CallSchema("IfcGetBasisSurface", []WhereValue{ec.QualAttr(ec.QualEntity(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1), "IfcCurveSegment"), "ParentCurve", 0)})
 		}
-		if entityIsOrSubtypes(step, "IfcCompositeCurveSegment") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVESEGMENT"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1)))) {
+			Surfs = ec.CallSchema("IfcGetBasisSurface", []WhereValue{ec.QualAttr(ec.QualEntity(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1), "IfcCompositeCurveSegment"), "ParentCurve", 0)})
 		}
-		if wvTruthy(wvCompareRel(sub.Attr("N"), parseLiteralNumber("1"), ">")) {
+		if wvTruthy(wvCompareRel(N, parseLiteralNumber("1"), ">")) {
+			for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(N); i++ {
+				if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVESEGMENT"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), i)))) {
+					Surfs = wvMul(Surfs, ec.CallSchema("IfcGetBasisSurface", []WhereValue{ec.QualAttr(ec.QualEntity(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), i), "IfcCurveSegment"), "ParentCurve", 0)}))
+				}
+				if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVESEGMENT"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), i)))) {
+					Surfs = wvMul(Surfs, ec.CallSchema("IfcGetBasisSurface", []WhereValue{ec.QualAttr(ec.QualEntity(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), i), "IfcCompositeCurveSegment"), "ParentCurve", 0)}))
+				}
+			}
 		}
 	}
-	return sub.Attr("Surfs")
+	return Surfs
 }
 
-func schemaIfcLoopHeadToTail(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcListToArray(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Derived("P")
+	var N WhereValue
+	var Res WhereValue
+	N = wvSizeOf(args[0])
+	if wvTruthy(wvCompareRel(N, wvAdd(wvSub(args[2], args[1]), parseLiteralNumber("1")), "<>")) {
+		return wvUnknownVal()
+	} else {
+		Res = wvRepeatList(ec.QualIndex(args[0], 1), N)
+		for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(N); i++ {
+			Res = wvAssignAtIndex(Res, wvAsInt(wvSub(wvAdd(args[1], wvFromInt(i)), parseLiteralNumber("1"))), ec.QualIndex(args[0], i))
+		}
+		return Res
+	}
+	return wvUnknownVal()
 }
 
-func schemaIfcMlsTotalThickness(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcLoopHeadToTail(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	if wvTruthy(wvCompareRel(wvSizeOf(sub.QualAttr(sub.Self(), "MaterialLayers", 0)), parseLiteralNumber("1"), ">")) {
+	var N WhereValue
+	var P WhereValue
+	P = parseLiteralLogical("TRUE")
+	N = wvSizeOf(ec.QualAttr(args[0], "EdgeList", 0))
+	for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(N); i++ {
+		P = wvAnd(P, wvInstSame(ec.QualAttr(ec.QualIndex(ec.QualAttr(args[0], "EdgeList", 0), wvAsInt(wvSub(wvFromInt(i), parseLiteralNumber("1")))), "EdgeEnd", 0), ec.QualAttr(ec.QualIndex(ec.QualAttr(args[0], "EdgeList", 0), i), "EdgeStart", 0)))
 	}
-	return sub.Attr("Max")
+	return P
 }
 
-func schemaIfcNormalise(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcMakeArrayOfArray(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 5 {
 		return wvUnknownVal()
 	}
-	step, ok := instanceStepName(inst)
+	var Res WhereValue
+	if wvTruthy(wvCompareRel(wvAdd(wvSub(args[2], args[1]), parseLiteralNumber("1")), wvSizeOf(args[0]), "<>")) {
+		return wvUnknownVal()
+	}
+	if wvTruthy(wvCompareRel(wvAdd(wvSub(args[4], args[3]), parseLiteralNumber("1")), wvSizeOf(ec.QualIndex(args[0], 1)), "<>")) {
+		return wvUnknownVal()
+	}
+	Res = wvRepeatList(ec.CallSchema("IfcListToArray", []WhereValue{ec.QualIndex(args[0], 1), args[3], args[4]}), wvAdd(wvSub(args[2], args[1]), parseLiteralNumber("1")))
+	for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		if wvTruthy(wvCompareRel(wvAdd(wvSub(args[4], args[3]), parseLiteralNumber("1")), wvSizeOf(ec.QualIndex(args[0], i)), "<>")) {
+			return wvUnknownVal()
+		}
+		Res = wvAssignAtIndex(Res, wvAsInt(wvSub(wvAdd(args[1], wvFromInt(i)), parseLiteralNumber("1"))), ec.CallSchema("IfcListToArray", []WhereValue{ec.QualIndex(args[0], i), args[3], args[4]}))
+	}
+	return Res
+}
+
+func schemaIfcMlsTotalThickness(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	var Max WhereValue
+	Max = ec.QualAttr(ec.QualIndex(ec.QualAttr(args[0], "MaterialLayers", 0), 1), "LayerThickness", 0)
+	if wvTruthy(wvCompareRel(wvSizeOf(ec.QualAttr(args[0], "MaterialLayers", 0)), parseLiteralNumber("1"), ">")) {
+		for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(wvHiIndex(ec.QualAttr(args[0], "MaterialLayers", 0))); i++ {
+			Max = wvAdd(Max, ec.QualAttr(ec.QualIndex(ec.QualAttr(args[0], "MaterialLayers", 0), i), "LayerThickness", 0))
+		}
+	}
+	return Max
+}
+
+func schemaIfcNormalise(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	step, ok := whereValueExpressType(args[0])
 	if !ok {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	if wvTruthy(wvNot(wvExists(sub.Self()))) {
+	var Ndim WhereValue
+	var V WhereValue
+	V = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("1."), parseLiteralNumber("0.")})))
+	var Vec WhereValue
+	Vec = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("1."), parseLiteralNumber("0.")}))), parseLiteralNumber("1.")))
+	var Mag WhereValue
+	var Result WhereValue
+	Result = V
+	if wvTruthy(wvNot(wvExists(args[0]))) {
 		return wvUnknownVal()
 	} else {
 		if entityIsOrSubtypes(step, "IfcVector") {
+			Ndim = ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Dim", 0)
+			V = wvAssignAttr(V, "DirectionRatios", ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Orientation", 0), "DirectionRatios", 0))
+			Vec = wvAssignAttr(Vec, "Magnitude", ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Magnitude", 0))
+			Vec = wvAssignAttr(Vec, "Orientation", V)
+			if wvTruthy(wvCompareRel(ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Magnitude", 0), parseLiteralNumber("0.0"), "=")) {
+				return wvUnknownVal()
+			} else {
+				Vec = wvAssignAttr(Vec, "Magnitude", parseLiteralNumber("1.0"))
+			}
+		} else {
+			Ndim = ec.QualAttr(ec.QualEntity(args[0], "IfcDirection"), "Dim", 0)
+			V = wvAssignAttr(V, "DirectionRatios", ec.QualAttr(ec.QualEntity(args[0], "IfcDirection"), "DirectionRatios", 0))
 		}
-		if wvTruthy(wvCompareRel(sub.Attr("Mag"), wvFromEnumStepLiteral("0"), ">")) {
+		Mag = parseLiteralNumber("0.0")
+		for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(Ndim); i++ {
+			Mag = wvAdd(Mag, wvMul(ec.QualIndex(ec.QualAttr(V, "DirectionRatios", 0), i), ec.QualIndex(ec.QualAttr(V, "DirectionRatios", 0), i)))
+		}
+		if wvTruthy(wvCompareRel(Mag, parseLiteralNumber("0.0"), ">")) {
+			Mag = wvSqrt(Mag)
+			for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(Ndim); i++ {
+				V = wvAssignListElem(V, "DirectionRatios", i, wvDiv(ec.QualIndex(ec.QualAttr(V, "DirectionRatios", 0), i), Mag))
+			}
 			if entityIsOrSubtypes(step, "IfcVector") {
+				Vec = wvAssignAttr(Vec, "Orientation", V)
+				Result = Vec
+			} else {
+				Result = V
 			}
 		} else {
 			return wvUnknownVal()
 		}
 	}
-	return sub.Attr("Result")
+	return Result
 }
 
-func schemaIfcOrthogonalComplement(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcOrthogonalComplement(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	if wvTruthy(wvOr(wvNot(wvExists(sub.Self())), wvCompareRel(sub.QualAttr(sub.Self(), "Dim", 0), parseLiteralNumber("2"), "<>"))) {
+	var Result WhereValue
+	if wvTruthy(wvOr(wvNot(wvExists(args[0])), wvCompareRel(ec.QualAttr(args[0], "Dim", 0), parseLiteralNumber("2"), "<>"))) {
 		return wvUnknownVal()
 	} else {
-		return sub.Attr("Result")
-	}
-}
-
-func schemaIfcPathHeadToTail(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
-		return wvUnknownVal()
-	}
-	sub := ec.withInstance(inst)
-	return sub.Derived("P")
-}
-
-func schemaIfcPointDim(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
-		return wvUnknownVal()
-	}
-	step, ok := instanceStepName(inst)
-	if !ok {
-		return wvUnknownVal()
-	}
-	sub := ec.withInstance(inst)
-	if entityIsOrSubtypes(step, "IfcCartesianPoint") {
-		return wvHiIndex(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianPoint"), "Coordinates", 0))
-	}
-	if entityIsOrSubtypes(step, "IfcPointByDistanceExpression") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcPointByDistanceExpression"), "BasisCurve", 0), "Dim", 0)
-	}
-	if entityIsOrSubtypes(step, "IfcPointOnCurve") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcPointOnCurve"), "BasisCurve", 0), "Dim", 0)
-	}
-	if entityIsOrSubtypes(step, "IfcPointOnSurface") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcPointOnSurface"), "BasisSurface", 0), "Dim", 0)
+		Result = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{wvSub(parseLiteralNumber("0"), ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 2)), ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 1)})))
+		return Result
 	}
 	return wvUnknownVal()
 }
 
-func schemaIfcPointListDim(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcPathHeadToTail(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	step, ok := instanceStepName(inst)
-	if !ok {
+	var N WhereValue
+	N = parseLiteralNumber("0")
+	var P WhereValue
+	P = parseLiteralLogical("UNKNOWN")
+	N = wvSizeOf(ec.QualAttr(args[0], "EdgeList", 0))
+	for i := wvAsInt(parseLiteralNumber("2")); i <= wvAsInt(N); i++ {
+		P = wvAnd(P, wvInstSame(ec.QualAttr(ec.QualIndex(ec.QualAttr(args[0], "EdgeList", 0), wvAsInt(wvSub(wvFromInt(i), parseLiteralNumber("1")))), "EdgeEnd", 0), ec.QualAttr(ec.QualIndex(ec.QualAttr(args[0], "EdgeList", 0), i), "EdgeStart", 0)))
+	}
+	return P
+}
+
+func schemaIfcPointDim(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	if entityIsOrSubtypes(step, "IfcCartesianPointList2D") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT"), wvTypeOf(args[0]))) {
+		return wvHiIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCartesianPoint"), "Coordinates", 0))
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOINTBYDISTANCEEXPRESSION"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcPointByDistanceExpression"), "BasisCurve", 0), "Dim", 0)
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOINTONCURVE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcPointOnCurve"), "BasisCurve", 0), "Dim", 0)
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOINTONSURFACE"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcPointOnSurface"), "BasisSurface", 0), "Dim", 0)
+	}
+	return wvUnknownVal()
+}
+
+func schemaIfcPointListDim(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINTLIST2D"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("2")
 	}
-	if entityIsOrSubtypes(step, "IfcCartesianPointList3D") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINTLIST3D"), wvTypeOf(args[0]))) {
 		return parseLiteralNumber("3")
 	}
 	return wvUnknownVal()
 }
 
-func schemaIfcSegmentDim(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcScalarTimesVector(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	step, ok := instanceStepName(inst)
+	step, ok := whereValueExpressType(args[0])
 	if !ok {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	if entityIsOrSubtypes(step, "IfcCurveSegment") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCurveSegment"), "ParentCurve", 0), "Dim", 0)
+	var V WhereValue
+	var Mag WhereValue
+	var Result WhereValue
+	if wvTruthy(wvOr(wvNot(wvExists(args[0])), wvNot(wvExists(args[1])))) {
+		return wvUnknownVal()
+	} else {
+		if entityIsOrSubtypes(step, "IfcVector") {
+			V = ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Orientation", 0)
+			Mag = wvMul(args[0], ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Magnitude", 0))
+		} else {
+			V = args[1]
+			Mag = args[0]
+		}
+		if wvTruthy(wvCompareRel(Mag, parseLiteralNumber("0.0"), "<")) {
+			for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvSizeOf(ec.QualAttr(V, "DirectionRatios", 0))); i++ {
+				V = wvAssignListElem(V, "DirectionRatios", i, wvSub(parseLiteralNumber("0"), ec.QualIndex(ec.QualAttr(V, "DirectionRatios", 0), i)))
+			}
+			Mag = wvSub(parseLiteralNumber("0"), Mag)
+		}
+		Result = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(ec.CallSchema("IfcNormalise", []WhereValue{V}), Mag))
 	}
-	if entityIsOrSubtypes(step, "IfcCompositeCurveSegment") {
-		return sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCompositeCurveSegment"), "ParentCurve", 0), "Dim", 0)
+	return Result
+}
+
+func schemaIfcSecondProjAxis(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
+		return wvUnknownVal()
+	}
+	var YAxis WhereValue
+	var V WhereValue
+	var Temp WhereValue
+	if wvTruthy(wvNot(wvExists(args[2]))) {
+		V = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("1.0"), parseLiteralNumber("0.0")})))
+	} else {
+		V = args[2]
+	}
+	Temp = ec.CallSchema("IfcScalarTimesVector", []WhereValue{ec.CallSchema("IfcDotProduct", []WhereValue{V, args[0]}), args[0]})
+	YAxis = ec.CallSchema("IfcVectorDifference", []WhereValue{V, Temp})
+	Temp = ec.CallSchema("IfcScalarTimesVector", []WhereValue{ec.CallSchema("IfcDotProduct", []WhereValue{V, args[1]}), args[1]})
+	YAxis = ec.CallSchema("IfcVectorDifference", []WhereValue{YAxis, Temp})
+	YAxis = ec.CallSchema("IfcNormalise", []WhereValue{YAxis})
+	return ec.QualAttr(YAxis, "Orientation", 0)
+}
+
+func schemaIfcSegmentDim(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVESEGMENT"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcCurveSegment"), "ParentCurve", 0), "Dim", 0)
+	}
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVESEGMENT"), wvTypeOf(args[0]))) {
+		return ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurveSegment"), "ParentCurve", 0), "Dim", 0)
 	}
 	return wvUnknownVal()
 }
 
-func schemaIfcSurfaceWeightsPositive(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcShapeRepresentationTypes(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return sub.Attr("Result")
+	var Count WhereValue
+	Count = parseLiteralNumber("0")
+	if wvTruthy(wvCompareRel(args[0], wvFromString("Point"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOINT"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINTLIST"), wvTypeOf(temp))) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("PointCloud"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINTLIST3D"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Curve"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Curve2D"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVE"), wvTypeOf(temp)), wvCompareRel(ec.QualAttr(ec.QualEntity(temp, "IfcCurve"), "Dim", 0), parseLiteralNumber("2"), "=")) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Curve3D"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVE"), wvTypeOf(temp)), wvCompareRel(ec.QualAttr(ec.QualEntity(temp, "IfcCurve"), "Dim", 0), parseLiteralNumber("3"), "=")) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Segment"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSEGMENT"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Surface"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Surface2D"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACE"), wvTypeOf(temp)), wvCompareRel(ec.QualAttr(ec.QualEntity(temp, "IfcSurface"), "Dim", 0), parseLiteralNumber("2"), "=")) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Surface3D"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACE"), wvTypeOf(temp)), wvCompareRel(ec.QualAttr(ec.QualEntity(temp, "IfcSurface"), "Dim", 0), parseLiteralNumber("3"), "=")) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("SectionedSurface"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSECTIONEDSURFACE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("FillArea"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCANNOTATIONFILLAREA"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Text"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTEXTLITERAL"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("AdvancedSurface"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBSPLINESURFACE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Annotation2D"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvTypeOf(temp), wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCPOINT"), wvFromString("IFC4X3_DEV_73740fe4.IFCCURVE"), wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICCURVESET"), wvFromString("IFC4X3_DEV_73740fe4.IFCANNOTATIONFILLAREA"), wvFromString("IFC4X3_DEV_73740fe4.IFCTEXTLITERAL")}))), parseLiteralNumber("1"), "=") }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("GeometricSet"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvOr(wvOr(wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICSET"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOINT"), wvTypeOf(temp))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVE"), wvTypeOf(temp))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACE"), wvTypeOf(temp))) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("GeometricCurveSet"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvOr(wvOr(wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICCURVESET"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICSET"), wvTypeOf(temp))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOINT"), wvTypeOf(temp))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVE"), wvTypeOf(temp))) }))
+		for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[1])); i++ {
+			if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICSET"), wvTypeOf(ec.QualIndex(args[1], i)))) {
+				if wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.QualIndex(args[1], i), "IfcGeometricSet"), "Elements", 0), func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACE"), wvTypeOf(temp)) })), parseLiteralNumber("0"), ">")) {
+					Count = wvSub(Count, parseLiteralNumber("1"))
+				}
+			}
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Tessellation"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDITEM"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("SurfaceOrSolidModel"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDITEM"), wvFromString("IFC4X3_DEV_73740fe4.IFCSHELLBASEDSURFACEMODEL"), wvFromString("IFC4X3_DEV_73740fe4.IFCFACEBASEDSURFACEMODEL"), wvFromString("IFC4X3_DEV_73740fe4.IFCSOLIDMODEL")}), wvTypeOf(temp))), parseLiteralNumber("1"), ">=") }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("SurfaceModel"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDITEM"), wvFromString("IFC4X3_DEV_73740fe4.IFCSHELLBASEDSURFACEMODEL"), wvFromString("IFC4X3_DEV_73740fe4.IFCFACEBASEDSURFACEMODEL")}), wvTypeOf(temp))), parseLiteralNumber("1"), ">=") }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("SolidModel"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSOLIDMODEL"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("SweptSolid"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvAnd(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCEXTRUDEDAREASOLID"), wvFromString("IFC4X3_DEV_73740fe4.IFCREVOLVEDAREASOLID")}), wvTypeOf(temp))), parseLiteralNumber("1"), ">="), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCEXTRUDEDAREASOLIDTAPERED"), wvFromString("IFC4X3_DEV_73740fe4.IFCREVOLVEDAREASOLIDTAPERED")}), wvTypeOf(temp))), parseLiteralNumber("0"), "=")) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("AdvancedSweptSolid"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTAREASOLID"), wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTDISKSOLID"), wvFromString("IFC4X3_DEV_73740fe4.IFCSECTIONEDSOLIDHORIZONTAL")}), wvTypeOf(temp))), parseLiteralNumber("1"), ">=") }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("CSG"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCBOOLEANRESULT"), wvFromString("IFC4X3_DEV_73740fe4.IFCCSGPRIMITIVE3D"), wvFromString("IFC4X3_DEV_73740fe4.IFCCSGSOLID")}), wvTypeOf(temp))), parseLiteralNumber("1"), ">=") }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Clipping"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCSGSOLID"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOOLEANCLIPPINGRESULT")}), wvTypeOf(temp))), parseLiteralNumber("1"), ">=") }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Brep"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFACETEDBREP"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("AdvancedBrep"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMANIFOLDSOLIDBREP"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("BoundingBox"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDINGBOX"), wvTypeOf(temp)) }))
+		if wvTruthy(wvCompareRel(wvSizeOf(args[1]), parseLiteralNumber("1"), ">")) {
+			Count = parseLiteralNumber("0")
+		}
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("SectionedSpine"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSECTIONEDSPINE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("LightSource"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLIGHTSOURCE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("MappedRepresentation"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMAPPEDITEM"), wvTypeOf(temp)) }))
+	} else {
+		return wvUnknownVal()
+	}
+	return wvCompareRel(Count, wvSizeOf(args[1]), "=")
 }
 
-func schemaIfcUniqueDefinitionNames(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcSurfaceWeightsPositive(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	if wvTruthy(wvCompareRel(wvSizeOf(sub.Self()), parseLiteralNumber("0"), "=")) {
+	var Result WhereValue
+	Result = parseLiteralLogical("TRUE")
+	var Weights WhereValue
+	Weights = ec.QualAttr(args[0], "Weights", 0)
+	for i := wvAsInt(parseLiteralNumber("0")); i <= wvAsInt(ec.QualAttr(ec.QualEntity(args[0], "IfcBSplineSurface"), "UUpper", 0)); i++ {
+		for j := wvAsInt(parseLiteralNumber("0")); j <= wvAsInt(ec.QualAttr(ec.QualEntity(args[0], "IfcBSplineSurface"), "VUpper", 0)); j++ {
+			if wvTruthy(wvCompareRel(ec.QualIndex(ec.QualIndex(Weights, i), j), parseLiteralNumber("0.0"), "<=")) {
+				Result = parseLiteralLogical("FALSE")
+				return Result
+			}
+		}
+	}
+	return Result
+}
+
+func schemaIfcTaperedSweptAreaProfiles(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	var Result WhereValue
+	Result = parseLiteralLogical("FALSE")
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPARAMETERIZEDPROFILEDEF"), wvTypeOf(args[0]))) {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDERIVEDPROFILEDEF"), wvTypeOf(args[1]))) {
+			Result = wvInstSame(args[0], ec.QualAttr(ec.QualEntity(args[1], "IfcDerivedProfileDef"), "ParentProfile", 0))
+		} else {
+			Result = wvCompareRel(wvTypeOf(args[0]), wvTypeOf(args[1]), "=")
+		}
+	} else {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDERIVEDPROFILEDEF"), wvTypeOf(args[1]))) {
+			Result = wvInstSame(args[0], ec.QualAttr(ec.QualEntity(args[1], "IfcDerivedProfileDef"), "ParentProfile", 0))
+		} else {
+			Result = parseLiteralLogical("FALSE")
+		}
+	}
+	return Result
+}
+
+func schemaIfcTopologyRepresentationTypes(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	var Count WhereValue
+	Count = parseLiteralNumber("0")
+	if wvTruthy(wvCompareRel(args[0], wvFromString("Vertex"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVERTEX"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Edge"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEDGE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Path"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPATH"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Face"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFACE"), wvTypeOf(temp)) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Shell"), "=")) {
+		Count = wvSizeOf(wvQuery(args[1], func(temp WhereValue) WhereValue { return wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOPENSHELL"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCLOSEDSHELL"), wvTypeOf(temp))) }))
+	} else if wvTruthy(wvCompareRel(args[0], wvFromString("Undefined"), "=")) {
+		return parseLiteralLogical("TRUE")
+	} else {
+		return wvUnknownVal()
+	}
+	return wvCompareRel(Count, wvSizeOf(args[1]), "=")
+}
+
+func schemaIfcUniqueDefinitionNames(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
+		return wvUnknownVal()
+	}
+	step, ok := whereValueExpressType(args[0])
+	if !ok {
+		return wvUnknownVal()
+	}
+	var Definition WhereValue
+	var DefinitionSet WhereValue
+	var Properties WhereValue
+	Properties = wvFromList([]WhereValue{})
+	var Result WhereValue
+	if wvTruthy(wvCompareRel(wvSizeOf(args[0]), parseLiteralNumber("0"), "=")) {
 		return parseLiteralLogical("TRUE")
 	}
-	return sub.Attr("Result")
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		Definition = ec.QualAttr(ec.QualIndex(args[0], i), "RelatingPropertyDefinition", 0)
+		if entityIsOrSubtypes(step, "IfcPropertySetDefinition") {
+			Properties = wvAdd(Properties, Definition)
+		} else {
+			if entityIsOrSubtypes(step, "IfcPropertysetdefinitionset") {
+				DefinitionSet = Definition
+				for j := wvAsInt(parseLiteralNumber("1")); j <= wvAsInt(wvHiIndex(DefinitionSet)); j++ {
+					Properties = wvAdd(Properties, ec.QualIndex(DefinitionSet, j))
+				}
+			}
+		}
+	}
+	Result = ec.CallSchema("IfcUniquePropertySetNames", []WhereValue{Properties})
+	return Result
 }
 
-func schemaIfcUniquePropertyName(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcUniquePropertyName(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return wvCompareRel(wvSizeOf(sub.Attr("Names")), wvSizeOf(sub.Self()), "=")
+	var Names WhereValue
+	Names = wvFromList([]WhereValue{})
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		Names = wvAdd(Names, ec.QualAttr(ec.QualIndex(args[0], i), "Name", 0))
+	}
+	return wvCompareRel(wvSizeOf(Names), wvSizeOf(args[0]), "=")
 }
 
-func schemaIfcUniquePropertySetNames(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcUniquePropertySetNames(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return wvCompareRel(wvAdd(wvSizeOf(sub.Attr("Names")), sub.Attr("Unnamed")), wvSizeOf(sub.Self()), "=")
+	step, ok := whereValueExpressType(args[0])
+	if !ok {
+		return wvUnknownVal()
+	}
+	var Names WhereValue
+	Names = wvFromList([]WhereValue{})
+	var Unnamed WhereValue
+	Unnamed = parseLiteralNumber("0")
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		if entityIsOrSubtypes(step, "IfcPropertySet") {
+			Names = wvAdd(Names, ec.QualAttr(ec.QualEntity(ec.QualIndex(args[0], i), "IfcRoot"), "Name", 0))
+		} else {
+			Unnamed = wvAdd(Unnamed, parseLiteralNumber("1"))
+		}
+	}
+	return wvCompareRel(wvAdd(wvSizeOf(Names), Unnamed), wvSizeOf(args[0]), "=")
 }
 
-func schemaIfcUniquePropertyTemplateNames(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcUniquePropertyTemplateNames(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return wvCompareRel(wvSizeOf(sub.Attr("Names")), wvSizeOf(sub.Self()), "=")
+	var Names WhereValue
+	Names = wvFromList([]WhereValue{})
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		Names = wvAdd(Names, ec.QualAttr(ec.QualIndex(args[0], i), "Name", 0))
+	}
+	return wvCompareRel(wvSizeOf(Names), wvSizeOf(args[0]), "=")
 }
 
-func schemaIfcUniqueQuantityNames(ec *EntityWhereEval, arg WhereValue) WhereValue {
-	inst := arg.entityInstance()
-	if inst == nil {
+func schemaIfcUniqueQuantityNames(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	sub := ec.withInstance(inst)
-	return wvCompareRel(wvSizeOf(sub.Attr("Names")), wvSizeOf(sub.Self()), "=")
+	var Names WhereValue
+	Names = wvFromList([]WhereValue{})
+	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
+		Names = wvAdd(Names, ec.QualAttr(ec.QualIndex(args[0], i), "Name", 0))
+	}
+	return wvCompareRel(wvSizeOf(Names), wvSizeOf(args[0]), "=")
+}
+
+func schemaIfcVectorDifference(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	step, ok := whereValueExpressType(args[0])
+	if !ok {
+		return wvUnknownVal()
+	}
+	var Result WhereValue
+	var Res, Vec1, Vec2 WhereValue
+	var Mag, Mag1, Mag2 WhereValue
+	var Ndim WhereValue
+	if wvTruthy(wvOr(wvOr(wvNot(wvExists(args[0])), wvNot(wvExists(args[1]))), wvCompareRel(ec.QualAttr(args[0], "Dim", 0), ec.QualAttr(args[1], "Dim", 0), "<>"))) {
+		return wvUnknownVal()
+	} else {
+		if entityIsOrSubtypes(step, "IfcVector") {
+			Mag1 = ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Magnitude", 0)
+			Vec1 = ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Orientation", 0)
+		} else {
+			Mag1 = parseLiteralNumber("1.0")
+			Vec1 = args[0]
+		}
+		if entityIsOrSubtypes(step, "IfcVector") {
+			Mag2 = ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Magnitude", 0)
+			Vec2 = ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Orientation", 0)
+		} else {
+			Mag2 = parseLiteralNumber("1.0")
+			Vec2 = args[1]
+		}
+		Vec1 = ec.CallSchema("IfcNormalise", []WhereValue{Vec1})
+		Vec2 = ec.CallSchema("IfcNormalise", []WhereValue{Vec2})
+		Ndim = wvSizeOf(ec.QualAttr(Vec1, "DirectionRatios", 0))
+		Mag = parseLiteralNumber("0.0")
+		Res = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvRepeatList(parseLiteralNumber("0.0"), Ndim)))
+		for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(Ndim); i++ {
+			Res = wvAssignListElem(Res, "DirectionRatios", i, wvSub(wvMul(Mag1, ec.QualIndex(ec.QualAttr(Vec1, "DirectionRatios", 0), i)), wvMul(Mag2, ec.QualIndex(ec.QualAttr(Vec2, "DirectionRatios", 0), i))))
+			Mag = wvAdd(Mag, wvMul(ec.QualIndex(ec.QualAttr(Res, "DirectionRatios", 0), i), ec.QualIndex(ec.QualAttr(Res, "DirectionRatios", 0), i)))
+		}
+		if wvTruthy(wvCompareRel(Mag, parseLiteralNumber("0.0"), ">")) {
+			Result = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(Res, wvSqrt(Mag)))
+		} else {
+			Result = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(Vec1, parseLiteralNumber("0.0")))
+		}
+	}
+	return Result
 }
 
 func dispatchSchemaFunction(ec *EntityWhereEval, name string, args []WhereValue) WhereValue {
-	if v, ok := dispatchHandwrittenSchemaFunction(ec, name, args); ok {
-		return v
-	}
 	switch name {
 	case "IfcAssociatedSurface":
-		return schemaIfcAssociatedSurface(ec, args[0])
+		return schemaIfcAssociatedSurface(ec, args)
+	case "IfcBaseAxis":
+		return schemaIfcBaseAxis(ec, args)
+	case "IfcBooleanChoose":
+		return schemaIfcBooleanChoose(ec, args)
 	case "IfcBuild2Axes":
-		return schemaIfcBuild2Axes(ec, args[0])
+		return schemaIfcBuild2Axes(ec, args)
+	case "IfcBuildAxes":
+		return schemaIfcBuildAxes(ec, args)
 	case "IfcConsecutiveSegments":
-		return schemaIfcConsecutiveSegments(ec, args[0])
+		return schemaIfcConsecutiveSegments(ec, args)
+	case "IfcConstraintsParamBSpline":
+		return schemaIfcConstraintsParamBSpline(ec, args)
 	case "IfcConvertDirectionInto2D":
-		return schemaIfcConvertDirectionInto2D(ec, args[0])
+		return schemaIfcConvertDirectionInto2D(ec, args)
+	case "IfcCorrectDimensions":
+		return schemaIfcCorrectDimensions(ec, args)
 	case "IfcCorrectFillAreaStyle":
-		return schemaIfcCorrectFillAreaStyle(ec, args[0])
+		return schemaIfcCorrectFillAreaStyle(ec, args)
+	case "IfcCorrectLocalPlacement":
+		return schemaIfcCorrectLocalPlacement(ec, args)
 	case "IfcCorrectUnitAssignment":
-		return schemaIfcCorrectUnitAssignment(ec, args[0])
+		return schemaIfcCorrectUnitAssignment(ec, args)
+	case "IfcCrossProduct":
+		return schemaIfcCrossProduct(ec, args)
 	case "IfcCurveDim":
-		return schemaIfcCurveDim(ec, args[0])
+		return schemaIfcCurveDim(ec, args)
 	case "IfcCurveWeightsPositive":
-		return schemaIfcCurveWeightsPositive(ec, args[0])
+		return schemaIfcCurveWeightsPositive(ec, args)
 	case "IfcDeriveDimensionalExponents":
-		return schemaIfcDeriveDimensionalExponents(ec, args[0])
+		return schemaIfcDeriveDimensionalExponents(ec, args)
 	case "IfcDimensionsForSIUnit":
-		return schemaIfcDimensionsForSIUnit(ec, args[0])
+		return schemaIfcDimensionsForSIUnit(ec, args)
+	case "IfcDotProduct":
+		return schemaIfcDotProduct(ec, args)
+	case "IfcFirstProjAxis":
+		return schemaIfcFirstProjAxis(ec, args)
 	case "IfcGetBasisSurface":
-		return schemaIfcGetBasisSurface(ec, args[0])
+		return schemaIfcGetBasisSurface(ec, args)
+	case "IfcListToArray":
+		return schemaIfcListToArray(ec, args)
 	case "IfcLoopHeadToTail":
-		return schemaIfcLoopHeadToTail(ec, args[0])
+		return schemaIfcLoopHeadToTail(ec, args)
+	case "IfcMakeArrayOfArray":
+		return schemaIfcMakeArrayOfArray(ec, args)
 	case "IfcMlsTotalThickness":
-		return schemaIfcMlsTotalThickness(ec, args[0])
+		return schemaIfcMlsTotalThickness(ec, args)
 	case "IfcNormalise":
-		return schemaIfcNormalise(ec, args[0])
+		return schemaIfcNormalise(ec, args)
 	case "IfcOrthogonalComplement":
-		return schemaIfcOrthogonalComplement(ec, args[0])
+		return schemaIfcOrthogonalComplement(ec, args)
 	case "IfcPathHeadToTail":
-		return schemaIfcPathHeadToTail(ec, args[0])
+		return schemaIfcPathHeadToTail(ec, args)
 	case "IfcPointDim":
-		return schemaIfcPointDim(ec, args[0])
+		return schemaIfcPointDim(ec, args)
 	case "IfcPointListDim":
-		return schemaIfcPointListDim(ec, args[0])
+		return schemaIfcPointListDim(ec, args)
+	case "IfcScalarTimesVector":
+		return schemaIfcScalarTimesVector(ec, args)
+	case "IfcSecondProjAxis":
+		return schemaIfcSecondProjAxis(ec, args)
 	case "IfcSegmentDim":
-		return schemaIfcSegmentDim(ec, args[0])
+		return schemaIfcSegmentDim(ec, args)
+	case "IfcShapeRepresentationTypes":
+		return schemaIfcShapeRepresentationTypes(ec, args)
 	case "IfcSurfaceWeightsPositive":
-		return schemaIfcSurfaceWeightsPositive(ec, args[0])
+		return schemaIfcSurfaceWeightsPositive(ec, args)
+	case "IfcTaperedSweptAreaProfiles":
+		return schemaIfcTaperedSweptAreaProfiles(ec, args)
+	case "IfcTopologyRepresentationTypes":
+		return schemaIfcTopologyRepresentationTypes(ec, args)
 	case "IfcUniqueDefinitionNames":
-		return schemaIfcUniqueDefinitionNames(ec, args[0])
+		return schemaIfcUniqueDefinitionNames(ec, args)
 	case "IfcUniquePropertyName":
-		return schemaIfcUniquePropertyName(ec, args[0])
+		return schemaIfcUniquePropertyName(ec, args)
 	case "IfcUniquePropertySetNames":
-		return schemaIfcUniquePropertySetNames(ec, args[0])
+		return schemaIfcUniquePropertySetNames(ec, args)
 	case "IfcUniquePropertyTemplateNames":
-		return schemaIfcUniquePropertyTemplateNames(ec, args[0])
+		return schemaIfcUniquePropertyTemplateNames(ec, args)
 	case "IfcUniqueQuantityNames":
-		return schemaIfcUniqueQuantityNames(ec, args[0])
+		return schemaIfcUniqueQuantityNames(ec, args)
+	case "IfcVectorDifference":
+		return schemaIfcVectorDifference(ec, args)
 	default:
 		return wvUnknownVal()
 	}

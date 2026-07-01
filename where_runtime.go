@@ -17,17 +17,20 @@ const (
 	wvKindLogical
 	wvKindList
 	wvKindEnumType
+	wvKindRecord
 )
 
 type WhereValue struct {
-	kind     wvKind
-	i        int64
-	r        float64
-	s        string
-	list     []WhereValue
-	log      int // 0=false, 1=true, 2=unknown
-	entity   SIMPLE_ENTITY_INSTANCE
-	entities []SIMPLE_ENTITY_INSTANCE
+	kind        wvKind
+	i           int64
+	r           float64
+	s           string
+	list        []WhereValue
+	log         int // 0=false, 1=true, 2=unknown
+	entity      SIMPLE_ENTITY_INSTANCE
+	entities    []SIMPLE_ENTITY_INSTANCE
+	recordType  string
+	recordAttrs map[string]WhereValue
 }
 
 func wvUnknownVal() WhereValue { return WhereValue{kind: wvKindUnknown} }
@@ -75,6 +78,10 @@ func wvEnumMemberLabel(v WhereValue) (string, bool) {
 
 func wvFromList(items []WhereValue) WhereValue {
 	return WhereValue{kind: wvKindList, list: items}
+}
+
+func wvFromInt(n int) WhereValue {
+	return WhereValue{kind: wvKindInteger, i: int64(n)}
 }
 
 func parseLiteralNumber(text string) WhereValue {
@@ -139,6 +146,14 @@ func wvAsNumber(v WhereValue) (float64, bool) {
 	}
 }
 
+func wvAsInt(v WhereValue) int {
+	n, ok := wvAsNumber(v)
+	if !ok {
+		return 0
+	}
+	return int(n)
+}
+
 func wvAsString(v WhereValue) (string, bool) {
 	switch v.kind {
 	case wvKindString, wvKindEnum:
@@ -185,6 +200,17 @@ func wvCompareRel(left, right WhereValue, op string) WhereValue {
 		if rs, rok := wvAsString(right); rok {
 			cmp := strings.Compare(ls, rs)
 			return WhereValue{kind: wvKindLogical, log: boolToLog(relCompare(cmp, op))}
+		}
+	}
+	if op == "=" || op == "<>" {
+		leftNorm := wvNormalizeForCompare(left)
+		rightNorm := wvNormalizeForCompare(right)
+		if leftNorm.kind == wvKindRecord && rightNorm.kind == wvKindRecord {
+			eq := wvRecordsEqual(leftNorm, rightNorm)
+			if op == "=" {
+				return WhereValue{kind: wvKindLogical, log: boolToLog(eq)}
+			}
+			return WhereValue{kind: wvKindLogical, log: boolToLog(!eq)}
 		}
 	}
 	return wvUnknownLogical()
@@ -251,13 +277,184 @@ func wvIn(item, set WhereValue) WhereValue {
 	return WhereValue{kind: wvKindLogical, log: 0}
 }
 
+func wvValueEqual(a, b WhereValue) bool {
+	if same := wvInstSame(a, b); same.kind == wvKindLogical && same.log == 1 {
+		return true
+	}
+	ae, aok := wvEnumMemberLabel(a)
+	be, bok := wvEnumMemberLabel(b)
+	return aok && bok && ae == be
+}
+
+func wvSetUnion(a, b WhereValue) WhereValue {
+	if a.kind != wvKindList {
+		if a.kind == wvKindUnknown {
+			return wvFromList([]WhereValue{b})
+		}
+		return wvUnknownVal()
+	}
+	out := append([]WhereValue{}, a.list...)
+	for _, existing := range out {
+		if wvValueEqual(existing, b) {
+			return wvFromList(out)
+		}
+	}
+	out = append(out, b)
+	return wvFromList(out)
+}
+
+func wvEntityTypeTag(typeName string) WhereValue {
+	return WhereValue{kind: wvKindRecord, recordType: typeName}
+}
+
+func wvNewDirection(ratios WhereValue) WhereValue {
+	return WhereValue{
+		kind:       wvKindRecord,
+		recordType: "IfcDirection",
+		recordAttrs: map[string]WhereValue{
+			"DirectionRatios": ratios,
+		},
+	}
+}
+
+func wvNewVector(orientation, magnitude WhereValue) WhereValue {
+	return WhereValue{
+		kind:       wvKindRecord,
+		recordType: "IfcVector",
+		recordAttrs: map[string]WhereValue{
+			"Orientation": orientation,
+			"Magnitude":   magnitude,
+		},
+	}
+}
+
+func wvNewEntityRecord(typeName string, attrNames []string, args []WhereValue) WhereValue {
+	attrs := make(map[string]WhereValue, len(attrNames))
+	for i, name := range attrNames {
+		if i >= len(args) {
+			break
+		}
+		attrs[name] = args[i]
+	}
+	return WhereValue{kind: wvKindRecord, recordType: typeName, recordAttrs: attrs}
+}
+
+func wvRecordsEqual(a, b WhereValue) bool {
+	if a.kind != wvKindRecord || b.kind != wvKindRecord {
+		return false
+	}
+	if a.recordType != "" && b.recordType != "" && !strings.EqualFold(a.recordType, b.recordType) {
+		return false
+	}
+	if len(a.recordAttrs) != len(b.recordAttrs) {
+		return false
+	}
+	for name, av := range a.recordAttrs {
+		bv, ok := b.recordAttrs[name]
+		if !ok {
+			return false
+		}
+		if !wvTruthy(wvCompareRel(av, bv, "=")) {
+			return false
+		}
+	}
+	return true
+}
+
+func wvEntityIntersect(a, b WhereValue) WhereValue {
+	if b.kind == wvKindRecord || b.kind == wvKindList || b.entityInstance() != nil {
+		return b
+	}
+	if a.kind == wvKindRecord || a.kind == wvKindList || a.entityInstance() != nil {
+		return a
+	}
+	return b
+}
+
+func cloneRecord(v WhereValue) WhereValue {
+	if v.kind != wvKindRecord {
+		return v
+	}
+	attrs := make(map[string]WhereValue, len(v.recordAttrs))
+	for k, val := range v.recordAttrs {
+		attrs[k] = val
+	}
+	return WhereValue{kind: wvKindRecord, recordType: v.recordType, recordAttrs: attrs}
+}
+
+func wvAssignAttr(base WhereValue, attrName string, value WhereValue) WhereValue {
+	out := cloneRecord(base)
+	if out.kind != wvKindRecord {
+		out = WhereValue{kind: wvKindRecord, recordAttrs: map[string]WhereValue{}}
+	}
+	if out.recordAttrs == nil {
+		out.recordAttrs = map[string]WhereValue{}
+	}
+	out.recordAttrs[attrName] = value
+	return out
+}
+
+func wvAssignListElem(base WhereValue, attrName string, index int, value WhereValue) WhereValue {
+	out := cloneRecord(base)
+	if out.kind != wvKindRecord {
+		out = WhereValue{kind: wvKindRecord, recordAttrs: map[string]WhereValue{}}
+	}
+	if out.recordAttrs == nil {
+		out.recordAttrs = map[string]WhereValue{}
+	}
+	list := out.recordAttrs[attrName]
+	items := []WhereValue{}
+	if list.kind == wvKindList {
+		items = append(items, list.list...)
+	}
+	for len(items) < index {
+		items = append(items, wvUnknownVal())
+	}
+	if index < 1 {
+		return out
+	}
+	items[index-1] = value
+	out.recordAttrs[attrName] = wvFromList(items)
+	return out
+}
+
+func wvAssignAtIndex(base WhereValue, index int, value WhereValue) WhereValue {
+	items := []WhereValue{}
+	if base.kind == wvKindList {
+		items = append(items, base.list...)
+	}
+	for len(items) < index {
+		items = append(items, wvUnknownVal())
+	}
+	if index < 1 {
+		return base
+	}
+	items[index-1] = value
+	return wvFromList(items)
+}
+
+func wvRepeatList(item WhereValue, count WhereValue) WhereValue {
+	n := wvAsInt(count)
+	if n < 0 {
+		return wvUnknownVal()
+	}
+	items := make([]WhereValue, n)
+	for i := range items {
+		items[i] = item
+	}
+	return wvFromList(items)
+}
+
 func wvAdd(a, b WhereValue) WhereValue {
 	an, aok := wvAsNumber(a)
 	bn, bok := wvAsNumber(b)
-	if !aok || !bok {
-		return wvUnknownVal()
+	if aok && bok {
+		return WhereValue{kind: wvKindReal, r: an + bn}
 	}
-	return WhereValue{kind: wvKindReal, r: an + bn}
+	if a.kind == wvKindList {
+		return wvSetUnion(a, b)
+	}
+	return wvUnknownVal()
 }
 
 func wvSub(a, b WhereValue) WhereValue {
@@ -272,10 +469,10 @@ func wvSub(a, b WhereValue) WhereValue {
 func wvMul(a, b WhereValue) WhereValue {
 	an, aok := wvAsNumber(a)
 	bn, bok := wvAsNumber(b)
-	if !aok || !bok {
-		return wvUnknownVal()
+	if aok && bok {
+		return WhereValue{kind: wvKindReal, r: an * bn}
 	}
-	return WhereValue{kind: wvKindReal, r: an * bn}
+	return wvSetIntersect(a, b)
 }
 
 func wvDiv(a, b WhereValue) WhereValue {
@@ -304,6 +501,14 @@ func wvAbs(v WhereValue) WhereValue {
 	return WhereValue{kind: wvKindReal, r: math.Abs(n)}
 }
 
+func wvSqrt(v WhereValue) WhereValue {
+	n, ok := wvAsNumber(v)
+	if !ok {
+		return wvUnknownVal()
+	}
+	return WhereValue{kind: wvKindReal, r: math.Sqrt(n)}
+}
+
 func wvSizeOf(v WhereValue) WhereValue {
 	if v.kind == wvKindList {
 		return WhereValue{kind: wvKindInteger, i: int64(len(v.list))}
@@ -316,6 +521,10 @@ func wvSizeOf(v WhereValue) WhereValue {
 
 func wvHiIndex(v WhereValue) WhereValue {
 	return wvSizeOf(v)
+}
+
+func wvLoIndex(v WhereValue) WhereValue {
+	return wvFromInt(1)
 }
 
 func wvExists(v WhereValue) WhereValue {
@@ -417,8 +626,35 @@ func wvInstSame(a, b WhereValue) WhereValue {
 	}
 	return wvUnknownLogical()
 }
-func wvSetIntersect(_, _ WhereValue) WhereValue { return wvUnknownVal() }
-func wvPower(a, _ WhereValue) WhereValue        { return a }
+func wvSetIntersect(a, b WhereValue) WhereValue {
+	sb := typeOfLabelSet(b)
+	if sb == nil {
+		if s, ok := wvAsString(b); ok {
+			sb = map[string]struct{}{strings.ToLower(s): {}}
+		} else {
+			return wvUnknownVal()
+		}
+	}
+	if a.kind != wvKindList {
+		if s, ok := wvAsString(a); ok {
+			if _, ok := sb[strings.ToLower(s)]; ok {
+				return wvFromList([]WhereValue{wvFromString(s)})
+			}
+			return wvFromList([]WhereValue{})
+		}
+		return wvUnknownVal()
+	}
+	out := make([]WhereValue, 0, len(a.list))
+	for _, item := range a.list {
+		if s, ok := wvAsString(item); ok {
+			if _, ok := sb[strings.ToLower(s)]; ok {
+				out = append(out, item)
+			}
+		}
+	}
+	return wvFromList(out)
+}
+func wvPower(a, _ WhereValue) WhereValue { return a }
 func wvQuery(v WhereValue, pred func(WhereValue) WhereValue) WhereValue {
 	var elements []WhereValue
 	switch v.kind {

@@ -9,6 +9,161 @@ import (
 	"typefox.dev/fastbelt/workspace"
 )
 
+func TestPopulationOfProductRepresentationInverseViaSubtype(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#6=IFCCARTESIANPOINT((0.,0.,0.));
+#117=IFCAXIS2PLACEMENT3D(#6,$,$);
+#118=IFCDIRECTION((0.,1.));
+#120=IFCGEOMETRICREPRESENTATIONCONTEXT($,'Model',3,0.01,#117,#118);
+#126=IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Body','Model',*,*,*,*,#120,$,.MODEL_VIEW.,$);
+#20=IFCDIRECTION((0.,0.,1.));
+#1=IFCCARTESIANPOINT((0.,0.));
+#2=IFCCARTESIANPOINT((1.,0.));
+#3=IFCCARTESIANPOINT((1.,1.));
+#213=IFCPOLYLINE((#1,#2,#3,#1));
+#214=IFCARBITRARYCLOSEDPROFILEDEF(.AREA.,$,#213);
+#217=IFCAXIS2PLACEMENT3D(#6,$,$);
+#218=IFCEXTRUDEDAREASOLID(#214,#217,#20,1.);
+#219=IFCSHAPEREPRESENTATION(#126,'Body','SweptSolid',(#218));
+#226=IFCPRODUCTDEFINITIONSHAPE($,$,(#219));
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	pop := BuildPopulation(context.Background(), doc.Document)
+	links := pop.InverseRelations("#219", "OfProductRepresentation")
+	if len(links) != 1 {
+		t.Fatalf("expected 1 OfProductRepresentation inverse link, got %d", len(links))
+	}
+	if links[0].Name() != "#226" {
+		t.Fatalf("expected inverse source #226, got %s", links[0].Name())
+	}
+
+	rec, ok := pop.Lookup("#219")
+	if !ok {
+		t.Fatal("missing #219")
+	}
+	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCSHAPEREPRESENTATION", rec.Instance, rec.Params, pop)
+	if !okPass {
+		t.Fatalf("CheckEntityWhereRules IFCSHAPEREPRESENTATION WR11 failed: %s", detail)
+	}
+}
+
+func TestPopulationHasAssociationsDeduped(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#48=IFCOWNERHISTORY($,$,$,$,$);
+#3228=IFCMATERIAL('Mat',$);
+#2912=IFCWALL('wall',#48,'W',$,$,$,$,$,.NOTDEFINED.);
+#94687=IFCRELASSOCIATESMATERIAL('r2',#48,$,$,(#2912),#3228);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+	pop := BuildPopulation(context.Background(), doc.Document)
+
+	assoc := pop.InverseRelations("#2912", "HasAssociations")
+	if len(assoc) != 1 {
+		t.Fatalf("expected 1 HasAssociations inverse link, got %d", len(assoc))
+	}
+	if assoc[0].Name() != "#94687" {
+		t.Fatalf("expected inverse source #94687, got %s", assoc[0].Name())
+	}
+
+	rec, ok := pop.Lookup("#2912")
+	if !ok {
+		t.Fatal("missing #2912")
+	}
+	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCWALL", rec.Instance, rec.Params, pop)
+	if !okPass {
+		t.Fatalf("CheckEntityWhereRules IFCWALL MaxOneMaterialAssociation failed: %s", detail)
+	}
+}
+
+func TestCartesianTransformationOperator3DOmittedAxis3(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#6=IFCCARTESIANPOINT((0.,0.,0.));
+#62595=IFCCARTESIANTRANSFORMATIONOPERATOR3D($,$,#6,1.,$);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+	pop := BuildPopulation(context.Background(), doc.Document)
+
+	rec, ok := pop.Lookup("#62595")
+	if !ok {
+		t.Fatal("missing #62595")
+	}
+	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCCARTESIANTRANSFORMATIONOPERATOR3D", rec.Instance, rec.Params, pop)
+	if !okPass {
+		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
+	}
+}
+
+func TestRelAssociatesMaterialAllowedElementsWindow(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#48=IFCOWNERHISTORY($,$,$,$,$);
+#94038=IFCMATERIAL('Glass',$);
+#94039=IFCMATERIAL('Frame',$);
+#94040=IFCMATERIALCONSTITUENTSET('MaterialConstituentSet',$,(#94038,#94039));
+#94035=IFCWINDOW('win',#48,'WI',$,'desc',$,$,'2240803',733.,2233.,.WINDOW.,.NOTDEFINED.,$);
+#95125=IFCRELASSOCIATESMATERIAL('rel',#48,$,$,(#94035),#94040);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+	pop := BuildPopulation(context.Background(), doc.Document)
+
+	rec, ok := pop.Lookup("#95125")
+	if !ok {
+		t.Fatal("missing #95125")
+	}
+	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCRELASSOCIATESMATERIAL", rec.Instance, rec.Params, pop)
+	if !okPass {
+		t.Fatalf("CheckEntityWhereRules IFCRELASSOCIATESMATERIAL AllowedElements failed: %s", detail)
+	}
+}
+
 func TestPopulationInverseIsActingUpon(t *testing.T) {
 	sc := CreateServices()
 	fixture := fbtest.New(t, sc)

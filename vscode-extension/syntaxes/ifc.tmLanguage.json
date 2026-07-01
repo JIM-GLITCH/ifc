@@ -6,14 +6,36 @@
   ],
   "patterns": [
     {
+      "include": "#strings"
+    },
+    {
       "include": "#comments"
     },
     {
       "name": "keyword.control.ifc",
-      "match": "\\bhello\\b"
+      "match": "\\b(?:ISO-10303-21|HEADER|DATA|ENDSEC|END-ISO-10303-21)\\b"
+    },
+    {
+      "name": "entity.name.type.ifc",
+      "match": "#[0-9]+"
     }
   ],
   "repository": {
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.ifc",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.ifc",
+              "match": "''"
+            }
+          ]
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {
@@ -30,16 +52,6 @@
               "name": "punctuation.definition.comment.ifc"
             }
           }
-        },
-        {
-          "begin": "//",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.whitespace.comment.leading.ifc"
-            }
-          },
-          "end": "(?=$)",
-          "name": "comment.line.ifc"
         }
       ]
     }

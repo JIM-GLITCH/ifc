@@ -12,7 +12,7 @@ func derivedEval_Dim_0(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereVa
 
 func derivedEval_Z_1(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvNVL(sub.CallSchema("IfcNormalise", []WhereValue{sub.Attr("Axis")}), wvFromList([]WhereValue{wvFromEnumStepLiteral("0"), wvFromEnumStepLiteral("0"), wvFromEnumStepLiteral("0")}))
+	return wvNVL(sub.CallSchema("IfcNormalise", []WhereValue{sub.Attr("Axis")}), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0.0"), parseLiteralNumber("0.0"), parseLiteralNumber("1.0")}))))
 }
 
 func derivedEval_Dim_2(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
@@ -46,7 +46,7 @@ func derivedEval_NSegments_7(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) W
 
 func derivedEval_ClosedCurve_8(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvCompareRel(sub.QualAttr(sub.QualIndex(sub.Attr("Segments"), 1), "Transition", 0), sub.Attr("Discontinuous"), "<>")
+	return wvCompareRel(sub.QualAttr(sub.QualIndex(sub.Attr("Segments"), wvAsInt(sub.Derived("NSegments"))), "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "<>")
 }
 
 func derivedEval_BasisSurface_9(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
@@ -103,7 +103,7 @@ func derivedEval_Dim_19(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereV
 
 func derivedEval_Scl_20(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvNVL(sub.Attr("Scale"), wvFromEnumStepLiteral("0"))
+	return wvNVL(sub.Attr("Scale"), parseLiteralNumber("1.0"))
 }
 
 func derivedEval_Dim_21(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
@@ -111,134 +111,140 @@ func derivedEval_Dim_21(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereV
 	return sub.QualAttr(sub.Attr("LocalOrigin"), "Dim", 0)
 }
 
-func derivedEval_Scl2_22(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_U_22(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+	sub := ec.withInstance(inst)
+	return sub.CallSchema("IfcBaseAxis", []WhereValue{parseLiteralNumber("2"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), wvUnknownVal()})
+}
+
+func derivedEval_Scl2_23(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvNVL(sub.Attr("Scale2"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Scl", 0))
 }
 
-func derivedEval_U_23(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_U_24(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcBaseAxis", []WhereValue{parseLiteralNumber("3"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), sub.Attr("Axis3")})
 }
 
-func derivedEval_Scl3_24(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Scl3_25(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvNVL(sub.Attr("Scale3"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Scl", 0))
 }
 
-func derivedEval_Dim_25(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Dim_26(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	return ec.CallSchema("IfcSegmentDim", []WhereValue{wvFromEntityInstance(inst)})
 }
 
-func derivedEval_Dimensions_26(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Dimensions_27(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcDeriveDimensionalExponents", []WhereValue{sub.Attr("Elements")})
 }
 
-func derivedEval_Dim_27(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Dim_28(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvHiIndex(sub.Attr("DirectionRatios"))
 }
 
-func derivedEval_Ne_28(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Ne_29(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvSizeOf(sub.Attr("EdgeList"))
 }
 
-func derivedEval_Dim_29(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Dim_30(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.QualAttr(sub.QualIndex(sub.Attr("Elements"), 1), "Dim", 0)
 }
 
-func derivedEval_WorldCoordinateSystem_30(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_WorldCoordinateSystem_31(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.QualAttr(sub.Attr("ParentContext"), "WorldCoordinateSystem", 0)
 }
 
-func derivedEval_CoordinateSpaceDimension_31(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_CoordinateSpaceDimension_32(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.QualAttr(sub.Attr("ParentContext"), "CoordinateSpaceDimension", 0)
 }
 
-func derivedEval_TrueNorth_32(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_TrueNorth_33(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvNVL(sub.QualAttr(sub.Attr("ParentContext"), "TrueNorth", 0), sub.CallSchema("IfcConvertDirectionInto2D", []WhereValue{sub.QualIndex(sub.QualAttr(sub.QualAttr(sub.QualEntity(sub.Self(), "IfcGeometricRepresentationContext"), "WorldCoordinateSystem", 0), "P", 0), 2)}))
 }
 
-func derivedEval_Precision_33(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Precision_34(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvNVL(sub.QualAttr(sub.Attr("ParentContext"), "Precision", 0), wvFromEnumStepLiteral("E-5"))
+	return wvNVL(sub.QualAttr(sub.Attr("ParentContext"), "Precision", 0), parseLiteralNumber("1.E-5"))
 }
 
-func derivedEval_TotalThickness_34(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_TotalThickness_35(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	return ec.CallSchema("IfcMlsTotalThickness", []WhereValue{wvFromEntityInstance(inst)})
 }
 
-func derivedEval_Operator_35(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
-	return wvFromList([]WhereValue{wvSub(parseLiteralNumber("0"), wvFromEnumStepLiteral("")), wvFromEnumStepLiteral("")})
+func derivedEval_Operator_36(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+	sub := ec.withInstance(inst)
+	return wvEntityIntersect(wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), sub.CallSchema("IfcCartesianTransformationOperator", []WhereValue{wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{wvSub(parseLiteralNumber("0"), parseLiteralNumber("1.")), parseLiteralNumber("0.")}))), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("0."), parseLiteralNumber("1.")}))), wvEntityIntersect(wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvEntityTypeTag("IfcPoint")), sub.CallSchema("IfcCartesianPoint", []WhereValue{wvFromList([]WhereValue{parseLiteralNumber("0."), parseLiteralNumber("0.")})})), parseLiteralNumber("1.")})), wvEntityTypeTag("IfcCartesianTransformationOperator2D"))
 }
 
-func derivedEval_EdgeStart_36(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_EdgeStart_37(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcBooleanChoose", []WhereValue{sub.Attr("Orientation"), sub.QualAttr(sub.Attr("EdgeElement"), "EdgeStart", 0), sub.QualAttr(sub.Attr("EdgeElement"), "EdgeEnd", 0)})
 }
 
-func derivedEval_EdgeEnd_37(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_EdgeEnd_38(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcBooleanChoose", []WhereValue{sub.Attr("Orientation"), sub.QualAttr(sub.Attr("EdgeElement"), "EdgeEnd", 0), sub.QualAttr(sub.Attr("EdgeElement"), "EdgeStart", 0)})
 }
 
-func derivedEval_Weights_38(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Weights_39(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcListToArray", []WhereValue{sub.Attr("WeightsData"), parseLiteralNumber("0"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcBSplineCurve"), "UpperIndexOnControlPoints", 0)})
 }
 
-func derivedEval_Weights_39(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Weights_40(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcMakeArrayOfArray", []WhereValue{sub.Attr("WeightsData"), parseLiteralNumber("0"), sub.Derived("UUpper"), parseLiteralNumber("0"), sub.Derived("VUpper")})
 }
 
-func derivedEval_AxisLine_40(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_AxisLine_41(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvSetIntersect(wvSetIntersect(wvSetIntersect(sub.CallSchema("IfcRepresentationItem", []WhereValue{}), sub.CallSchema("IfcGeometricRepresentationItem", []WhereValue{})), sub.CallSchema("IfcCurve", []WhereValue{})), sub.CallSchema("IfcLine", []WhereValue{sub.QualAttr(sub.Attr("Axis"), "Location", 0), wvSetIntersect(wvSetIntersect(sub.CallSchema("IfcRepresentationItem", []WhereValue{}), sub.CallSchema("IfcGeometricRepresentationItem", []WhereValue{})), sub.CallSchema("IfcVector", []WhereValue{sub.QualAttr(sub.Attr("Axis"), "Z", 0), wvFromEnumStepLiteral("0")}))}))
+	return wvEntityIntersect(wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvEntityTypeTag("IfcCurve")), sub.CallSchema("IfcLine", []WhereValue{sub.QualAttr(sub.Attr("Axis"), "Location", 0), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(sub.QualAttr(sub.Attr("Axis"), "Z", 0), parseLiteralNumber("1.0")))}))
 }
 
-func derivedEval_Dimensions_41(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Dimensions_42(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.CallSchema("IfcDimensionsForSIUnit", []WhereValue{sub.QualAttr(sub.Self(), "Name", 0)})
 }
 
-func derivedEval_ExtrusionAxis_42(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_ExtrusionAxis_43(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvSetIntersect(wvSetIntersect(sub.CallSchema("IfcRepresentationItem", []WhereValue{}), sub.CallSchema("IfcGeometricRepresentationItem", []WhereValue{})), sub.CallSchema("IfcVector", []WhereValue{sub.Attr("ExtrudedDirection"), sub.Attr("Depth")}))
+	return wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(sub.Attr("ExtrudedDirection"), sub.Attr("Depth")))
 }
 
-func derivedEval_AxisLine_43(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_AxisLine_44(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return wvSetIntersect(wvSetIntersect(wvSetIntersect(sub.CallSchema("IfcRepresentationItem", []WhereValue{}), sub.CallSchema("IfcGeometricRepresentationItem", []WhereValue{})), sub.CallSchema("IfcCurve", []WhereValue{})), sub.CallSchema("IfcLine", []WhereValue{sub.QualAttr(sub.Attr("AxisPosition"), "Location", 0), wvSetIntersect(wvSetIntersect(sub.CallSchema("IfcRepresentationItem", []WhereValue{}), sub.CallSchema("IfcGeometricRepresentationItem", []WhereValue{})), sub.CallSchema("IfcVector", []WhereValue{sub.QualAttr(sub.Attr("AxisPosition"), "Z", 0), wvFromEnumStepLiteral("0")}))}))
+	return wvEntityIntersect(wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvEntityTypeTag("IfcCurve")), sub.CallSchema("IfcLine", []WhereValue{sub.QualAttr(sub.Attr("AxisPosition"), "Location", 0), wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewVector(sub.QualAttr(sub.Attr("AxisPosition"), "Z", 0), parseLiteralNumber("1.0")))}))
 }
 
-func derivedEval_NumberOfCellsInRow_44(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_NumberOfCellsInRow_45(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvHiIndex(sub.QualAttr(sub.QualIndex(sub.Attr("Rows"), 1), "RowCells", 0))
 }
 
-func derivedEval_NumberOfHeadings_45(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_NumberOfHeadings_46(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvSizeOf(wvQuery(sub.Attr("Rows"), func(Temp WhereValue) WhereValue { return sub.QualAttr(Temp, "IsHeading", 0) }))
 }
 
-func derivedEval_NumberOfDataRows_46(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_NumberOfDataRows_47(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvSizeOf(wvQuery(sub.Attr("Rows"), func(Temp WhereValue) WhereValue { return wvNot(sub.QualAttr(Temp, "IsHeading", 0)) }))
 }
 
-func derivedEval_NumberOfTriangles_47(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_NumberOfTriangles_48(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return wvSizeOf(sub.Attr("CoordIndex"))
 }
 
-func derivedEval_Dim_48(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
+func derivedEval_Dim_49(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
 	return sub.QualAttr(sub.Attr("Orientation"), "Dim", 0)
 }
@@ -339,23 +345,25 @@ func init() {
 		"IFCCARTESIANTRANSFORMATIONOPERATOR2D": {
 			"Dim": derivedEval_Dim_21,
 			"Scl": derivedEval_Scl_20,
+			"U": derivedEval_U_22,
 		},
 		"IFCCARTESIANTRANSFORMATIONOPERATOR2DNONUNIFORM": {
 			"Dim": derivedEval_Dim_21,
 			"Scl": derivedEval_Scl_20,
-			"Scl2": derivedEval_Scl2_22,
+			"Scl2": derivedEval_Scl2_23,
+			"U": derivedEval_U_22,
 		},
 		"IFCCARTESIANTRANSFORMATIONOPERATOR3D": {
 			"Dim": derivedEval_Dim_21,
 			"Scl": derivedEval_Scl_20,
-			"U": derivedEval_U_23,
+			"U": derivedEval_U_24,
 		},
 		"IFCCARTESIANTRANSFORMATIONOPERATOR3DNONUNIFORM": {
 			"Dim": derivedEval_Dim_21,
 			"Scl": derivedEval_Scl_20,
-			"Scl2": derivedEval_Scl2_22,
-			"Scl3": derivedEval_Scl3_24,
-			"U": derivedEval_U_23,
+			"Scl2": derivedEval_Scl2_23,
+			"Scl3": derivedEval_Scl3_25,
+			"U": derivedEval_U_24,
 		},
 		"IFCCIRCLE": {
 			"Dim": derivedEval_Dim_6,
@@ -375,7 +383,7 @@ func init() {
 			"NSegments": derivedEval_NSegments_7,
 		},
 		"IFCCOMPOSITECURVESEGMENT": {
-			"Dim": derivedEval_Dim_25,
+			"Dim": derivedEval_Dim_26,
 		},
 		"IFCCONIC": {
 			"Dim": derivedEval_Dim_6,
@@ -399,16 +407,16 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCCURVESEGMENT": {
-			"Dim": derivedEval_Dim_25,
+			"Dim": derivedEval_Dim_26,
 		},
 		"IFCCYLINDRICALSURFACE": {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCDERIVEDUNIT": {
-			"Dimensions": derivedEval_Dimensions_26,
+			"Dimensions": derivedEval_Dimensions_27,
 		},
 		"IFCDIRECTION": {
-			"Dim": derivedEval_Dim_27,
+			"Dim": derivedEval_Dim_28,
 		},
 		"IFCDIRECTRIXCURVESWEPTAREASOLID": {
 			"Dim": derivedEval_Dim_0,
@@ -417,7 +425,7 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCEDGELOOP": {
-			"Ne": derivedEval_Ne_28,
+			"Ne": derivedEval_Ne_29,
 		},
 		"IFCELEMENTARYSURFACE": {
 			"Dim": derivedEval_Dim_0,
@@ -444,16 +452,16 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCGEOMETRICCURVESET": {
-			"Dim": derivedEval_Dim_29,
+			"Dim": derivedEval_Dim_30,
 		},
 		"IFCGEOMETRICREPRESENTATIONSUBCONTEXT": {
-			"CoordinateSpaceDimension": derivedEval_CoordinateSpaceDimension_31,
-			"Precision": derivedEval_Precision_33,
-			"TrueNorth": derivedEval_TrueNorth_32,
-			"WorldCoordinateSystem": derivedEval_WorldCoordinateSystem_30,
+			"CoordinateSpaceDimension": derivedEval_CoordinateSpaceDimension_32,
+			"Precision": derivedEval_Precision_34,
+			"TrueNorth": derivedEval_TrueNorth_33,
+			"WorldCoordinateSystem": derivedEval_WorldCoordinateSystem_31,
 		},
 		"IFCGEOMETRICSET": {
-			"Dim": derivedEval_Dim_29,
+			"Dim": derivedEval_Dim_30,
 		},
 		"IFCGRADIENTCURVE": {
 			"ClosedCurve": derivedEval_ClosedCurve_8,
@@ -477,10 +485,10 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCMATERIALLAYERSET": {
-			"TotalThickness": derivedEval_TotalThickness_34,
+			"TotalThickness": derivedEval_TotalThickness_35,
 		},
 		"IFCMIRROREDPROFILEDEF": {
-			"Operator": derivedEval_Operator_35,
+			"Operator": derivedEval_Operator_36,
 		},
 		"IFCOFFSETCURVE": {
 			"Dim": derivedEval_Dim_6,
@@ -495,8 +503,8 @@ func init() {
 			"Dim": derivedEval_Dim_6,
 		},
 		"IFCORIENTEDEDGE": {
-			"EdgeEnd": derivedEval_EdgeEnd_37,
-			"EdgeStart": derivedEval_EdgeStart_36,
+			"EdgeEnd": derivedEval_EdgeEnd_38,
+			"EdgeStart": derivedEval_EdgeStart_37,
 		},
 		"IFCOUTERBOUNDARYCURVE": {
 			"BasisSurface": derivedEval_BasisSurface_9,
@@ -542,7 +550,7 @@ func init() {
 			"Dim": derivedEval_Dim_6,
 			"UpperIndexOnControlPoints": derivedEval_UpperIndexOnControlPoints_10,
 			"UpperIndexOnKnots": derivedEval_UpperIndexOnKnots_12,
-			"Weights": derivedEval_Weights_38,
+			"Weights": derivedEval_Weights_39,
 		},
 		"IFCRATIONALBSPLINESURFACEWITHKNOTS": {
 			"ControlPoints": derivedEval_ControlPoints_15,
@@ -551,7 +559,7 @@ func init() {
 			"KnotVUpper": derivedEval_KnotVUpper_16,
 			"UUpper": derivedEval_UUpper_13,
 			"VUpper": derivedEval_VUpper_14,
-			"Weights": derivedEval_Weights_39,
+			"Weights": derivedEval_Weights_40,
 		},
 		"IFCRECTANGULARPYRAMID": {
 			"Dim": derivedEval_Dim_0,
@@ -560,14 +568,14 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCREPARAMETRISEDCOMPOSITECURVESEGMENT": {
-			"Dim": derivedEval_Dim_25,
+			"Dim": derivedEval_Dim_26,
 		},
 		"IFCREVOLVEDAREASOLID": {
-			"AxisLine": derivedEval_AxisLine_40,
+			"AxisLine": derivedEval_AxisLine_41,
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCREVOLVEDAREASOLIDTAPERED": {
-			"AxisLine": derivedEval_AxisLine_40,
+			"AxisLine": derivedEval_AxisLine_41,
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCRIGHTCIRCULARCONE": {
@@ -596,7 +604,7 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCSEGMENT": {
-			"Dim": derivedEval_Dim_25,
+			"Dim": derivedEval_Dim_26,
 		},
 		"IFCSEGMENTEDREFERENCECURVE": {
 			"ClosedCurve": derivedEval_ClosedCurve_8,
@@ -613,7 +621,7 @@ func init() {
 			"Dim": derivedEval_Dim_6,
 		},
 		"IFCSIUNIT": {
-			"Dimensions": derivedEval_Dimensions_41,
+			"Dimensions": derivedEval_Dimensions_42,
 		},
 		"IFCSOLIDMODEL": {
 			"Dim": derivedEval_Dim_0,
@@ -639,10 +647,10 @@ func init() {
 		},
 		"IFCSURFACEOFLINEAREXTRUSION": {
 			"Dim": derivedEval_Dim_0,
-			"ExtrusionAxis": derivedEval_ExtrusionAxis_42,
+			"ExtrusionAxis": derivedEval_ExtrusionAxis_43,
 		},
 		"IFCSURFACEOFREVOLUTION": {
-			"AxisLine": derivedEval_AxisLine_43,
+			"AxisLine": derivedEval_AxisLine_44,
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCSWEPTAREASOLID": {
@@ -658,9 +666,9 @@ func init() {
 			"Dim": derivedEval_Dim_0,
 		},
 		"IFCTABLE": {
-			"NumberOfCellsInRow": derivedEval_NumberOfCellsInRow_44,
-			"NumberOfDataRows": derivedEval_NumberOfDataRows_46,
-			"NumberOfHeadings": derivedEval_NumberOfHeadings_45,
+			"NumberOfCellsInRow": derivedEval_NumberOfCellsInRow_45,
+			"NumberOfDataRows": derivedEval_NumberOfDataRows_47,
+			"NumberOfHeadings": derivedEval_NumberOfHeadings_46,
 		},
 		"IFCTESSELLATEDFACESET": {
 			"Dim": derivedEval_Dim_0,
@@ -673,17 +681,17 @@ func init() {
 		},
 		"IFCTRIANGULATEDFACESET": {
 			"Dim": derivedEval_Dim_0,
-			"NumberOfTriangles": derivedEval_NumberOfTriangles_47,
+			"NumberOfTriangles": derivedEval_NumberOfTriangles_48,
 		},
 		"IFCTRIANGULATEDIRREGULARNETWORK": {
 			"Dim": derivedEval_Dim_0,
-			"NumberOfTriangles": derivedEval_NumberOfTriangles_47,
+			"NumberOfTriangles": derivedEval_NumberOfTriangles_48,
 		},
 		"IFCTRIMMEDCURVE": {
 			"Dim": derivedEval_Dim_6,
 		},
 		"IFCVECTOR": {
-			"Dim": derivedEval_Dim_48,
+			"Dim": derivedEval_Dim_49,
 		},
 	}
 }

@@ -249,6 +249,85 @@ END-ISO-10303-21;`
 	}
 }
 
+func TestSIUnitDerivedDimensionsAndWR1(t *testing.T) {
+	pop, ec := schemaTestEnv(t, `#49=IFCSIUNIT(*,.LENGTHUNIT.,.MILLI.,.METRE.);`)
+	rec, ok := pop.Lookup("#49")
+	if !ok {
+		t.Fatal("missing #49")
+	}
+	ec = NewEntityWhereEval(context.Background(), "IFCSIUNIT", rec.Instance, rec.Params, pop)
+	dimDerived := ec.Derived("Dimensions")
+	if dimDerived.kind != wvKindRecord {
+		t.Fatalf("Dimensions kind=%d, want record", dimDerived.kind)
+	}
+	unitType := ec.QualAttr(ec.Self(), "UnitType", 0)
+	dim := ec.QualAttr(ec.Self(), "Dimensions", 0)
+	result := ec.CallSchema("IfcCorrectDimensions", []WhereValue{unitType, dim})
+	if !wvTruthy(result) {
+		t.Fatalf("IfcCorrectDimensions failed: unitType=%v dim=%v result=%v", unitType, dim, result)
+	}
+	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCSIUNIT", rec.Instance, rec.Params, pop)
+	if !okPass {
+		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
+	}
+}
+
+func TestConversionBasedUnitExplicitDimensionsAndWR1(t *testing.T) {
+	pop, ec := schemaTestEnv(t, `#53=IFCSIUNIT(*,.PLANEANGLEUNIT.,$,.RADIAN.);
+#54=IFCDIMENSIONALEXPONENTS(0,0,0,0,0,0,0);
+#55=IFCMEASUREWITHUNIT(IFCRATIOMEASURE(0.0174532925199433),#53);
+#56=IFCCONVERSIONBASEDUNIT(#54,.PLANEANGLEUNIT.,'DEGREE',#55);`)
+	rec, ok := pop.Lookup("#56")
+	if !ok {
+		t.Fatal("missing #56")
+	}
+	ec = NewEntityWhereEval(context.Background(), "IFCCONVERSIONBASEDUNIT", rec.Instance, rec.Params, pop)
+	unitType := ec.QualAttr(ec.Self(), "UnitType", 0)
+	dim := ec.QualAttr(ec.Self(), "Dimensions", 0)
+	if dim.entityInstance() == nil {
+		t.Fatalf("Dimensions should be entity instance, got kind=%d", dim.kind)
+	}
+	result := ec.CallSchema("IfcCorrectDimensions", []WhereValue{unitType, dim})
+	if !wvTruthy(result) {
+		t.Fatalf("IfcCorrectDimensions failed: unitType=%v dim=%v result=%v", unitType, dim, result)
+	}
+	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCCONVERSIONBASEDUNIT", rec.Instance, rec.Params, pop)
+	if !okPass {
+		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
+	}
+}
+
+func TestValidateConversionBasedUnitWR1(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#53=IFCSIUNIT(*,.PLANEANGLEUNIT.,$,.RADIAN.);
+#54=IFCDIMENSIONALEXPONENTS(0,0,0,0,0,0,0);
+#55=IFCMEASUREWITHUNIT(IFCRATIOMEASURE(0.0174532925199433),#53);
+#56=IFCCONVERSIONBASEDUNIT(#54,.PLANEANGLEUNIT.,'DEGREE',#55);
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+
+	for _, d := range diagnostics {
+		if d.Code == "ifc-entity-where" {
+			t.Fatalf("unexpected ifc-entity-where: %s", d.Message)
+		}
+	}
+}
+
 func TestValidateSIUnitDerivedParameter(t *testing.T) {
 	sc := CreateServices()
 	fixture := fbtest.New(t, sc)
@@ -279,8 +358,8 @@ END-ISO-10303-21;`
 	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
 
 	for _, d := range diagnostics {
-		if d.Code == "ifc-param-required" || d.Code == "ifc-param-derived" {
-			t.Fatalf("unexpected diagnostic: %s", d.Message)
+		if d.Code == "ifc-param-required" || d.Code == "ifc-param-derived" || d.Code == "ifc-entity-where" {
+			t.Fatalf("unexpected diagnostic (%s): %s", d.Code, d.Message)
 		}
 	}
 }
