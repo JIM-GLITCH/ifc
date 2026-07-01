@@ -3,6 +3,7 @@ package ifc
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	core "typefox.dev/fastbelt"
@@ -225,6 +226,106 @@ func aggregateExpressionForAttr(attr SchemaAttr) string {
 	return attr.TypeName
 }
 
+type aggregateBounds struct {
+	low  int // -1 when unbounded (?)
+	high int // -1 when unbounded (?)
+}
+
+func parseAggregateBounds(typeName string) (aggregateBounds, bool) {
+	upper := strings.ToUpper(strings.TrimSpace(typeName))
+	prefixLen := 0
+	for _, prefix := range []string{"LIST ", "SET ", "BAG ", "ARRAY "} {
+		if strings.HasPrefix(upper, prefix) {
+			prefixLen = len(prefix)
+			break
+		}
+	}
+	if prefixLen == 0 {
+		return aggregateBounds{}, false
+	}
+	rest := strings.TrimSpace(typeName[prefixLen:])
+	start := strings.Index(rest, "[")
+	if start < 0 {
+		return aggregateBounds{}, false
+	}
+	end := strings.Index(rest[start:], "]")
+	if end < 0 {
+		return aggregateBounds{}, false
+	}
+	inner := rest[start+1 : start+end]
+	colon := strings.Index(inner, ":")
+	if colon < 0 {
+		return aggregateBounds{}, false
+	}
+	lowStr := strings.TrimSpace(inner[:colon])
+	highStr := strings.TrimSpace(inner[colon+1:])
+
+	bounds := aggregateBounds{low: -1, high: -1}
+	if lowStr != "?" {
+		low, err := strconv.Atoi(lowStr)
+		if err != nil {
+			return aggregateBounds{}, false
+		}
+		bounds.low = low
+	}
+	if highStr != "?" {
+		high, err := strconv.Atoi(highStr)
+		if err != nil {
+			return aggregateBounds{}, false
+		}
+		bounds.high = high
+	}
+	return bounds, true
+}
+
+func aggregateBoundsForAttr(attr SchemaAttr) (aggregateBounds, bool) {
+	expr := aggregateExpressionForAttr(attr)
+	if !isAggregateTypeExpression(expr) {
+		return aggregateBounds{}, false
+	}
+	return parseAggregateBounds(expr)
+}
+
+func validateAggregateBoundsCount(
+	owner core.AstNode,
+	attr SchemaAttr,
+	count int,
+	accept core.ValidationAcceptor,
+) {
+	bounds, ok := aggregateBoundsForAttr(attr)
+	if !ok {
+		return
+	}
+	typeDesc := typeDescription(attr)
+	if bounds.low >= 0 && count < bounds.low {
+		opts := []core.DiagnosticOption{core.WithCode("ifc-aggregate-bounds")}
+		accept(core.NewDiagnostic(
+			core.SeverityError,
+			fmt.Sprintf("Aggregate for %q expects at least %d element(s), got %d", typeDesc, bounds.low, count),
+			owner,
+			opts...,
+		))
+	}
+	if bounds.high >= 0 && count > bounds.high {
+		opts := []core.DiagnosticOption{core.WithCode("ifc-aggregate-bounds")}
+		accept(core.NewDiagnostic(
+			core.SeverityError,
+			fmt.Sprintf("Aggregate for %q expects at most %d element(s), got %d", typeDesc, bounds.high, count),
+			owner,
+			opts...,
+		))
+	}
+}
+
+func validateAggregateBounds(
+	owner core.AstNode,
+	attr SchemaAttr,
+	list LIST,
+	accept core.ValidationAcceptor,
+) {
+	validateAggregateBoundsCount(owner, attr, len(list.Parameters()), accept)
+}
+
 func validateAggregateElements(
 	ctx context.Context,
 	owner core.AstNode,
@@ -232,6 +333,7 @@ func validateAggregateElements(
 	list LIST,
 	accept core.ValidationAcceptor,
 ) {
+	validateAggregateBounds(owner, attr, list, accept)
 	elementType := aggregateElementTypeName(aggregateExpressionForAttr(attr))
 	if elementType == "" {
 		return
@@ -242,6 +344,6 @@ func validateAggregateElements(
 	}
 	elementAttr := schemaAttrForTypeName(elementType)
 	for _, element := range list.Parameters() {
-		validateParameterValue(ctx, owner, elementAttr, element, -1, accept)
+		validateParameterValue(ctx, owner, "", "", elementAttr, element, -1, accept)
 	}
 }

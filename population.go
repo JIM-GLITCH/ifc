@@ -275,6 +275,17 @@ func attrIndex(stepName, attrName string) int {
 	return -1
 }
 
+func entityAttrNameAt(stepName string, index int) string {
+	if stepName == "" || index < 0 {
+		return ""
+	}
+	names := entityAttrNames[stepName]
+	if index >= len(names) {
+		return ""
+	}
+	return names[index]
+}
+
 type populationContextKey struct{}
 
 func WithPopulation(ctx context.Context, pop *Population) context.Context {

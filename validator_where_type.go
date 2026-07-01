@@ -89,25 +89,18 @@ func unquoteIFCString(raw string) string {
 	return raw
 }
 
-func shouldSkipTypeWhere(attr SchemaAttr, param PARAMETER) bool {
-	info := parameterInfoFrom(param)
-	if info.kind == paramKindOmitted && attr.Derived {
-		return true
-	}
-	if info.kind == paramKindUnset && attr.Optional {
-		return true
-	}
-	return false
+func shouldSkipTypeWhere(param PARAMETER) bool {
+	return parameterInfoFrom(param).kind == paramKindUnset
 }
 
-func validateTypeWhereConstraints(
+func validateTypeWhereOnWhereValue(
 	attr SchemaAttr,
-	param PARAMETER,
+	value WhereValue,
 	diagnosticNode core.AstNode,
 	token *core.Token,
 	accept core.ValidationAcceptor,
 ) {
-	if shouldSkipTypeWhere(attr, param) {
+	if value.kind == wvKindUnknown {
 		return
 	}
 	typeName := whereTypeNameForAttr(attr)
@@ -116,10 +109,6 @@ func validateTypeWhereConstraints(
 	}
 	rules, ok := LookupTypeWhereRules(typeName)
 	if !ok || len(rules) == 0 {
-		return
-	}
-	value, convOK := parameterToWhereValue(param)
-	if !convOK {
 		return
 	}
 	ec := NewTypeWhereEval(value)
@@ -142,14 +131,65 @@ func validateTypeWhereConstraints(
 	}
 }
 
-func validateTypeWhereForParameter(
+func validateTypeWhereConstraints(
+	attr SchemaAttr,
+	param PARAMETER,
+	diagnosticNode core.AstNode,
+	token *core.Token,
+	accept core.ValidationAcceptor,
+) {
+	if shouldSkipTypeWhere(param) {
+		return
+	}
+	value, convOK := parameterToWhereValue(param)
+	if !convOK {
+		return
+	}
+	validateTypeWhereOnWhereValue(attr, value, diagnosticNode, token, accept)
+}
+
+func validateDerivedParameterChecks(
 	ctx context.Context,
 	owner core.AstNode,
+	stepName string,
+	attrName string,
 	attr SchemaAttr,
 	param PARAMETER,
 	accept core.ValidationAcceptor,
 ) {
-	_ = ctx
 	info := parameterInfoFrom(param)
+	inst, ok := owner.(SIMPLE_ENTITY_INSTANCE)
+	if !ok || stepName == "" || attrName == "" {
+		return
+	}
+	pop := PopulationFromContext(ctx)
+	ec := NewEntityWhereEval(ctx, stepName, inst, instanceParams(inst), pop)
+	derived := evalDerivedAttr(ec, inst, attrName)
+	if derived.kind == wvKindUnknown {
+		return
+	}
+	validateTypeWhereOnWhereValue(attr, derived, info.node, info.token, accept)
+	if derived.kind == wvKindList {
+		validateAggregateBoundsCount(info.node, attr, len(derived.list), accept)
+	}
+}
+
+func validateTypeWhereForParameter(
+	ctx context.Context,
+	owner core.AstNode,
+	stepName string,
+	attrName string,
+	attr SchemaAttr,
+	param PARAMETER,
+	accept core.ValidationAcceptor,
+) {
+	info := parameterInfoFrom(param)
+	if info.kind == paramKindUnset {
+		return
+	}
+	if info.kind == paramKindOmitted && attr.Derived {
+		validateDerivedParameterChecks(ctx, owner, stepName, attrName, attr, param, accept)
+		return
+	}
 	validateTypeWhereConstraints(attr, param, info.node, info.token, accept)
 }

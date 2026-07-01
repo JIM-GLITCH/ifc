@@ -680,24 +680,20 @@ func schemaIfcGetBasisSurface(ec *EntityWhereEval, args []WhereValue) WhereValue
 	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	step, ok := whereValueExpressType(args[0])
-	if !ok {
-		return wvUnknownVal()
-	}
 	var Surfs WhereValue
 	var N WhereValue
 	Surfs = wvFromList([]WhereValue{})
-	if entityIsOrSubtypes(step, "IfcPcurve") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPCURVE"), wvTypeOf(args[0]))) {
 		Surfs = ec.QualAttr(ec.QualEntity(args[0], "IfcPCurve"), "BasisSurface", 0)
 	} else {
-		if entityIsOrSubtypes(step, "IfcSurfaceCurve") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACECURVE"), wvTypeOf(args[0]))) {
 			N = wvSizeOf(ec.QualAttr(ec.QualEntity(args[0], "IfcSurfaceCurve"), "AssociatedGeometry", 0))
 			for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(N); i++ {
 				Surfs = wvAdd(Surfs, ec.CallSchema("IfcAssociatedSurface", []WhereValue{ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcSurfaceCurve"), "AssociatedGeometry", 0), i)}))
 			}
 		}
 	}
-	if entityIsOrSubtypes(step, "IfcCompositeCurveOnSurface") {
+	if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPOSITECURVEONSURFACE"), wvTypeOf(args[0]))) {
 		N = wvSizeOf(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0))
 		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURVESEGMENT"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1)))) {
 			Surfs = ec.CallSchema("IfcGetBasisSurface", []WhereValue{ec.QualAttr(ec.QualEntity(ec.QualIndex(ec.QualAttr(ec.QualEntity(args[0], "IfcCompositeCurve"), "Segments", 0), 1), "IfcCurveSegment"), "ParentCurve", 0)})
@@ -791,10 +787,6 @@ func schemaIfcNormalise(ec *EntityWhereEval, args []WhereValue) WhereValue {
 	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	step, ok := whereValueExpressType(args[0])
-	if !ok {
-		return wvUnknownVal()
-	}
 	var Ndim WhereValue
 	var V WhereValue
 	V = wvEntityIntersect(wvEntityIntersect(wvEntityTypeTag("IfcRepresentationItem"), wvEntityTypeTag("IfcGeometricRepresentationItem")), wvNewDirection(wvFromList([]WhereValue{parseLiteralNumber("1."), parseLiteralNumber("0.")})))
@@ -806,7 +798,7 @@ func schemaIfcNormalise(ec *EntityWhereEval, args []WhereValue) WhereValue {
 	if wvTruthy(wvNot(wvExists(args[0]))) {
 		return wvUnknownVal()
 	} else {
-		if entityIsOrSubtypes(step, "IfcVector") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVECTOR"), wvTypeOf(args[0]))) {
 			Ndim = ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Dim", 0)
 			V = wvAssignAttr(V, "DirectionRatios", ec.QualAttr(ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Orientation", 0), "DirectionRatios", 0))
 			Vec = wvAssignAttr(Vec, "Magnitude", ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Magnitude", 0))
@@ -829,7 +821,7 @@ func schemaIfcNormalise(ec *EntityWhereEval, args []WhereValue) WhereValue {
 			for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(Ndim); i++ {
 				V = wvAssignListElem(V, "DirectionRatios", i, wvDiv(ec.QualIndex(ec.QualAttr(V, "DirectionRatios", 0), i), Mag))
 			}
-			if entityIsOrSubtypes(step, "IfcVector") {
+			if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVECTOR"), wvTypeOf(args[0]))) {
 				Vec = wvAssignAttr(Vec, "Orientation", V)
 				Result = Vec
 			} else {
@@ -991,17 +983,13 @@ func schemaIfcScalarTimesVector(ec *EntityWhereEval, args []WhereValue) WhereVal
 	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	step, ok := whereValueExpressType(args[0])
-	if !ok {
-		return wvUnknownVal()
-	}
 	var V WhereValue
 	var Mag WhereValue
 	var Result WhereValue
 	if wvTruthy(wvOr(wvNot(wvExists(args[0])), wvNot(wvExists(args[1])))) {
 		return wvUnknownVal()
 	} else {
-		if entityIsOrSubtypes(step, "IfcVector") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVECTOR"), wvTypeOf(args[1]))) {
 			V = ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Orientation", 0)
 			Mag = wvMul(args[0], ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Magnitude", 0))
 		} else {
@@ -1203,10 +1191,6 @@ func schemaIfcUniqueDefinitionNames(ec *EntityWhereEval, args []WhereValue) Wher
 	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	step, ok := whereValueExpressType(args[0])
-	if !ok {
-		return wvUnknownVal()
-	}
 	var Definition WhereValue
 	var DefinitionSet WhereValue
 	var Properties WhereValue
@@ -1217,10 +1201,10 @@ func schemaIfcUniqueDefinitionNames(ec *EntityWhereEval, args []WhereValue) Wher
 	}
 	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
 		Definition = ec.QualAttr(ec.QualIndex(args[0], i), "RelatingPropertyDefinition", 0)
-		if entityIsOrSubtypes(step, "IfcPropertySetDefinition") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROPERTYSETDEFINITION"), wvTypeOf(Definition))) {
 			Properties = wvAdd(Properties, Definition)
 		} else {
-			if entityIsOrSubtypes(step, "IfcPropertysetdefinitionset") {
+			if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROPERTYSETDEFINITIONSET"), wvTypeOf(Definition))) {
 				DefinitionSet = Definition
 				for j := wvAsInt(parseLiteralNumber("1")); j <= wvAsInt(wvHiIndex(DefinitionSet)); j++ {
 					Properties = wvAdd(Properties, ec.QualIndex(DefinitionSet, j))
@@ -1248,16 +1232,12 @@ func schemaIfcUniquePropertySetNames(ec *EntityWhereEval, args []WhereValue) Whe
 	if len(args) != 1 {
 		return wvUnknownVal()
 	}
-	step, ok := whereValueExpressType(args[0])
-	if !ok {
-		return wvUnknownVal()
-	}
 	var Names WhereValue
 	Names = wvFromList([]WhereValue{})
 	var Unnamed WhereValue
 	Unnamed = parseLiteralNumber("0")
 	for i := wvAsInt(parseLiteralNumber("1")); i <= wvAsInt(wvHiIndex(args[0])); i++ {
-		if entityIsOrSubtypes(step, "IfcPropertySet") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROPERTYSET"), wvTypeOf(ec.QualIndex(args[0], i)))) {
 			Names = wvAdd(Names, ec.QualAttr(ec.QualEntity(ec.QualIndex(args[0], i), "IfcRoot"), "Name", 0))
 		} else {
 			Unnamed = wvAdd(Unnamed, parseLiteralNumber("1"))
@@ -1294,10 +1274,6 @@ func schemaIfcVectorDifference(ec *EntityWhereEval, args []WhereValue) WhereValu
 	if len(args) != 2 {
 		return wvUnknownVal()
 	}
-	step, ok := whereValueExpressType(args[0])
-	if !ok {
-		return wvUnknownVal()
-	}
 	var Result WhereValue
 	var Res, Vec1, Vec2 WhereValue
 	var Mag, Mag1, Mag2 WhereValue
@@ -1305,14 +1281,14 @@ func schemaIfcVectorDifference(ec *EntityWhereEval, args []WhereValue) WhereValu
 	if wvTruthy(wvOr(wvOr(wvNot(wvExists(args[0])), wvNot(wvExists(args[1]))), wvCompareRel(ec.QualAttr(args[0], "Dim", 0), ec.QualAttr(args[1], "Dim", 0), "<>"))) {
 		return wvUnknownVal()
 	} else {
-		if entityIsOrSubtypes(step, "IfcVector") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVECTOR"), wvTypeOf(args[0]))) {
 			Mag1 = ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Magnitude", 0)
 			Vec1 = ec.QualAttr(ec.QualEntity(args[0], "IfcVector"), "Orientation", 0)
 		} else {
 			Mag1 = parseLiteralNumber("1.0")
 			Vec1 = args[0]
 		}
-		if entityIsOrSubtypes(step, "IfcVector") {
+		if wvTruthy(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVECTOR"), wvTypeOf(args[1]))) {
 			Mag2 = ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Magnitude", 0)
 			Vec2 = ec.QualAttr(ec.QualEntity(args[1], "IfcVector"), "Orientation", 0)
 		} else {

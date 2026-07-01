@@ -347,6 +347,8 @@ func diagnosticTokenOptions(token *core.Token) []core.DiagnosticOption {
 func validateParameterValue(
 	ctx context.Context,
 	owner core.AstNode,
+	stepName string,
+	attrName string,
 	attr SchemaAttr,
 	param PARAMETER,
 	position int,
@@ -358,7 +360,7 @@ func validateParameterValue(
 	}
 
 	validateParameterValueCore(ctx, owner, attr, param, position, accept)
-	validateTypeWhereForParameter(ctx, owner, attr, param, accept)
+	validateTypeWhereForParameter(ctx, owner, stepName, attrName, attr, param, accept)
 }
 
 func validateParameterValueCore(
@@ -440,11 +442,15 @@ func validateParameterTypes(
 	params []PARAMETER,
 	accept core.ValidationAcceptor,
 ) {
+	stepName := ""
+	if inst, ok := owner.(SIMPLE_ENTITY_INSTANCE); ok {
+		stepName, _ = instanceStepName(inst)
+	}
 	for i, param := range params {
 		if i >= len(def.Attrs) {
 			break
 		}
-		validateParameterValue(ctx, owner, def.Attrs[i], param, i, accept)
+		validateParameterValue(ctx, owner, stepName, entityAttrNameAt(stepName, i), def.Attrs[i], param, i, accept)
 	}
 }
 

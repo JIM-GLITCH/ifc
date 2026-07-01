@@ -209,3 +209,46 @@ func TestSchemaIfcNormaliseAlreadyUnit(t *testing.T) {
 	assertNear(t, "ratio[1]", ratios[1], 0.0, 1e-9)
 	assertNear(t, "ratio[2]", ratios[2], 0.0, 1e-9)
 }
+
+func TestSchemaIfcScalarTimesVectorOnDirection(t *testing.T) {
+	pop, ec := schemaTestEnv(t, `#1=IFCDIRECTION((3.,4.,0.));`)
+	dir := entityWV(t, pop, "#1")
+	result := callSchema(t, ec, "IfcScalarTimesVector", parseLiteralNumber("2.0"), dir)
+	mag := wvMustReal(t, ec.QualAttr(result, "Magnitude", 0))
+	if math.Abs(mag-2.0) > 1e-9 {
+		t.Fatalf("expected magnitude 2, got %g", mag)
+	}
+	ratios := directionRatios(t, ec, ec.QualAttr(result, "Orientation", 0))
+	assertNear(t, "ratio[0]", ratios[0], 0.6, 1e-9)
+	assertNear(t, "ratio[1]", ratios[1], 0.8, 1e-9)
+}
+
+func TestSchemaIfcUniquePropertySetNamesDetectsDuplicate(t *testing.T) {
+	pop, ec := schemaTestEnv(t, `#1=IFCPROPERTYSET('g1',$,'A',$,(#2));
+#2=IFCPROPERTYSINGLEVALUE('x',$,$,$);
+#3=IFCPROPERTYSET('g2',$,'A',$,(#4));
+#4=IFCPROPERTYSINGLEVALUE('y',$,$,$);`)
+	set := wvFromList([]WhereValue{
+		entityWV(t, pop, "#1"),
+		entityWV(t, pop, "#3"),
+	})
+	result := callSchema(t, ec, "IfcUniquePropertySetNames", set)
+	if wvTruthy(result) {
+		t.Fatal("expected duplicate property set names to fail")
+	}
+}
+
+func TestSchemaIfcUniquePropertySetNamesPass(t *testing.T) {
+	pop, ec := schemaTestEnv(t, `#1=IFCPROPERTYSET('g1',$,'A',$,(#2));
+#2=IFCPROPERTYSINGLEVALUE('x',$,$,$);
+#3=IFCPROPERTYSET('g2',$,'B',$,(#4));
+#4=IFCPROPERTYSINGLEVALUE('y',$,$,$);`)
+	set := wvFromList([]WhereValue{
+		entityWV(t, pop, "#1"),
+		entityWV(t, pop, "#3"),
+	})
+	result := callSchema(t, ec, "IfcUniquePropertySetNames", set)
+	if !wvTruthy(result) {
+		t.Fatal("expected unique property set names to pass")
+	}
+}

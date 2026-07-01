@@ -558,15 +558,17 @@ func wvTypeOf(v WhereValue) WhereValue {
 }
 
 func wvEntityInTypeOf(v WhereValue, expectedExpressName string) WhereValue {
-	inst := v.entityInstance()
-	if inst == nil {
-		return wvUnknownLogical()
+	if inst := v.entityInstance(); inst != nil {
+		step, ok := instanceStepName(inst)
+		if !ok {
+			return wvUnknownLogical()
+		}
+		return WhereValue{kind: wvKindLogical, log: boolToLog(entityIsOrSubtypes(step, expectedExpressName))}
 	}
-	step, ok := instanceStepName(inst)
-	if !ok {
-		return wvUnknownLogical()
+	if step, ok := whereValueExpressType(v); ok {
+		return WhereValue{kind: wvKindLogical, log: boolToLog(entityIsOrSubtypes(step, expectedExpressName))}
 	}
-	return WhereValue{kind: wvKindLogical, log: boolToLog(entityIsOrSubtypes(step, expectedExpressName))}
+	return wvUnknownLogical()
 }
 
 func typeOfLabelSet(v WhereValue) map[string]struct{} {
