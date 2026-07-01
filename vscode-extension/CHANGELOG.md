@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.0.7] - 2026-06-30
+
+### Added
+
+- **EXPRESS WHERE validation**
+  - Entity WHERE: all 752 entity WHERE rules for IFC4X3 (`ifc-entity-where`).
+  - Type WHERE: WHERE rules on defined types (e.g. `IfcPositiveInteger`, `IfcCompoundPlaneAngleMeasure`) (`ifc-type-where`).
+  - Global RULE: schema-wide cross-entity rules (`ifc-global-rule`).
+  - EXPRESS schema functions used by WHERE/RULE expressions (codegen + runtime evaluators).
+- **UNIQUE constraints**
+  - Entity UNIQUE clauses (e.g. `IfcRoot.GlobalId`) (`ifc-unique`).
+  - Aggregate `OF UNIQUE` element uniqueness (`ifc-unique-aggregate`).
+- **Aggregate bounds** — validate declared sizes such as `LIST [1:3]`, `SET [0:?]`, `ARRAY [1:2]` (`ifc-aggregate-bounds`).
+- **Derived attribute checks** — `*` on DERIVE attributes: Type WHERE and aggregate bounds run on computed DERIVE values where evaluators exist.
+- Tests: `unique_rule_test.go`, `aggregate_bounds_test.go`, `validator_where_type_test.go`, schema function regression tests.
+
+### Changed
+
+- **`$` vs `*`** — optional `$` skips Type WHERE (absent value); derived `*` is validated via DERIVE evaluation, not skipped like `$`.
+- **EXPRESS `?` and `$`** — compile to `wvAbsentVal()` (was `unknown`); aligns with absent-parameter semantics in WHERE/DERIVE.
+- **WHERE three-valued logic** — `unknown`/`absent` are falsy in `wvTruthy`; `wvAnd`/`wvOr`/`wvXor`/`wvNot` use Kleene logic so indeterminate conditions no longer pass by default.
+- **Schema function codegen** — emit all 48 IFC schema functions (including unreferenced ones such as `IfcVectorSum`); 192 DERIVE slots with 50 shared evaluators.
+- **README** — documents full EXPRESS validation coverage, diagnostic codes, and updated limitations (runtime unknown handling, not a geometry/IDS cert tool).
+
+### Fixed
+
+- Schema function codegen: `TYPEOF` / `IN TYPEOF` no longer miscompiled to entity subtype shortcuts; `IfcScalarTimesVector`, `IfcUniquePropertySetNames`, and similar functions evaluate correctly.
+- `wvEntityInTypeOf` fallback for record-typed WHERE values.
+
 ## [0.0.6] - 2026-06-29
 
 ### Added
@@ -15,7 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Extension version: `0.0.5` → `0.0.6`.
-- Updated `README.md` with schema validation capabilities, diagnostic codes, and known limitations.
+- Updated `README.md` with initial schema validation section and diagnostic codes.
 
 ## [0.0.5] - 2026-06-28 / 2026-06-29
 

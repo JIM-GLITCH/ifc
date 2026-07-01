@@ -113,7 +113,7 @@ func derivedEval_Dim_21(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereV
 
 func derivedEval_U_22(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {
 	sub := ec.withInstance(inst)
-	return sub.CallSchema("IfcBaseAxis", []WhereValue{parseLiteralNumber("2"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), wvUnknownVal()})
+	return sub.CallSchema("IfcBaseAxis", []WhereValue{parseLiteralNumber("2"), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), sub.QualAttr(sub.QualEntity(sub.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), wvAbsentVal()})
 }
 
 func derivedEval_Scl2_23(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE) WhereValue {

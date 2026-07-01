@@ -47,7 +47,9 @@ func parameterToWhereValueCtx(ctx context.Context, pop *Population, param PARAME
 			return wvFromEntityInstance(inst), true
 		}
 		return wvUnknownVal(), false
-	case DEFAULT_PARAMETER, OMITTED_PARAMETER:
+	case DEFAULT_PARAMETER:
+		return wvAbsentVal(), true
+	case OMITTED_PARAMETER:
 		return wvUnknownVal(), true
 	case LIST:
 		items := make([]WhereValue, 0, len(p.Parameters()))
@@ -100,7 +102,7 @@ func validateTypeWhereOnWhereValue(
 	token *core.Token,
 	accept core.ValidationAcceptor,
 ) {
-	if value.kind == wvKindUnknown {
+	if value.kind == wvKindUnknown || value.kind == wvKindAbsent {
 		return
 	}
 	typeName := whereTypeNameForAttr(attr)

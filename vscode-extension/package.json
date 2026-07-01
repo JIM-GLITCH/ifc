@@ -3,7 +3,7 @@
   "publisher": "lilr",
   "displayName": "Ifc",
   "description": "IFC (.ifc) language support for VS Code — syntax highlighting, diagnostics, go-to-definition, and LSP for ISO 10303-21 STEP files in BIM workflows.",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "UNLICENSED",
   "icon": "icon.png",
   "keywords": [

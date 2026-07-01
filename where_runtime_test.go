@@ -117,3 +117,39 @@ func TestWvQueryAllZeroDirectionRatios(t *testing.T) {
 		t.Fatal("expected no non-zero direction ratios")
 	}
 }
+
+func TestWvTruthyUnknownIsFalse(t *testing.T) {
+	if wvTruthy(wvUnknownVal()) {
+		t.Fatal("expected unknown to be falsy in WHERE validation")
+	}
+	if wvTruthy(wvAbsentVal()) {
+		t.Fatal("expected absent to be falsy in WHERE validation")
+	}
+	if wvTruthy(wvUnknownLogical()) {
+		t.Fatal("expected unknown logical to be falsy")
+	}
+}
+
+func TestWvAndUnknownDoesNotPass(t *testing.T) {
+	trueLit := WhereValue{kind: wvKindLogical, log: 1}
+	and := wvAnd(trueLit, wvUnknownVal())
+	if wvTruthy(and) {
+		t.Fatal("true AND unknown should not pass strict WHERE")
+	}
+}
+
+func TestWvOrExistsShortCircuit(t *testing.T) {
+	notExists := wvNot(wvExists(wvAbsentVal()))
+	or := wvOr(notExists, wvUnknownVal())
+	if !wvTruthy(or) {
+		t.Fatal("NOT EXISTS(absent) OR unknown should pass")
+	}
+}
+
+func TestWvNVLAbsentUsesFallback(t *testing.T) {
+	fallback := parseLiteralNumber("1.0")
+	got := wvNVL(wvAbsentVal(), fallback)
+	if !wvTruthy(wvCompareRel(got, fallback, "=")) {
+		t.Fatal("NVL(absent, fallback) should return fallback")
+	}
+}

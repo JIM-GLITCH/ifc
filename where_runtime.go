@@ -10,6 +10,7 @@ type wvKind int
 
 const (
 	wvKindUnknown wvKind = iota
+	wvKindAbsent
 	wvKindInteger
 	wvKindReal
 	wvKindString
@@ -34,8 +35,16 @@ type WhereValue struct {
 }
 
 func wvUnknownVal() WhereValue { return WhereValue{kind: wvKindUnknown} }
+func wvAbsentVal() WhereValue  { return WhereValue{kind: wvKindAbsent} }
 func wvUnknownLogical() WhereValue {
 	return WhereValue{kind: wvKindLogical, log: 2}
+}
+
+func wvIsIndeterminate(v WhereValue) bool {
+	if v.kind == wvKindUnknown || v.kind == wvKindAbsent {
+		return true
+	}
+	return v.kind == wvKindLogical && v.log == 2
 }
 
 func wvFromString(s string) WhereValue {
@@ -123,9 +132,28 @@ func wvTruthy(v WhereValue) bool {
 		return v.s != ""
 	case wvKindList:
 		return len(v.list) > 0
+	case wvKindUnknown, wvKindAbsent:
+		return false
 	default:
-		return true // unknown satisfies WHERE (partial evaluation)
+		return false
 	}
+}
+
+func wvIsDefiniteTrue(v WhereValue) bool {
+	if wvIsIndeterminate(v) {
+		return false
+	}
+	return wvTruthy(v)
+}
+
+func wvIsDefiniteFalse(v WhereValue) bool {
+	if wvIsIndeterminate(v) {
+		return false
+	}
+	if v.kind == wvKindLogical {
+		return v.log == 0
+	}
+	return !wvTruthy(v)
 }
 
 func wvAsNumber(v WhereValue) (float64, bool) {
@@ -254,18 +282,36 @@ func boolToLog(b bool) int {
 }
 
 func wvAnd(a, b WhereValue) WhereValue {
-	return WhereValue{kind: wvKindLogical, log: boolToLog(wvTruthy(a) && wvTruthy(b))}
+	if wvIsDefiniteFalse(a) || wvIsDefiniteFalse(b) {
+		return WhereValue{kind: wvKindLogical, log: 0}
+	}
+	if wvIsDefiniteTrue(a) && wvIsDefiniteTrue(b) {
+		return WhereValue{kind: wvKindLogical, log: 1}
+	}
+	return wvUnknownLogical()
 }
 
 func wvOr(a, b WhereValue) WhereValue {
-	return WhereValue{kind: wvKindLogical, log: boolToLog(wvTruthy(a) || wvTruthy(b))}
+	if wvIsDefiniteTrue(a) || wvIsDefiniteTrue(b) {
+		return WhereValue{kind: wvKindLogical, log: 1}
+	}
+	if wvIsDefiniteFalse(a) && wvIsDefiniteFalse(b) {
+		return WhereValue{kind: wvKindLogical, log: 0}
+	}
+	return wvUnknownLogical()
 }
 
 func wvXor(a, b WhereValue) WhereValue {
+	if wvIsIndeterminate(a) || wvIsIndeterminate(b) {
+		return wvUnknownLogical()
+	}
 	return WhereValue{kind: wvKindLogical, log: boolToLog(wvTruthy(a) != wvTruthy(b))}
 }
 
 func wvNot(v WhereValue) WhereValue {
+	if wvIsIndeterminate(v) {
+		return wvUnknownLogical()
+	}
 	return WhereValue{kind: wvKindLogical, log: boolToLog(!wvTruthy(v))}
 }
 
@@ -539,7 +585,7 @@ func wvLoIndex(v WhereValue) WhereValue {
 }
 
 func wvExists(v WhereValue) WhereValue {
-	if v.kind == wvKindUnknown {
+	if v.kind == wvKindUnknown || v.kind == wvKindAbsent {
 		return WhereValue{kind: wvKindLogical, log: 0}
 	}
 	return WhereValue{kind: wvKindLogical, log: 1}
@@ -609,7 +655,7 @@ func wvTypeOfNotEqual(a, b WhereValue) WhereValue {
 	return WhereValue{kind: wvKindLogical, log: boolToLog(eq.log != 1)}
 }
 func wvNVL(a, b WhereValue) WhereValue {
-	if a.kind != wvKindUnknown {
+	if a.kind != wvKindUnknown && a.kind != wvKindAbsent {
 		return a
 	}
 	return b
