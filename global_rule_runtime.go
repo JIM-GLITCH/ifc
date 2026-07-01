@@ -121,39 +121,47 @@ func (ec *GlobalRuleEval) QualAttr(v WhereValue, attrName string, index int) Whe
 	return ec.entityEval.QualAttr(v, attrName, index)
 }
 
-func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail string) {
+func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail string, evalUnknowns []string) {
 	if len(GlobalRuleChecks) == 0 {
-		return true, ""
+		return true, "", nil
 	}
-	ec := NewGlobalRuleEval(ctx, pop)
 	for _, rule := range GlobalRuleChecks {
 		if rule.Check == nil {
 			continue
 		}
-		if pass, msg := rule.Check(ec); !pass {
+		ec := NewGlobalRuleEval(ctx, pop)
+		pass, msg := rule.Check(ec)
+		ruleUnknowns := ec.entityEval.takeEvalUnknowns()
+		evalUnknowns = append(evalUnknowns, ruleUnknowns...)
+		if len(ruleUnknowns) == 0 && !pass && detail == "" {
 			if msg == "" {
-				return false, "RULE " + rule.ExpressName + " violated"
+				detail = "RULE " + rule.ExpressName + " violated"
+			} else if rule.ExpressName != "" && !strings.Contains(msg, rule.ExpressName) {
+				detail = rule.ExpressName + ": " + msg
+			} else {
+				detail = msg
 			}
-			if rule.ExpressName != "" && !strings.Contains(msg, rule.ExpressName) {
-				return false, rule.ExpressName + ": " + msg
-			}
-			return false, msg
 		}
 	}
-	return true, ""
+	if detail != "" {
+		return false, detail, evalUnknowns
+	}
+	if len(evalUnknowns) > 0 {
+		return false, "", evalUnknowns
+	}
+	return true, "", nil
 }
 
 func validateGlobalRules(ctx context.Context, owner core.AstNode, accept core.ValidationAcceptor) {
 	pop := PopulationFromContext(ctx)
-	ok, detail := CheckGlobalRules(ctx, pop)
+	ok, detail, evalUnknowns := CheckGlobalRules(ctx, pop)
+	acceptEvalUnknowns(accept, owner, nil, evalUnknowns)
 	if ok {
 		return
 	}
-	msg := detail
-	if msg == "" {
-		msg = "Global RULE constraint violated"
-	} else {
-		msg = "Global RULE constraint violated: " + detail
+	if detail == "" {
+		return
 	}
+	msg := "Global RULE constraint violated: " + detail
 	accept(core.NewDiagnostic(core.SeverityError, msg, owner, core.WithCode("ifc-global-rule")))
 }

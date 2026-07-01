@@ -42,17 +42,16 @@ func validateEntityWhereRules(
 	accept core.ValidationAcceptor,
 ) {
 	pop := PopulationFromContext(ctx)
-	ok, detail := CheckEntityWhereRules(ctx, stepName, self, params, pop)
+	ok, detail, evalUnknowns := CheckEntityWhereRules(ctx, stepName, self, params, pop)
+	token := self.NameToken()
+	acceptEvalUnknowns(accept, owner, token, evalUnknowns)
 	if ok {
 		return
 	}
-	msg := detail
-	if msg == "" {
-		msg = fmt.Sprintf("Entity %q violates a WHERE constraint", stepName)
-	} else {
-		msg = fmt.Sprintf("Entity %q WHERE constraint violated: %s", stepName, detail)
+	if detail == "" {
+		return
 	}
-	token := self.NameToken()
+	msg := fmt.Sprintf("Entity %q WHERE constraint violated: %s", stepName, detail)
 	opts := []core.DiagnosticOption{core.WithCode("ifc-entity-where")}
 	if token != nil {
 		opts = append(opts, core.WithToken(token))

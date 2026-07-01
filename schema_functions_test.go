@@ -141,7 +141,7 @@ func TestExtrudedAreaSolidValidExtrusionDirection(t *testing.T) {
 	if !ok {
 		t.Fatal("missing #218")
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCEXTRUDEDAREASOLID", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCEXTRUDEDAREASOLID", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
 	}

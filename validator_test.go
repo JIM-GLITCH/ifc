@@ -266,7 +266,7 @@ func TestSIUnitDerivedDimensionsAndWR1(t *testing.T) {
 	if !wvTruthy(result) {
 		t.Fatalf("IfcCorrectDimensions failed: unitType=%v dim=%v result=%v", unitType, dim, result)
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCSIUNIT", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCSIUNIT", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
 	}
@@ -291,7 +291,7 @@ func TestConversionBasedUnitExplicitDimensionsAndWR1(t *testing.T) {
 	if !wvTruthy(result) {
 		t.Fatalf("IfcCorrectDimensions failed: unitType=%v dim=%v result=%v", unitType, dim, result)
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCCONVERSIONBASEDUNIT", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCCONVERSIONBASEDUNIT", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
 	}

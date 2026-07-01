@@ -54,7 +54,7 @@ END-ISO-10303-21;`
 	if !ok {
 		t.Fatal("missing #219")
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCSHAPEREPRESENTATION", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCSHAPEREPRESENTATION", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules IFCSHAPEREPRESENTATION WR11 failed: %s", detail)
 	}
@@ -94,7 +94,7 @@ END-ISO-10303-21;`
 	if !ok {
 		t.Fatal("missing #2912")
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCWALL", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCWALL", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules IFCWALL MaxOneMaterialAssociation failed: %s", detail)
 	}
@@ -124,7 +124,7 @@ END-ISO-10303-21;`
 	if !ok {
 		t.Fatal("missing #62595")
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCCARTESIANTRANSFORMATIONOPERATOR3D", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCCARTESIANTRANSFORMATIONOPERATOR3D", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules failed: %s", detail)
 	}
@@ -158,7 +158,7 @@ END-ISO-10303-21;`
 	if !ok {
 		t.Fatal("missing #95125")
 	}
-	okPass, detail := CheckEntityWhereRules(context.Background(), "IFCRELASSOCIATESMATERIAL", rec.Instance, rec.Params, pop)
+	okPass, detail, _ := CheckEntityWhereRules(context.Background(), "IFCRELASSOCIATESMATERIAL", rec.Instance, rec.Params, pop)
 	if !okPass {
 		t.Fatalf("CheckEntityWhereRules IFCRELASSOCIATESMATERIAL AllowedElements failed: %s", detail)
 	}

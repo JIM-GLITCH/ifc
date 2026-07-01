@@ -212,7 +212,7 @@ func validateTypedParameter(
 	}
 	innerAttr := schemaAttrForTypeName(expressType)
 	validateParameterValueCore(ctx, owner, innerAttr, inner, position, accept)
-	validateTypeWhereConstraints(attr, inner, inner, parameterInfoFrom(inner).token, accept)
+	validateTypeWhereConstraints(ctx, innerAttr, inner, inner, parameterInfoFrom(inner).token, accept)
 }
 
 func aggregateExpressionForAttr(attr SchemaAttr) string {

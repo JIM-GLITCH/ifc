@@ -78,6 +78,7 @@ Diagnostic codes (shown in the Problems panel):
 | `ifc-unique` | Violates an entity UNIQUE constraint |
 | `ifc-unique-aggregate` | Duplicate element in a `UNIQUE` aggregate |
 | `ifc-aggregate-bounds` | Aggregate element count outside declared `[low:high]` bounds |
+| `ifc-eval-unknown` | Expression or constraint check could not be evaluated (e.g. unresolved `#` reference, DERIVE failure) |
 
 ## Requirements
 
@@ -105,6 +106,6 @@ After installation, open any `.ifc` file to start using syntax highlighting and 
 
 - Support targets the ISO 10303-21 physical file format (`.ifc` text files). Other IFC representations (e.g. IFC-XML, IFC-ZIP) are not covered.
 - Validation uses a compiled **IFC4X3** schema; entities or types from other schema releases may not be recognized.
-- **DERIVE** codegen covers all schema DERIVE slots; at runtime, unresolved references or indeterminate expression results may still yield `unknown`/`absent`, which skips dependent checks rather than assuming pass or fail.
+- **DERIVE** codegen covers all schema DERIVE slots; unresolved references or failed DERIVE/type-WHERE evaluation now report `ifc-eval-unknown` instead of silently skipping. Optional `$` / EXPRESS absent values still skip checks.
 - This is an **EXPRESS / schema** validator, not a full BIM certification tool: no geometry kernel, IDS/MVD filtering, or clash detection.
 - The extension focuses on single-file editing; cross-file workspace analysis depends on how your files are organized.

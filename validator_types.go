@@ -303,10 +303,26 @@ func validateEntityReference(
 	accept core.ValidationAcceptor,
 ) {
 	ref := param.Value()
-	if ref == nil || ref.Ref(ctx) == nil {
+	if ref == nil {
 		return
 	}
-	actualStepName, ok := referencedEntityStepName(ctx, ref)
+	pop := PopulationFromContext(ctx)
+	inst := resolveEntityReference(ctx, pop, param)
+	if inst == nil {
+		text := strings.TrimSpace(ref.Text())
+		if text != "" {
+			info := parameterInfoFrom(param)
+			opts := append(diagnosticTokenOptions(info.token), core.WithCode(evalUnknownCode), core.WithReference(ref))
+			accept(core.NewDiagnostic(
+				core.SeverityError,
+				fmt.Sprintf("Unresolved entity reference %s", text),
+				owner,
+				opts...,
+			))
+		}
+		return
+	}
+	actualStepName, ok := instanceStepName(inst)
 	if !ok {
 		return
 	}
@@ -317,10 +333,7 @@ func validateEntityReference(
 	if attr.Kind == ParamSelect {
 		expected = fmt.Sprintf("one of %s", selectMemberSummary(attr.TypeName))
 	}
-	opts := []core.DiagnosticOption{core.WithCode("ifc-entity-type")}
-	if ref := param.Value(); ref != nil {
-		opts = append(opts, core.WithReference(ref))
-	}
+	opts := []core.DiagnosticOption{core.WithCode("ifc-entity-type"), core.WithReference(ref)}
 	accept(core.NewDiagnostic(
 		core.SeverityError,
 		fmt.Sprintf("Expected %s for attribute type %q, got %q", expected, attr.TypeName, entityExpressName(actualStepName)),

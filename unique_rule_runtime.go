@@ -15,32 +15,41 @@ type UniqueViolation struct {
 	Detail    string
 }
 
-func uniqueKeyPart(v WhereValue) string {
+type UniqueEvalFailure struct {
+	Instance SIMPLE_ENTITY_INSTANCE
+	Message  string
+}
+
+func uniqueKeyPart(v WhereValue) (string, bool) {
 	if v.kind == wvKindUnknown {
-		return "*"
+		return "", false
 	}
 	switch v.kind {
 	case wvKindString:
-		return "S:" + strings.ToLower(v.s)
+		return "S:" + strings.ToLower(v.s), true
 	case wvKindEnum:
-		return "N:" + strings.ToLower(normalizeEnumMember(v.s))
+		return "N:" + strings.ToLower(normalizeEnumMember(v.s)), true
 	case wvKindInteger:
-		return fmt.Sprintf("I:%d", v.i)
+		return fmt.Sprintf("I:%d", v.i), true
 	case wvKindReal:
-		return fmt.Sprintf("R:%g", v.r)
+		return fmt.Sprintf("R:%g", v.r), true
 	case wvKindLogical:
-		return fmt.Sprintf("L:%d", v.log)
+		return fmt.Sprintf("L:%d", v.log), true
 	case wvKindEntityInst:
 		if v.entity != nil {
-			return "REF:" + strings.ToUpper(strings.TrimSpace(v.entity.Name()))
+			return "REF:" + strings.ToUpper(strings.TrimSpace(v.entity.Name())), true
 		}
-		return "*"
+		return "", false
 	case wvKindList:
 		parts := make([]string, len(v.list))
 		for i, item := range v.list {
-			parts[i] = uniqueKeyPart(item)
+			part, ok := uniqueKeyPart(item)
+			if !ok {
+				return "", false
+			}
+			parts[i] = part
 		}
-		return "[" + strings.Join(parts, ",") + "]"
+		return "[" + strings.Join(parts, ",") + "]", true
 	case wvKindRecord:
 		names := make([]string, 0, len(v.recordAttrs))
 		for name := range v.recordAttrs {
@@ -49,23 +58,27 @@ func uniqueKeyPart(v WhereValue) string {
 		sort.Strings(names)
 		parts := make([]string, len(names))
 		for i, name := range names {
-			parts[i] = name + "=" + uniqueKeyPart(v.recordAttrs[name])
+			part, ok := uniqueKeyPart(v.recordAttrs[name])
+			if !ok {
+				return "", false
+			}
+			parts[i] = name + "=" + part
 		}
-		return "{" + strings.Join(parts, ",") + "}"
+		return "{" + strings.Join(parts, ",") + "}", true
 	default:
-		return "*"
+		return "", false
 	}
 }
 
-func instanceUniqueKey(ctx context.Context, pop *Population, inst SIMPLE_ENTITY_INSTANCE, attrNames []string) (string, bool) {
-	step, ok := instanceStepName(inst)
-	if !ok {
-		return "", false
-	}
-	ec := NewEntityWhereEval(ctx, step, inst, instanceParams(inst), pop)
+func instanceUniqueKey(ec *EntityWhereEval, attrNames []string) (string, bool) {
 	parts := make([]string, len(attrNames))
 	for i, name := range attrNames {
-		parts[i] = uniqueKeyPart(ec.Attr(name))
+		value := ec.Attr(name)
+		part, ok := uniqueKeyPart(value)
+		if !ok {
+			return "", false
+		}
+		parts[i] = part
 	}
 	return strings.Join(parts, "\x1e"), true
 }
@@ -75,7 +88,8 @@ func parameterUniqueKey(ctx context.Context, pop *Population, param PARAMETER) (
 	if !ok {
 		return "", false
 	}
-	return uniqueKeyPart(v), true
+	part, ok := uniqueKeyPart(v)
+	return part, ok
 }
 
 func whereValueEntityInstances(v WhereValue) []SIMPLE_ENTITY_INSTANCE {
@@ -97,12 +111,13 @@ func formatInstanceNames(insts []SIMPLE_ENTITY_INSTANCE) string {
 	return strings.Join(names, ", ")
 }
 
-func CheckUniqueRules(ctx context.Context, pop *Population) []UniqueViolation {
+func CheckUniqueRules(ctx context.Context, pop *Population) ([]UniqueViolation, []UniqueEvalFailure) {
 	if len(UniqueRuleChecks) == 0 || pop == nil {
-		return nil
+		return nil, nil
 	}
 	eval := NewGlobalRuleEval(ctx, pop)
 	var violations []UniqueViolation
+	var failures []UniqueEvalFailure
 	for _, rule := range UniqueRuleChecks {
 		instances := whereValueEntityInstances(eval.EntitySet(rule.OwnerExpressName))
 		if len(instances) < 2 {
@@ -110,8 +125,24 @@ func CheckUniqueRules(ctx context.Context, pop *Population) []UniqueViolation {
 		}
 		byKey := map[string][]SIMPLE_ENTITY_INSTANCE{}
 		for _, inst := range instances {
-			key, ok := instanceUniqueKey(ctx, pop, inst, rule.AttrNames)
+			step, ok := instanceStepName(inst)
 			if !ok {
+				continue
+			}
+			ec := NewEntityWhereEval(ctx, step, inst, instanceParams(inst), pop)
+			key, keyOK := instanceUniqueKey(ec, rule.AttrNames)
+			notes := ec.takeEvalUnknowns()
+			if len(notes) > 0 {
+				for _, msg := range notes {
+					failures = append(failures, UniqueEvalFailure{Instance: inst, Message: msg})
+				}
+				continue
+			}
+			if !keyOK {
+				failures = append(failures, UniqueEvalFailure{
+					Instance: inst,
+					Message:  fmt.Sprintf("Cannot evaluate UNIQUE key on %s", rule.OwnerExpressName),
+				})
 				continue
 			}
 			byKey[key] = append(byKey[key], inst)
@@ -141,12 +172,19 @@ func CheckUniqueRules(ctx context.Context, pop *Population) []UniqueViolation {
 			})
 		}
 	}
-	return violations
+	return violations, failures
 }
 
 func validateUniqueRules(ctx context.Context, accept core.ValidationAcceptor) {
 	pop := PopulationFromContext(ctx)
-	for _, violation := range CheckUniqueRules(ctx, pop) {
+	violations, failures := CheckUniqueRules(ctx, pop)
+	for _, failure := range failures {
+		if failure.Instance == nil {
+			continue
+		}
+		acceptEvalUnknown(accept, failure.Instance, failure.Instance.NameToken(), failure.Message)
+	}
+	for _, violation := range violations {
 		for _, inst := range violation.Instances {
 			if inst == nil {
 				continue
@@ -181,6 +219,8 @@ func validateAggregateUniqueElements(
 	for _, element := range list.Parameters() {
 		key, ok := parameterUniqueKey(ctx, pop, element)
 		if !ok {
+			info := parameterInfoFrom(element)
+			acceptEvalUnknown(accept, diagnosticNodeForParameter(owner, element), info.token, parameterEvalFailureReason(ctx, pop, element))
 			continue
 		}
 		if prev, dup := seen[key]; dup {

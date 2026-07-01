@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`ifc-eval-unknown`** — evaluation failures (unresolved `#` references, parameter conversion failures, DERIVE errors, UNIQUE key failures) now report `ifc-eval-unknown` instead of silently skipping. Optional `$` / absent values still skip Type WHERE as before.
+- Entity WHERE / Global RULE collect real evaluation failures during rule checks; EXPRESS type-narrowing paths (`QualEntity` mismatch, empty inverse lists) remain silent `unknown` for Kleene logic.
+
 ## [0.0.7] - 2026-06-30
 
 ### Added

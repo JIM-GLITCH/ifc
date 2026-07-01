@@ -50,7 +50,7 @@ func parameterToWhereValueCtx(ctx context.Context, pop *Population, param PARAME
 	case DEFAULT_PARAMETER:
 		return wvAbsentVal(), true
 	case OMITTED_PARAMETER:
-		return wvUnknownVal(), true
+		return wvUnknownVal(), false
 	case LIST:
 		items := make([]WhereValue, 0, len(p.Parameters()))
 		for _, el := range p.Parameters() {
@@ -102,7 +102,16 @@ func validateTypeWhereOnWhereValue(
 	token *core.Token,
 	accept core.ValidationAcceptor,
 ) {
-	if value.kind == wvKindUnknown || value.kind == wvKindAbsent {
+	if value.kind == wvKindAbsent {
+		return
+	}
+	if value.kind == wvKindUnknown {
+		typeName := whereTypeNameForAttr(attr)
+		msg := "Cannot evaluate value for type WHERE constraint"
+		if typeName != "" {
+			msg = fmt.Sprintf("Cannot evaluate value for type WHERE constraint on type %q", typeName)
+		}
+		acceptEvalUnknown(accept, diagnosticNode, token, msg)
 		return
 	}
 	typeName := whereTypeNameForAttr(attr)
@@ -134,6 +143,7 @@ func validateTypeWhereOnWhereValue(
 }
 
 func validateTypeWhereConstraints(
+	ctx context.Context,
 	attr SchemaAttr,
 	param PARAMETER,
 	diagnosticNode core.AstNode,
@@ -143,8 +153,10 @@ func validateTypeWhereConstraints(
 	if shouldSkipTypeWhere(param) {
 		return
 	}
-	value, convOK := parameterToWhereValue(param)
+	pop := PopulationFromContext(ctx)
+	value, convOK := parameterToWhereValueCtx(ctx, pop, param)
 	if !convOK {
+		acceptEvalUnknown(accept, diagnosticNode, token, parameterEvalFailureReason(ctx, pop, param))
 		return
 	}
 	validateTypeWhereOnWhereValue(attr, value, diagnosticNode, token, accept)
@@ -167,7 +179,12 @@ func validateDerivedParameterChecks(
 	pop := PopulationFromContext(ctx)
 	ec := NewEntityWhereEval(ctx, stepName, inst, instanceParams(inst), pop)
 	derived := evalDerivedAttr(ec, inst, attrName)
+	notes := ec.takeEvalUnknowns()
+	acceptEvalUnknowns(accept, info.node, info.token, notes)
 	if derived.kind == wvKindUnknown {
+		if len(notes) == 0 {
+			acceptEvalUnknown(accept, info.node, info.token, fmt.Sprintf("Cannot evaluate DERIVE attribute %q on %s", attrName, stepName))
+		}
 		return
 	}
 	validateTypeWhereOnWhereValue(attr, derived, info.node, info.token, accept)
@@ -193,5 +210,5 @@ func validateTypeWhereForParameter(
 		validateDerivedParameterChecks(ctx, owner, stepName, attrName, attr, param, accept)
 		return
 	}
-	validateTypeWhereConstraints(attr, param, info.node, info.token, accept)
+	validateTypeWhereConstraints(ctx, attr, param, info.node, info.token, accept)
 }

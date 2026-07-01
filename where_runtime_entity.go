@@ -2,6 +2,7 @@ package ifc
 
 import (
 	"context"
+	"fmt"
 	"strings"
 )
 
@@ -84,11 +85,33 @@ func (v WhereValue) entityInstance() SIMPLE_ENTITY_INSTANCE {
 }
 
 type EntityWhereEval struct {
-	ctx      context.Context
-	stepName string
-	self     SIMPLE_ENTITY_INSTANCE
-	params   []PARAMETER
-	pop      *Population
+	ctx          context.Context
+	stepName     string
+	self         SIMPLE_ENTITY_INSTANCE
+	params       []PARAMETER
+	pop          *Population
+	evalUnknowns *[]string
+}
+
+func (ec *EntityWhereEval) noteEvalUnknown(message string) {
+	if ec == nil || ec.evalUnknowns == nil || strings.TrimSpace(message) == "" {
+		return
+	}
+	*ec.evalUnknowns = append(*ec.evalUnknowns, message)
+}
+
+func (ec *EntityWhereEval) unknown(message string) WhereValue {
+	ec.noteEvalUnknown(message)
+	return wvUnknownVal()
+}
+
+func (ec *EntityWhereEval) takeEvalUnknowns() []string {
+	if ec == nil || ec.evalUnknowns == nil {
+		return nil
+	}
+	out := append([]string(nil), *ec.evalUnknowns...)
+	*ec.evalUnknowns = (*ec.evalUnknowns)[:0]
+	return out
 }
 
 func NewEntityWhereEval(
@@ -98,12 +121,14 @@ func NewEntityWhereEval(
 	params []PARAMETER,
 	pop *Population,
 ) *EntityWhereEval {
+	notes := []string{}
 	return &EntityWhereEval{
-		ctx:      ctx,
-		stepName: strings.ToUpper(strings.TrimSpace(stepName)),
-		self:     self,
-		params:   params,
-		pop:      pop,
+		ctx:          ctx,
+		stepName:     strings.ToUpper(strings.TrimSpace(stepName)),
+		self:         self,
+		params:       params,
+		pop:          pop,
+		evalUnknowns: &notes,
 	}
 }
 
@@ -126,7 +151,7 @@ func (ec *EntityWhereEval) parameterToWhereValue(param PARAMETER) (WhereValue, b
 func (ec *EntityWhereEval) Attr(name string) WhereValue {
 	if entityHasDerivedAttr(ec.stepName, name) {
 		if ec.self == nil {
-			return wvUnknownVal()
+			return ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q: missing entity instance", name))
 		}
 		return evalDerivedAttr(ec, ec.self, name)
 	}
@@ -138,18 +163,18 @@ func (ec *EntityWhereEval) Attr(name string) WhereValue {
 		return wvUnknownVal()
 	}
 	if idx >= len(ec.params) {
-		return wvUnknownVal()
+		return ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q on %s: parameter missing", name, ec.stepName))
 	}
 	value, ok := ec.parameterToWhereValue(ec.params[idx])
 	if !ok {
-		return wvUnknownVal()
+		return ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, ec.params[idx]))
 	}
 	return value
 }
 
 func (ec *EntityWhereEval) Derived(name string) WhereValue {
 	if ec.self == nil {
-		return wvUnknownVal()
+		return ec.unknown(fmt.Sprintf("Cannot evaluate DERIVE attribute %q: missing entity instance", name))
 	}
 	return evalDerivedAttr(ec, ec.self, name)
 }
@@ -237,11 +262,11 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 	}
 	params := instanceParams(inst)
 	if idx >= len(params) {
-		return wvUnknownVal()
+		return ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q on %s: parameter missing", attrName, step))
 	}
 	value, ok := ec.parameterToWhereValue(params[idx])
 	if !ok {
-		return wvUnknownVal()
+		return ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, params[idx]))
 	}
 	return value
 }
@@ -251,7 +276,11 @@ func (ec *EntityWhereEval) CallSchema(name string, args []WhereValue) WhereValue
 	if result.kind != wvKindUnknown {
 		return result
 	}
-	return constructEntityRecord(name, args)
+	result = constructEntityRecord(name, args)
+	if result.kind == wvKindUnknown {
+		return ec.unknown(fmt.Sprintf("Schema function %q could not be evaluated", name))
+	}
+	return result
 }
 
 func constructEntityRecord(expressName string, args []WhereValue) WhereValue {
@@ -383,19 +412,28 @@ func CheckEntityWhereRules(
 	self SIMPLE_ENTITY_INSTANCE,
 	params []PARAMETER,
 	pop *Population,
-) (ok bool, detail string) {
+) (ok bool, detail string, evalUnknowns []string) {
 	rules := mergedEntityWhereRules(stepName)
 	if len(rules) == 0 {
-		return true, ""
+		return true, "", nil
 	}
-	ec := NewEntityWhereEval(ctx, stepName, self, params, pop)
 	for _, rule := range rules {
 		if rule.Check == nil {
 			continue
 		}
-		if pass, msg := rule.Check(ec); !pass {
-			return false, msg
+		ec := NewEntityWhereEval(ctx, stepName, self, params, pop)
+		pass, msg := rule.Check(ec)
+		ruleUnknowns := ec.takeEvalUnknowns()
+		evalUnknowns = append(evalUnknowns, ruleUnknowns...)
+		if len(ruleUnknowns) == 0 && !pass && detail == "" {
+			detail = msg
 		}
 	}
-	return true, ""
+	if detail != "" {
+		return false, detail, evalUnknowns
+	}
+	if len(evalUnknowns) > 0 {
+		return false, "", evalUnknowns
+	}
+	return true, "", nil
 }
