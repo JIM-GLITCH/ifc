@@ -196,6 +196,17 @@ func wvCompareRel(left, right WhereValue, op string) WhereValue {
 			return WhereValue{kind: wvKindLogical, log: boolToLog(relCompare(cmp, op))}
 		}
 	}
+	if left.kind == wvKindLogical && right.kind == wvKindLogical {
+		same := left.log == right.log
+		switch op {
+		case "=":
+			return WhereValue{kind: wvKindLogical, log: boolToLog(same)}
+		case "<>":
+			return WhereValue{kind: wvKindLogical, log: boolToLog(!same)}
+		default:
+			return wvUnknownLogical()
+		}
+	}
 	if ls, lok := wvAsString(left); lok {
 		if rs, rok := wvAsString(right); rok {
 			cmp := strings.Compare(ls, rs)

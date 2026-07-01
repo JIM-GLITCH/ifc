@@ -22,7 +22,14 @@ func NewIfcDocumentValidator(sc *service.Container) workspace.DocumentValidator 
 func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document, level string) []*core.Diagnostic {
 	pop := BuildPopulation(ctx, doc)
 	ctx = WithPopulation(ctx, pop)
-	return v.inner.Validate(ctx, doc, level)
+	diags := v.inner.Validate(ctx, doc, level)
+	if doc != nil && doc.Root != nil {
+		var accept core.ValidationAcceptor = func(d *core.Diagnostic) {
+			diags = append(diags, d)
+		}
+		validateGlobalRules(ctx, doc.Root, accept)
+	}
+	return diags
 }
 
 func validateEntityWhereRules(

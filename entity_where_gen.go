@@ -3167,7 +3167,7 @@ func whereIFCPROPERTYBOUNDEDVALUE_SameUnitUpperSet(ec *EntityWhereEval) (bool, s
 }
 
 func whereIFCPROPERTYDEPENDENCYRELATIONSHIP_NoSelfReference(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvInstSame(ec.Attr("DependingProperty"), ec.Attr("DependantProperty")))) {
+	if !(wvTruthy(wvNot(wvInstSame(ec.Attr("DependingProperty"), ec.Attr("DependantProperty"))))) {
 		return false, "WHERE NoSelfReference: NoSelfReference : DependingProperty :<>: DependantProperty"
 	}
 	return true, ""
@@ -3685,7 +3685,7 @@ func whereIFCRELASSOCIATESMATERIAL_NoVoidElement(ec *EntityWhereEval) (bool, str
 }
 
 func whereIFCRELCONNECTSELEMENTS_NoSelfReference(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvInstSame(ec.Attr("RelatingElement"), ec.Attr("RelatedElement")))) {
+	if !(wvTruthy(wvNot(wvInstSame(ec.Attr("RelatingElement"), ec.Attr("RelatedElement"))))) {
 		return false, "WHERE NoSelfReference: NoSelfReference : RelatingElement :<>: RelatedElement"
 	}
 	return true, ""
@@ -3706,7 +3706,7 @@ func whereIFCRELCONNECTSPATHELEMENTS_NormalizedRelatingPriorities(ec *EntityWher
 }
 
 func whereIFCRELCONNECTSPORTS_NoSelfReference(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvInstSame(ec.Attr("RelatingPort"), ec.Attr("RelatedPort")))) {
+	if !(wvTruthy(wvNot(wvInstSame(ec.Attr("RelatingPort"), ec.Attr("RelatedPort"))))) {
 		return false, "WHERE NoSelfReference: NoSelfReference : RelatingPort :<>: RelatedPort"
 	}
 	return true, ""
@@ -3734,7 +3734,7 @@ func whereIFCRELDEFINESBYPROPERTIES_NoRelatedTypeObject(ec *EntityWhereEval) (bo
 }
 
 func whereIFCRELINTERFERESELEMENTS_NoSelfReference(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvInstSame(ec.Attr("RelatingElement"), ec.Attr("RelatedElement")))) {
+	if !(wvTruthy(wvNot(wvInstSame(ec.Attr("RelatingElement"), ec.Attr("RelatedElement"))))) {
 		return false, "WHERE NoSelfReference: NoSelfReference : RelatingElement :<>: RelatedElement"
 	}
 	return true, ""
@@ -3762,7 +3762,7 @@ func whereIFCRELREFERENCEDINSPATIALSTRUCTURE_AllowedRelatedElements(ec *EntityWh
 }
 
 func whereIFCRELSEQUENCE_AvoidInconsistentSequence(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvInstSame(ec.Attr("RelatingProcess"), ec.Attr("RelatedProcess")))) {
+	if !(wvTruthy(wvNot(wvInstSame(ec.Attr("RelatingProcess"), ec.Attr("RelatedProcess"))))) {
 		return false, "WHERE AvoidInconsistentSequence: AvoidInconsistentSequence : RelatingProcess :<>: RelatedProcess"
 	}
 	return true, ""

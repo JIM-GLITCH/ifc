@@ -903,6 +903,90 @@ func schemaIfcPointListDim(ec *EntityWhereEval, args []WhereValue) WhereValue {
 	return wvUnknownVal()
 }
 
+func schemaIfcSameAxis2Placement(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
+		return wvUnknownVal()
+	}
+	return wvAnd(wvAnd(ec.CallSchema("IfcSameDirection", []WhereValue{ec.QualIndex(ec.QualAttr(args[0], "P", 0), 1), ec.QualIndex(ec.QualAttr(args[1], "P", 0), 1), args[2]}), ec.CallSchema("IfcSameDirection", []WhereValue{ec.QualIndex(ec.QualAttr(args[0], "P", 0), 2), ec.QualIndex(ec.QualAttr(args[1], "P", 0), 2), args[2]})), ec.CallSchema("IfcSameCartesianPoint", []WhereValue{ec.QualAttr(args[0], "Location", 0), ec.QualAttr(args[1], "Location", 0), args[2]}))
+}
+
+func schemaIfcSameCartesianPoint(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
+		return wvUnknownVal()
+	}
+	var cp1x WhereValue
+	cp1x = ec.QualIndex(ec.QualAttr(args[0], "Coordinates", 0), 1)
+	var cp1y WhereValue
+	cp1y = ec.QualIndex(ec.QualAttr(args[0], "Coordinates", 0), 2)
+	var cp1z WhereValue
+	cp1z = parseLiteralNumber("0")
+	var cp2x WhereValue
+	cp2x = ec.QualIndex(ec.QualAttr(args[1], "Coordinates", 0), 1)
+	var cp2y WhereValue
+	cp2y = ec.QualIndex(ec.QualAttr(args[1], "Coordinates", 0), 2)
+	var cp2z WhereValue
+	cp2z = parseLiteralNumber("0")
+	if wvTruthy(wvCompareRel(wvSizeOf(ec.QualAttr(args[0], "Coordinates", 0)), parseLiteralNumber("2"), ">")) {
+		cp1z = ec.QualIndex(ec.QualAttr(args[0], "Coordinates", 0), 3)
+	}
+	if wvTruthy(wvCompareRel(wvSizeOf(ec.QualAttr(args[1], "Coordinates", 0)), parseLiteralNumber("2"), ">")) {
+		cp2z = ec.QualIndex(ec.QualAttr(args[1], "Coordinates", 0), 3)
+	}
+	return wvAnd(wvAnd(ec.CallSchema("IfcSameValue", []WhereValue{cp1x, cp2x, args[2]}), ec.CallSchema("IfcSameValue", []WhereValue{cp1y, cp2y, args[2]})), ec.CallSchema("IfcSameValue", []WhereValue{cp1z, cp2z, args[2]}))
+}
+
+func schemaIfcSameDirection(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
+		return wvUnknownVal()
+	}
+	var dir1x WhereValue
+	dir1x = ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 1)
+	var dir1y WhereValue
+	dir1y = ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 2)
+	var dir1z WhereValue
+	dir1z = parseLiteralNumber("0")
+	var dir2x WhereValue
+	dir2x = ec.QualIndex(ec.QualAttr(args[1], "DirectionRatios", 0), 1)
+	var dir2y WhereValue
+	dir2y = ec.QualIndex(ec.QualAttr(args[1], "DirectionRatios", 0), 2)
+	var dir2z WhereValue
+	dir2z = parseLiteralNumber("0")
+	if wvTruthy(wvCompareRel(wvSizeOf(ec.QualAttr(args[0], "DirectionRatios", 0)), parseLiteralNumber("2"), ">")) {
+		dir1z = ec.QualIndex(ec.QualAttr(args[0], "DirectionRatios", 0), 3)
+	}
+	if wvTruthy(wvCompareRel(wvSizeOf(ec.QualAttr(args[1], "DirectionRatios", 0)), parseLiteralNumber("2"), ">")) {
+		dir2z = ec.QualIndex(ec.QualAttr(args[1], "DirectionRatios", 0), 3)
+	}
+	return wvAnd(wvAnd(ec.CallSchema("IfcSameValue", []WhereValue{dir1x, dir2x, args[2]}), ec.CallSchema("IfcSameValue", []WhereValue{dir1y, dir2y, args[2]})), ec.CallSchema("IfcSameValue", []WhereValue{dir1z, dir2z, args[2]}))
+}
+
+func schemaIfcSameValidPrecision(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 2 {
+		return wvUnknownVal()
+	}
+	var ValidEps1, ValidEps2 WhereValue
+	var DefaultEps WhereValue
+	DefaultEps = parseLiteralNumber("0.000001")
+	var DerivationOfEps WhereValue
+	DerivationOfEps = parseLiteralNumber("1.001")
+	var UpperEps WhereValue
+	UpperEps = parseLiteralNumber("1.0")
+	ValidEps1 = wvNVL(args[0], DefaultEps)
+	ValidEps2 = wvNVL(args[1], DefaultEps)
+	return wvAnd(wvAnd(wvAnd(wvCompareRel(parseLiteralNumber("0.0"), ValidEps1, "<"), wvCompareRel(ValidEps1, wvMul(DerivationOfEps, ValidEps2), "<=")), wvCompareRel(ValidEps2, wvMul(DerivationOfEps, ValidEps1), "<=")), wvCompareRel(ValidEps2, UpperEps, "<"))
+}
+
+func schemaIfcSameValue(ec *EntityWhereEval, args []WhereValue) WhereValue {
+	if len(args) != 3 {
+		return wvUnknownVal()
+	}
+	var ValidEps WhereValue
+	var DefaultEps WhereValue
+	DefaultEps = parseLiteralNumber("0.000001")
+	ValidEps = wvNVL(args[2], DefaultEps)
+	return wvAnd(wvCompareRel(wvAdd(args[0], ValidEps), args[1], ">"), wvCompareRel(args[0], wvAdd(args[1], ValidEps), "<"))
+}
+
 func schemaIfcScalarTimesVector(ec *EntityWhereEval, args []WhereValue) WhereValue {
 	if len(args) != 2 {
 		return wvUnknownVal()
@@ -1313,6 +1397,16 @@ func dispatchSchemaFunction(ec *EntityWhereEval, name string, args []WhereValue)
 		return schemaIfcPointDim(ec, args)
 	case "IfcPointListDim":
 		return schemaIfcPointListDim(ec, args)
+	case "IfcSameAxis2Placement":
+		return schemaIfcSameAxis2Placement(ec, args)
+	case "IfcSameCartesianPoint":
+		return schemaIfcSameCartesianPoint(ec, args)
+	case "IfcSameDirection":
+		return schemaIfcSameDirection(ec, args)
+	case "IfcSameValidPrecision":
+		return schemaIfcSameValidPrecision(ec, args)
+	case "IfcSameValue":
+		return schemaIfcSameValue(ec, args)
 	case "IfcScalarTimesVector":
 		return schemaIfcScalarTimesVector(ec, args)
 	case "IfcSecondProjAxis":
