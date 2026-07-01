@@ -236,6 +236,10 @@ func validateAggregateElements(
 	if elementType == "" {
 		return
 	}
+	aggExpr := aggregateExpressionForAttr(attr)
+	if aggregateHasUniqueElements(aggExpr) {
+		validateAggregateUniqueElements(ctx, owner, list, accept)
+	}
 	elementAttr := schemaAttrForTypeName(elementType)
 	for _, element := range list.Parameters() {
 		validateParameterValue(ctx, owner, elementAttr, element, -1, accept)

@@ -28,6 +28,7 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 			diags = append(diags, d)
 		}
 		validateGlobalRules(ctx, doc.Root, accept)
+		validateUniqueRules(ctx, accept)
 	}
 	return diags
 }
