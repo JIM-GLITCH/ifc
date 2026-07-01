@@ -34,4 +34,4 @@ npm-debug.log*
 yarn-error.log*
 *.vsix
 *.tsbuildinfo
-vscode-extension/dist/extension.js
+vscode-extension/dist/
