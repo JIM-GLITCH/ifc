@@ -26,7 +26,7 @@ func uniqueKeyPart(v WhereValue) (string, bool) {
 	}
 	switch v.kind {
 	case wvKindString:
-		return "S:" + strings.ToLower(v.s), true
+		return "S:" + v.s, true
 	case wvKindEnum:
 		return "N:" + strings.ToLower(normalizeEnumMember(v.s)), true
 	case wvKindInteger:
@@ -219,6 +219,9 @@ func validateAggregateUniqueElements(
 	for _, element := range list.Parameters() {
 		key, ok := parameterUniqueKey(ctx, pop, element)
 		if !ok {
+			if parameterBlockedByUnresolvedEntityRef(ctx, pop, element) {
+				continue
+			}
 			info := parameterInfoFrom(element)
 			acceptEvalUnknown(accept, diagnosticNodeForParameter(owner, element), info.token, parameterEvalFailureReason(ctx, pop, element))
 			continue

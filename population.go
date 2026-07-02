@@ -56,9 +56,6 @@ func findExchangeFile(root core.AstNode) EXCHANGE_FILE {
 	if root == nil {
 		return nil
 	}
-	if file, ok := root.(StepFile); ok {
-		return file.File()
-	}
 	if file, ok := root.(EXCHANGE_FILE); ok {
 		return file
 	}

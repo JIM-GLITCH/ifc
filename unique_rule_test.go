@@ -70,6 +70,35 @@ END-ISO-10303-21;`
 	}
 }
 
+func TestUniqueRuleGlobalIdCaseSensitivePass(t *testing.T) {
+	sc := CreateServices()
+	fixture := fbtest.New(t, sc)
+
+	source := `ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCPROPERTYSET('2uphWCk9v7hw8QHlM1lYgR',#48,'A',$,(#2));
+#2=IFCPROPERTYSINGLEVALUE('x',$,$,$);
+#3=IFCPROPERTYSET('2uphWCk9v7hw8QHlM1lYGr',#48,'B',$,(#2));
+ENDSEC;
+END-ISO-10303-21;`
+
+	doc := fixture.Parse(source)
+	doc.AssertNoParseErrors()
+
+	validator := serviceMustUniqueRuleValidator(sc)
+	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	for _, d := range diagnostics {
+		if d.Code == "ifc-unique" {
+			t.Fatalf("case-differing GlobalIds must not collide: %s", d.Message)
+		}
+	}
+}
+
 func TestUniqueAggregateEnumerationValues(t *testing.T) {
 	sc := CreateServices()
 	fixture := fbtest.New(t, sc)

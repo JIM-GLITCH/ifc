@@ -91,18 +91,97 @@ type EntityWhereEval struct {
 	params       []PARAMETER
 	pop          *Population
 	evalUnknowns *[]string
+	whereKind    string
+	ruleLabel    string
 }
 
 func (ec *EntityWhereEval) noteEvalUnknown(message string) {
-	if ec == nil || ec.evalUnknowns == nil || strings.TrimSpace(message) == "" {
+	if ec == nil || ec.evalUnknowns == nil || strings.TrimSpace(message) == "" || shouldSuppressEvalUnknownMessage(message) {
 		return
+	}
+	message = formatWhereEvalUnknownMessage(ec.stepName, ec.ruleLabel, ec.whereKind, message)
+	for _, existing := range *ec.evalUnknowns {
+		if existing == message {
+			return
+		}
 	}
 	*ec.evalUnknowns = append(*ec.evalUnknowns, message)
 }
 
+func (ec *EntityWhereEval) hasEvalUnknowns() bool {
+	return ec != nil && ec.evalUnknowns != nil && len(*ec.evalUnknowns) > 0
+}
+
+func formatWhereEvalUnknownMessage(stepName, ruleLabel, whereKind, message string) string {
+	stepName = strings.TrimSpace(stepName)
+	ruleLabel = strings.TrimSpace(ruleLabel)
+	if ruleLabel == "" {
+		return message
+	}
+	switch whereKind {
+	case "global":
+		if stepName != "" {
+			return fmt.Sprintf("Global RULE %q %q: %s", stepName, ruleLabel, message)
+		}
+		return fmt.Sprintf("Global RULE %q: %s", ruleLabel, message)
+	default:
+		if stepName != "" {
+			return fmt.Sprintf("Entity %q WHERE %q: %s", stepName, ruleLabel, message)
+		}
+		return fmt.Sprintf("WHERE %q: %s", ruleLabel, message)
+	}
+}
+
 func (ec *EntityWhereEval) unknown(message string) WhereValue {
+	if ec != nil && ec.hasEvalUnknowns() {
+		return wvUnknownVal()
+	}
 	ec.noteEvalUnknown(message)
 	return wvUnknownVal()
+}
+
+func (ec *EntityWhereEval) WvOrLazy(a, b func() WhereValue) WhereValue {
+	av := a()
+	if ec != nil && ec.hasEvalUnknowns() {
+		return wvUnknownVal()
+	}
+	if wvIsDefiniteTrue(av) {
+		return WhereValue{kind: wvKindLogical, log: 1}
+	}
+	if wvIsDefiniteFalse(av) {
+		bv := b()
+		if ec != nil && ec.hasEvalUnknowns() {
+			return wvUnknownVal()
+		}
+		return wvOr(av, bv)
+	}
+	if ec != nil && ec.hasEvalUnknowns() {
+		return wvUnknownVal()
+	}
+	bv := b()
+	return wvOr(av, bv)
+}
+
+func (ec *EntityWhereEval) WvAndLazy(a, b func() WhereValue) WhereValue {
+	av := a()
+	if ec != nil && ec.hasEvalUnknowns() {
+		return wvUnknownVal()
+	}
+	if wvIsDefiniteFalse(av) {
+		return WhereValue{kind: wvKindLogical, log: 0}
+	}
+	if wvIsDefiniteTrue(av) {
+		bv := b()
+		if ec != nil && ec.hasEvalUnknowns() {
+			return wvUnknownVal()
+		}
+		return wvAnd(av, bv)
+	}
+	if ec != nil && ec.hasEvalUnknowns() {
+		return wvUnknownVal()
+	}
+	bv := b()
+	return wvAnd(av, bv)
 }
 
 func (ec *EntityWhereEval) takeEvalUnknowns() []string {
@@ -167,6 +246,9 @@ func (ec *EntityWhereEval) Attr(name string) WhereValue {
 	}
 	value, ok := ec.parameterToWhereValue(ec.params[idx])
 	if !ok {
+		if parameterBlockedByUnresolvedEntityRef(ec.ctx, ec.pop, ec.params[idx]) {
+			return wvUnknownVal()
+		}
 		return ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, ec.params[idx]))
 	}
 	return value
@@ -186,13 +268,14 @@ func (ec *EntityWhereEval) QualEntity(v WhereValue, entityName string) WhereValu
 		}
 		return wvUnknownVal()
 	}
-	if ec.self != nil && entityIsOrSubtypes(ec.stepName, entityName) {
-		return wvFromEntityInstance(ec.self)
-	}
 	if inst := v.entityInstance(); inst != nil {
 		if step, ok := instanceStepName(inst); ok && entityIsOrSubtypes(step, entityName) {
 			return v
 		}
+		return wvUnknownVal()
+	}
+	if ec.self != nil && entityIsOrSubtypes(ec.stepName, entityName) {
+		return wvFromEntityInstance(ec.self)
 	}
 	return wvUnknownVal()
 }
@@ -266,6 +349,9 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 	}
 	value, ok := ec.parameterToWhereValue(params[idx])
 	if !ok {
+		if parameterBlockedByUnresolvedEntityRef(ec.ctx, ec.pop, params[idx]) {
+			return wvUnknownVal()
+		}
 		return ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, params[idx]))
 	}
 	return value
@@ -422,10 +508,14 @@ func CheckEntityWhereRules(
 			continue
 		}
 		ec := NewEntityWhereEval(ctx, stepName, self, params, pop)
+		ec.ruleLabel = rule.Label
 		pass, msg := rule.Check(ec)
 		ruleUnknowns := ec.takeEvalUnknowns()
 		evalUnknowns = append(evalUnknowns, ruleUnknowns...)
-		if len(ruleUnknowns) == 0 && !pass && detail == "" {
+		if len(ruleUnknowns) > 0 {
+			break
+		}
+		if !pass && detail == "" {
 			detail = msg
 		}
 	}

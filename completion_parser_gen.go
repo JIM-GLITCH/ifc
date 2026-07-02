@@ -39,18 +39,6 @@ func (p *CompletionParser) Parse(tokens []core.Token) *parser.CompletionParseRes
 	return cp.cp.Result(tokens)
 }
 
-func (p *CompletionParser) ParseStepFile() {
-	p.cp.EnterRule("StepFile", StepFile__Start)
-	defer p.cp.ExitRule()
-	{
-		p.cp.MarkAssignment("File")
-		p.state.EnterRule(StepFile__Basic_1)
-		p.ParseEXCHANGE_FILE()
-		p.state.ExitRule()
-		p.cp.ClearAssignment()
-	}
-}
-
 func (p *CompletionParser) ParseEXCHANGE_FILE() {
 	p.cp.EnterRule("EXCHANGE_FILE", EXCHANGE_FILE__Start)
 	defer p.cp.ExitRule()

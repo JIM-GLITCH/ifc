@@ -121,6 +121,20 @@ func (ec *GlobalRuleEval) QualAttr(v WhereValue, attrName string, index int) Whe
 	return ec.entityEval.QualAttr(v, attrName, index)
 }
 
+func (ec *GlobalRuleEval) WvOrLazy(a, b func() WhereValue) WhereValue {
+	if ec == nil || ec.entityEval == nil {
+		return wvOr(a(), b())
+	}
+	return ec.entityEval.WvOrLazy(a, b)
+}
+
+func (ec *GlobalRuleEval) WvAndLazy(a, b func() WhereValue) WhereValue {
+	if ec == nil || ec.entityEval == nil {
+		return wvAnd(a(), b())
+	}
+	return ec.entityEval.WvAndLazy(a, b)
+}
+
 func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail string, evalUnknowns []string) {
 	if len(GlobalRuleChecks) == 0 {
 		return true, "", nil
@@ -130,10 +144,16 @@ func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail str
 			continue
 		}
 		ec := NewGlobalRuleEval(ctx, pop)
+		ec.entityEval.whereKind = "global"
+		ec.entityEval.ruleLabel = rule.Label
+		ec.entityEval.stepName = rule.ExpressName
 		pass, msg := rule.Check(ec)
 		ruleUnknowns := ec.entityEval.takeEvalUnknowns()
 		evalUnknowns = append(evalUnknowns, ruleUnknowns...)
-		if len(ruleUnknowns) == 0 && !pass && detail == "" {
+		if len(ruleUnknowns) > 0 {
+			break
+		}
+		if !pass && detail == "" {
 			if msg == "" {
 				detail = "RULE " + rule.ExpressName + " violated"
 			} else if rule.ExpressName != "" && !strings.Contains(msg, rule.ExpressName) {
@@ -154,14 +174,20 @@ func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail str
 
 func validateGlobalRules(ctx context.Context, owner core.AstNode, accept core.ValidationAcceptor) {
 	pop := PopulationFromContext(ctx)
-	ok, detail, evalUnknowns := CheckGlobalRules(ctx, pop)
-	acceptEvalUnknowns(accept, owner, nil, evalUnknowns)
+	ok, detail, _ := CheckGlobalRules(ctx, pop)
+	// evalUnknowns from global rule evaluation are side effects while reading
+	// entity attributes; they are already reported per-entity during AST validation.
 	if ok {
 		return
 	}
 	if detail == "" {
 		return
 	}
+	anchorNode, anchorToken := validationAnchorNode(owner)
 	msg := "Global RULE constraint violated: " + detail
-	accept(core.NewDiagnostic(core.SeverityError, msg, owner, core.WithCode("ifc-global-rule")))
+	opts := []core.DiagnosticOption{core.WithCode("ifc-global-rule")}
+	if anchorToken != nil {
+		opts = append(opts, core.WithToken(anchorToken))
+	}
+	accept(core.NewDiagnostic(core.SeverityError, msg, anchorNode, opts...))
 }

@@ -775,6 +775,28 @@ func (ec *TypeWhereEval) CallSchema(_ string, _ []WhereValue) WhereValue {
 	return wvUnknownVal()
 }
 
+func (ec *TypeWhereEval) WvOrLazy(a, b func() WhereValue) WhereValue {
+	av := a()
+	if wvIsDefiniteTrue(av) {
+		return WhereValue{kind: wvKindLogical, log: 1}
+	}
+	if wvIsDefiniteFalse(av) {
+		return wvOr(av, b())
+	}
+	return wvOr(av, b())
+}
+
+func (ec *TypeWhereEval) WvAndLazy(a, b func() WhereValue) WhereValue {
+	av := a()
+	if wvIsDefiniteFalse(av) {
+		return WhereValue{kind: wvKindLogical, log: 0}
+	}
+	if wvIsDefiniteTrue(av) {
+		return wvAnd(av, b())
+	}
+	return wvAnd(av, b())
+}
+
 func LookupTypeWhereRules(typeName string) ([]TypeWhereRuleSpec, bool) {
 	if rules, ok := TypeWhereRules[typeName]; ok {
 		return rules, true

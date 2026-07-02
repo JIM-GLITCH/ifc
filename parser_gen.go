@@ -33,23 +33,6 @@ func NewParser(sc *service.Container) *Parser {
 	}
 }
 
-func (p *Parser) ParseStepFile() StepFile {
-	current := NewStepFile()
-	current.SetSegmentStartToken(p.state.LA(1))
-	{
-		{
-			p.state.EnterRule(StepFile__Basic_1)
-			result := p.ParseEXCHANGE_FILE()
-			p.state.ExitRule()
-			if result != nil {
-				current.SetFile(result)
-			}
-		}
-	}
-	current.SetSegmentEndToken(p.state.LA(0))
-	return current
-}
-
 func (p *Parser) ParseEXCHANGE_FILE() EXCHANGE_FILE {
 	current := NewEXCHANGE_FILE()
 	current.SetSegmentStartToken(p.state.LA(1))

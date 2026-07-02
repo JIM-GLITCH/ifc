@@ -19,6 +19,7 @@ func TestValidateTypeWhereOnUnknownReportsEvalUnknown(t *testing.T) {
 	if len(diags) != 1 || diags[0].Code != evalUnknownCode {
 		t.Fatalf("expected %s for unknown value, got %v", evalUnknownCode, diags)
 	}
+	t.Logf("ifc-eval-unknown example (Type WHERE): code=%s severity=%s message=%q", diags[0].Code, diags[0].Severity, diags[0].Message)
 
 	diags = nil
 	validateTypeWhereOnWhereValue(attr, wvAbsentVal(), node, nil, accept)
@@ -27,7 +28,7 @@ func TestValidateTypeWhereOnUnknownReportsEvalUnknown(t *testing.T) {
 	}
 }
 
-func TestUnresolvedEntityReferenceReportsEvalUnknown(t *testing.T) {
+func TestUnresolvedEntityReferenceSkipsEvalUnknown(t *testing.T) {
 	sc := CreateServices()
 	fixture := fbtest.New(t, sc)
 
@@ -48,13 +49,17 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
-	found := false
+	foundLinker := false
 	for _, d := range diagnostics {
 		if d.Code == evalUnknownCode && strings.Contains(d.Message, "#999") {
-			found = true
+			t.Fatalf("unexpected %s for unresolved #999: %v", evalUnknownCode, d)
+		}
+		if strings.Contains(d.Message, "#999") && strings.Contains(strings.ToLower(d.Message), "resolve") {
+			foundLinker = true
+			t.Logf("linker diagnostic: code=%s message=%q", d.Code, d.Message)
 		}
 	}
-	if !found {
-		t.Fatalf("expected %s for unresolved #999, got %v", evalUnknownCode, diagnostics)
+	if !foundLinker {
+		t.Fatalf("expected linker diagnostic for #999, got %v", diagnostics)
 	}
 }

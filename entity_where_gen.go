@@ -10,35 +10,35 @@ type EntityWhereRuleSpec struct {
 }
 
 func whereIFCACTORROLE_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("Role"), ec.QualAttr(wvFromEnumType("IfcRoleEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("Role"), ec.QualAttr(wvFromEnumType("IfcRoleEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.Self(), "UserDefinedRole", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("Role"), ec.QualAttr(wvFromEnumType("IfcRoleEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("Role"), ec.QualAttr(wvFromEnumType("IfcRoleEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.Self(), "UserDefinedRole", 0)) }) }))) {
 		return false, "WHERE WR1: WR1 : (Role <> IfcRoleEnum.USERDEFINED) OR\r\n((Role = IfcRoleEnum.USERDEFINED) AND\r\n  EXISTS(SELF.UserDefinedRole))"
 	}
 	return true, ""
 }
 
 func whereIFCACTUATOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcActuatorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcActuatorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCACTUATOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCACTUATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCACTUATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCACTUATORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCACTUATORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcActuatorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcActuatorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcActuatorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCADDRESS_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Purpose"))), wvOr(wvCompareRel(ec.Attr("Purpose"), ec.QualAttr(wvFromEnumType("IfcAddressTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("Purpose"), ec.QualAttr(wvFromEnumType("IfcAddressTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.Self(), "UserDefinedPurpose", 0))))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Purpose"))) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("Purpose"), ec.QualAttr(wvFromEnumType("IfcAddressTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("Purpose"), ec.QualAttr(wvFromEnumType("IfcAddressTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.Self(), "UserDefinedPurpose", 0)) }) }) }))) {
 		return false, "WHERE WR1: WR1 : (NOT(EXISTS(Purpose))) OR\r\n((Purpose <> IfcAddressTypeEnum.USERDEFINED) OR\r\n((Purpose = IfcAddressTypeEnum.USERDEFINED) AND\r\n  EXISTS(SELF.UserDefinedPurpose)))"
 	}
 	return true, ""
@@ -80,91 +80,91 @@ func whereIFCADVANCEDFACE_RequiresEdgeCurve(ec *EntityWhereEval) (bool, string) 
 }
 
 func whereIFCAIRTERMINAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcAirTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAirTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTERMINAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAIRTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAIRTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCAIRTERMINALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTERMINALBOX_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcAirTerminalBoxTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAirTerminalBoxTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTERMINALBOX_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAIRTERMINALBOXTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAIRTERMINALBOXTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCAIRTERMINALBOXTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTERMINALBOXTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalBoxTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcAirTerminalBoxTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAirTerminalBoxTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTERMINALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcAirTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAirTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTOAIRHEATRECOVERY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcAirToAirHeatRecoveryTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAirToAirHeatRecoveryTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTOAIRHEATRECOVERY_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAIRTOAIRHEATRECOVERYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAIRTOAIRHEATRECOVERYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCAIRTOAIRHEATRECOVERYTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCAIRTOAIRHEATRECOVERYTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAirToAirHeatRecoveryTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcAirToAirHeatRecoveryTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAirToAirHeatRecoveryTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCALARM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcAlarmTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAlarmTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCALARM_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCALARMTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCALARMTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCALARMTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCALARMTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAlarmTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcAlarmTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAlarmTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCAPPROVAL_HasIdentifierOrName(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvExists(ec.Attr("Identifier")), wvExists(ec.Attr("Name"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("Identifier")) }, func() WhereValue { return wvExists(ec.Attr("Name")) }))) {
 		return false, "WHERE HasIdentifierOrName: HasIdentifierOrName : EXISTS (Identifier) OR EXISTS (Name)"
 	}
 	return true, ""
@@ -192,7 +192,7 @@ func whereIFCARBITRARYCLOSEDPROFILEDEF_WR3(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCARBITRARYOPENPROFILEDEF_WR11(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCENTERLINEPROFILEDEF"), wvTypeOf(ec.Self())), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcProfileDef"), "ProfileType", 0), ec.QualAttr(wvFromEnumType("IfcProfileTypeEnum"), "CURVE", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCENTERLINEPROFILEDEF"), wvTypeOf(ec.Self())) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcProfileDef"), "ProfileType", 0), ec.QualAttr(wvFromEnumType("IfcProfileTypeEnum"), "CURVE", 0), "=") }))) {
 		return false, "WHERE WR11: WR11 : ('IFC4X3_DEV_73740fe4.IFCCENTERLINEPROFILEDEF' IN TYPEOF(SELF)) OR \r\n (SELF\\IfcProfileDef.ProfileType = IfcProfileTypeEnum.CURVE)"
 	}
 	return true, ""
@@ -227,56 +227,56 @@ func whereIFCARBITRARYPROFILEDEFWITHVOIDS_WR3(ec *EntityWhereEval) (bool, string
 }
 
 func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidBottomFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("BottomFlangeFilletRadius"))), wvCompareRel(ec.Attr("BottomFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("BottomFlangeWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("BottomFlangeFilletRadius"))) }, func() WhereValue { return wvCompareRel(ec.Attr("BottomFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("BottomFlangeWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=") }))) {
 		return false, "WHERE ValidBottomFilletRadius: ValidBottomFilletRadius : (NOT(EXISTS(BottomFlangeFilletRadius))) OR \r\n(BottomFlangeFilletRadius <= (BottomFlangeWidth - WebThickness)/2.)"
 	}
 	return true, ""
 }
 
 func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidFlangeThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("TopFlangeThickness"))), wvCompareRel(wvAdd(ec.Attr("BottomFlangeThickness"), ec.Attr("TopFlangeThickness")), ec.Attr("OverallDepth"), "<")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("TopFlangeThickness"))) }, func() WhereValue { return wvCompareRel(wvAdd(ec.Attr("BottomFlangeThickness"), ec.Attr("TopFlangeThickness")), ec.Attr("OverallDepth"), "<") }))) {
 		return false, "WHERE ValidFlangeThickness: ValidFlangeThickness : NOT(EXISTS(TopFlangeThickness)) OR ((BottomFlangeThickness + TopFlangeThickness) < OverallDepth)"
 	}
 	return true, ""
 }
 
 func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidTopFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("TopFlangeFilletRadius"))), wvCompareRel(ec.Attr("TopFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("TopFlangeWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("TopFlangeFilletRadius"))) }, func() WhereValue { return wvCompareRel(ec.Attr("TopFlangeFilletRadius"), wvDiv(wvSub(ec.Attr("TopFlangeWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=") }))) {
 		return false, "WHERE ValidTopFilletRadius: ValidTopFilletRadius : (NOT(EXISTS(TopFlangeFilletRadius))) OR \r\n(TopFlangeFilletRadius <= (TopFlangeWidth - WebThickness)/2.)"
 	}
 	return true, ""
 }
 
 func whereIFCASYMMETRICISHAPEPROFILEDEF_ValidWebThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WebThickness"), ec.Attr("BottomFlangeWidth"), "<"), wvCompareRel(ec.Attr("WebThickness"), ec.Attr("TopFlangeWidth"), "<")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("WebThickness"), ec.Attr("BottomFlangeWidth"), "<") }, func() WhereValue { return wvCompareRel(ec.Attr("WebThickness"), ec.Attr("TopFlangeWidth"), "<") }))) {
 		return false, "WHERE ValidWebThickness: ValidWebThickness : (WebThickness < BottomFlangeWidth) AND (WebThickness < TopFlangeWidth)"
 	}
 	return true, ""
 }
 
 func whereIFCAUDIOVISUALAPPLIANCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcAudioVisualApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAudioVisualApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCAUDIOVISUALAPPLIANCE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAUDIOVISUALAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCAUDIOVISUALAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCAUDIOVISUALAPPLIANCETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCAUDIOVISUALAPPLIANCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAudioVisualApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcAudioVisualApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAudioVisualApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCAXIS1PLACEMENT_AxisIs3D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvCompareRel(ec.QualAttr(ec.Attr("Axis"), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Axis"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("Axis"), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE AxisIs3D: AxisIs3D : (NOT (EXISTS (Axis))) OR (Axis.Dim = 3)"
 	}
 	return true, ""
@@ -311,7 +311,7 @@ func whereIFCAXIS2PLACEMENT2D_LocationIsCP(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCAXIS2PLACEMENT2D_RefDirIs2D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("RefDirection"))), wvCompareRel(ec.QualAttr(ec.Attr("RefDirection"), "Dim", 0), parseLiteralNumber("2"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("RefDirection"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("RefDirection"), "Dim", 0), parseLiteralNumber("2"), "=") }))) {
 		return false, "WHERE RefDirIs2D: RefDirIs2D : (NOT (EXISTS (RefDirection))) OR (RefDirection.Dim = 2)"
 	}
 	return true, ""
@@ -325,14 +325,14 @@ func whereIFCAXIS2PLACEMENT3D_AxisAndRefDirProvision(ec *EntityWhereEval) (bool,
 }
 
 func whereIFCAXIS2PLACEMENT3D_AxisIs3D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvCompareRel(ec.QualAttr(ec.Attr("Axis"), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Axis"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("Axis"), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE AxisIs3D: AxisIs3D : (NOT (EXISTS (Axis))) OR (Axis.Dim = 3)"
 	}
 	return true, ""
 }
 
 func whereIFCAXIS2PLACEMENT3D_AxisToRefDirPosition(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvNot(wvExists(ec.Attr("RefDirection")))), wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), "Magnitude", 0), parseLiteralNumber("0.0"), ">")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Axis"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("RefDirection"))) }) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), "Magnitude", 0), parseLiteralNumber("0.0"), ">") }))) {
 		return false, "WHERE AxisToRefDirPosition: AxisToRefDirPosition : (NOT (EXISTS (Axis))) OR (NOT (EXISTS (RefDirection))) OR (IfcCrossProduct(Axis,RefDirection).Magnitude > 0.0)"
 	}
 	return true, ""
@@ -353,7 +353,7 @@ func whereIFCAXIS2PLACEMENT3D_LocationIsCP(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCAXIS2PLACEMENT3D_RefDirIs3D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("RefDirection"))), wvCompareRel(ec.QualAttr(ec.Attr("RefDirection"), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("RefDirection"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("RefDirection"), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE RefDirIs3D: RefDirIs3D : (NOT (EXISTS (RefDirection))) OR (RefDirection.Dim = 3)"
 	}
 	return true, ""
@@ -367,49 +367,49 @@ func whereIFCAXIS2PLACEMENTLINEAR_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCAXIS2PLACEMENTLINEAR_WR2(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("Axis"))), wvNot(wvExists(ec.Attr("RefDirection")))), wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), "Magnitude", 0), parseLiteralNumber("0.0"), ">")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Axis"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("RefDirection"))) }) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.CallSchema("IfcCrossProduct", []WhereValue{ec.Attr("Axis"), ec.Attr("RefDirection")}), "Magnitude", 0), parseLiteralNumber("0.0"), ">") }))) {
 		return false, "WHERE WR2: WR2 : (NOT (EXISTS (Axis))) OR (NOT (EXISTS (RefDirection))) OR (IfcCrossProduct(Axis,RefDirection).Magnitude > 0.0)"
 	}
 	return true, ""
 }
 
 func whereIFCBEAM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBeamTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBeamTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBEAM_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBEAMTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBEAMTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCBEAMTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCBEAMTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBeamTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcBeamTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBeamTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCBEARING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBearingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBearingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBEARING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBEARINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBEARINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCBEARINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCBEARINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBearingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcBearingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBearingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -430,28 +430,28 @@ func whereIFCBLOBTEXTURE_SupportedRasterFormat(ec *EntityWhereEval) (bool, strin
 }
 
 func whereIFCBOILER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBoilerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBoilerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBOILER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBOILERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBOILERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCBOILERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCBOILERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBoilerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcBoilerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBoilerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCBOOLEANCLIPPINGRESULT_FirstOperandType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTAREASOLID"), wvTypeOf(ec.Attr("FirstOperand"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTDISCSOLID"), wvTypeOf(ec.Attr("FirstOperand")))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBOOLEANCLIPPINGRESULT"), wvTypeOf(ec.Attr("FirstOperand")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTAREASOLID"), wvTypeOf(ec.Attr("FirstOperand"))) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSWEPTDISCSOLID"), wvTypeOf(ec.Attr("FirstOperand"))) }) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBOOLEANCLIPPINGRESULT"), wvTypeOf(ec.Attr("FirstOperand"))) }))) {
 		return false, "WHERE FirstOperandType: FirstOperandType : ('IFC4X3_DEV_73740fe4.IFCSWEPTAREASOLID' IN TYPEOF(FirstOperand)) OR \r\n('IFC4X3_DEV_73740fe4.IFCSWEPTDISCSOLID' IN TYPEOF(FirstOperand)) OR \r\n('IFC4X3_DEV_73740fe4.IFCBOOLEANCLIPPINGRESULT' IN TYPEOF(FirstOperand))"
 	}
 	return true, ""
@@ -472,7 +472,7 @@ func whereIFCBOOLEANCLIPPINGRESULT_SecondOperandType(ec *EntityWhereEval) (bool,
 }
 
 func whereIFCBOOLEANRESULT_FirstOperandClosed(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDFACESET"), wvTypeOf(ec.Attr("FirstOperand")))), wvAnd(wvExists(ec.QualAttr(ec.Attr("FirstOperand"), "Closed", 0)), ec.QualAttr(ec.Attr("FirstOperand"), "Closed", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDFACESET"), wvTypeOf(ec.Attr("FirstOperand")))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.QualAttr(ec.Attr("FirstOperand"), "Closed", 0)) }, func() WhereValue { return ec.QualAttr(ec.Attr("FirstOperand"), "Closed", 0) }) }))) {
 		return false, "WHERE FirstOperandClosed: FirstOperandClosed : NOT('IFC4X3_DEV_73740fe4.IFCTESSELLATEDFACESET' IN TYPEOF(FirstOperand)) OR (EXISTS(FirstOperand.Closed) AND FirstOperand.Closed)"
 	}
 	return true, ""
@@ -486,7 +486,7 @@ func whereIFCBOOLEANRESULT_SameDim(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCBOOLEANRESULT_SecondOperandClosed(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDFACESET"), wvTypeOf(ec.Attr("SecondOperand")))), wvAnd(wvExists(ec.QualAttr(ec.Attr("SecondOperand"), "Closed", 0)), ec.QualAttr(ec.Attr("SecondOperand"), "Closed", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTESSELLATEDFACESET"), wvTypeOf(ec.Attr("SecondOperand")))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.QualAttr(ec.Attr("SecondOperand"), "Closed", 0)) }, func() WhereValue { return ec.QualAttr(ec.Attr("SecondOperand"), "Closed", 0) }) }))) {
 		return false, "WHERE SecondOperandClosed: SecondOperandClosed : NOT('IFC4X3_DEV_73740fe4.IFCTESSELLATEDFACESET' IN TYPEOF(SecondOperand)) OR (EXISTS(SecondOperand.Closed) AND SecondOperand.Closed)"
 	}
 	return true, ""
@@ -507,14 +507,14 @@ func whereIFCBOXEDHALFSPACE_UnboundedSurface(ec *EntityWhereEval) (bool, string)
 }
 
 func whereIFCBRIDGE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgeTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgeTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgeTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgeTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBridgeTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBridgeTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBRIDGEPART_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgePartTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgePartTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgePartTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBridgePartTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBridgePartTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBridgePartTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -570,35 +570,35 @@ func whereIFCBSPLINESURFACEWITHKNOTS_VDirectionConstraints(ec *EntityWhereEval) 
 }
 
 func whereIFCBUILDINGELEMENTPART_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBuildingElementPartTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBuildingElementPartTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBUILDINGELEMENTPART_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBUILDINGELEMENTPARTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBUILDINGELEMENTPARTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCBUILDINGELEMENTPARTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCBUILDINGELEMENTPARTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementPartTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcBuildingElementPartTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBuildingElementPartTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCBUILDINGELEMENTPROXY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBuildingElementProxyTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBuildingElementProxyTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBUILDINGELEMENTPROXY_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBUILDINGELEMENTPROXYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBUILDINGELEMENTPROXYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCBUILDINGELEMENTPROXYTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
@@ -612,14 +612,14 @@ func whereIFCBUILDINGELEMENTPROXY_HasObjectName(ec *EntityWhereEval) (bool, stri
 }
 
 func whereIFCBUILDINGELEMENTPROXYTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingElementProxyTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcBuildingElementProxyTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBuildingElementProxyTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCBUILDINGSYSTEM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingSystemTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingSystemTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingSystemTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuildingSystemTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBuildingSystemTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBuildingSystemTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -633,133 +633,133 @@ func whereIFCBUILTELEMENT_MaxOneMaterialAssociation(ec *EntityWhereEval) (bool, 
 }
 
 func whereIFCBUILTSYSTEM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuiltSystemTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuiltSystemTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuiltSystemTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBuiltSystemTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBuiltSystemTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBuiltSystemTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBURNER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcBurnerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBurnerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCBURNER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBURNERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCBURNERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCBURNERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCBURNERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcBurnerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcBurnerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcBurnerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLECARRIERFITTING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCableCarrierFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableCarrierFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLECARRIERFITTING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLECARRIERFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLECARRIERFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCABLECARRIERFITTINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLECARRIERFITTINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCableCarrierFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableCarrierFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLECARRIERSEGMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCableCarrierSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableCarrierSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLECARRIERSEGMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLECARRIERSEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLECARRIERSEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCABLECARRIERSEGMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLECARRIERSEGMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableCarrierSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCableCarrierSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableCarrierSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLEFITTING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCableFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLEFITTING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLEFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLEFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCABLEFITTINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLEFITTINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCableFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLESEGMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCableSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLESEGMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLESEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCABLESEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCABLESEGMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCABLESEGMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCableSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCableSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCableSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCAISSONFOUNDATION_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCaissonFoundationTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCaissonFoundationTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCAISSONFOUNDATION_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCAISSONFOUNDATIONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCAISSONFOUNDATIONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCAISSONFOUNDATIONTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCAISSONFOUNDATIONTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCaissonFoundationTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCaissonFoundationTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCaissonFoundationTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -780,14 +780,14 @@ func whereIFCCARTESIANTRANSFORMATIONOPERATOR_ScaleGreaterZero(ec *EntityWhereEva
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR2D_Axis1Is2D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), "Dim", 0), parseLiteralNumber("2"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), "Dim", 0), parseLiteralNumber("2"), "=") }))) {
 		return false, "WHERE Axis1Is2D: Axis1Is2D : NOT(EXISTS(SELF\\IfcCartesianTransformationOperator.Axis1)) OR \r\n(SELF\\IfcCartesianTransformationOperator.Axis1.Dim = 2)"
 	}
 	return true, ""
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR2D_Axis2Is2D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), "Dim", 0), parseLiteralNumber("2"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), "Dim", 0), parseLiteralNumber("2"), "=") }))) {
 		return false, "WHERE Axis2Is2D: Axis2Is2D : NOT(EXISTS(SELF\\IfcCartesianTransformationOperator.Axis2)) OR \r\n(SELF\\IfcCartesianTransformationOperator.Axis2.Dim = 2)"
 	}
 	return true, ""
@@ -808,21 +808,21 @@ func whereIFCCARTESIANTRANSFORMATIONOPERATOR2DNONUNIFORM_Scale2GreaterZero(ec *E
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR3D_Axis1Is3D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis1", 0), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE Axis1Is3D: Axis1Is3D : NOT(EXISTS(SELF\\IfcCartesianTransformationOperator.Axis1)) OR \r\n(SELF\\IfcCartesianTransformationOperator.Axis1.Dim = 3)"
 	}
 	return true, ""
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR3D_Axis2Is3D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcCartesianTransformationOperator"), "Axis2", 0), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE Axis2Is3D: Axis2Is3D : NOT(EXISTS(SELF\\IfcCartesianTransformationOperator.Axis2)) OR \r\n(SELF\\IfcCartesianTransformationOperator.Axis2.Dim = 3)"
 	}
 	return true, ""
 }
 
 func whereIFCCARTESIANTRANSFORMATIONOPERATOR3D_Axis3Is3D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Axis3"))), wvCompareRel(ec.QualAttr(ec.Attr("Axis3"), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Axis3"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("Axis3"), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE Axis3Is3D: Axis3Is3D : NOT(EXISTS(Axis3)) OR (Axis3.Dim = 3)"
 	}
 	return true, ""
@@ -850,42 +850,42 @@ func whereIFCCARTESIANTRANSFORMATIONOPERATOR3DNONUNIFORM_Scale3GreaterZero(ec *E
 }
 
 func whereIFCCHILLER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcChillerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcChillerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCHILLER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCHILLERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCHILLERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCHILLERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCHILLERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChillerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcChillerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcChillerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCHIMNEY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcChimneyTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcChimneyTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCHIMNEY_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCHIMNEYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCHIMNEYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCHIMNEYTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCHIMNEYTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcChimneyTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcChimneyTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcChimneyTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -899,63 +899,63 @@ func whereIFCCIRCLEHOLLOWPROFILEDEF_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCCOIL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCoilTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCoilTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOIL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOILTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOILTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOILTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOILTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoilTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCoilTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCoilTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOLUMN_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcColumnTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcColumnTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOLUMN_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOLUMNTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOLUMNTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOLUMNTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOLUMNTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcColumnTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcColumnTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcColumnTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOMMUNICATIONSAPPLIANCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCommunicationsApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCommunicationsApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOMMUNICATIONSAPPLIANCE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMMUNICATIONSAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMMUNICATIONSAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOMMUNICATIONSAPPLIANCETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOMMUNICATIONSAPPLIANCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCommunicationsApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCommunicationsApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -990,7 +990,7 @@ func whereIFCCOMPLEXPROPERTYTEMPLATE_UniquePropertyNames(ec *EntityWhereEval) (b
 }
 
 func whereIFCCOMPOSITECURVE_CurveContinuous(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvNot(ec.Attr("ClosedCurve")), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "=") })), parseLiteralNumber("1"), "=")), wvAnd(ec.Attr("ClosedCurve"), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "=") })), parseLiteralNumber("0"), "="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvNot(ec.Attr("ClosedCurve")) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "=") })), parseLiteralNumber("1"), "=") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.Attr("ClosedCurve") }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Segments"), func(Temp WhereValue) WhereValue { return wvCompareRel(ec.QualAttr(Temp, "Transition", 0), wvFromEnumStepLiteral("DISCONTINUOUS"), "=") })), parseLiteralNumber("0"), "=") }) }))) {
 		return false, "WHERE CurveContinuous: CurveContinuous : ((NOT ClosedCurve) AND (SIZEOF(QUERY(Temp <* Segments | Temp.Transition = Discontinuous)) = 1)) OR ((ClosedCurve) AND (SIZEOF(QUERY(Temp <* Segments | Temp.Transition = Discontinuous)) = 0))"
 	}
 	return true, ""
@@ -1032,238 +1032,238 @@ func whereIFCCOMPOSITEPROFILEDEF_NoRecursion(ec *EntityWhereEval) (bool, string)
 }
 
 func whereIFCCOMPRESSOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCompressorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCompressorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOMPRESSOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPRESSORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOMPRESSORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOMPRESSORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOMPRESSORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCompressorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCompressorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCompressorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONDENSER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCondenserTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCondenserTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONDENSER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONDENSERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONDENSERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCONDENSERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONDENSERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCondenserTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCondenserTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCondenserTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRAINT_WR11(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("ConstraintGrade"), ec.QualAttr(wvFromEnumType("IfcConstraintEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("ConstraintGrade"), ec.QualAttr(wvFromEnumType("IfcConstraintEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcConstraint"), "UserDefinedGrade", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("ConstraintGrade"), ec.QualAttr(wvFromEnumType("IfcConstraintEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("ConstraintGrade"), ec.QualAttr(wvFromEnumType("IfcConstraintEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcConstraint"), "UserDefinedGrade", 0)) }) }))) {
 		return false, "WHERE WR11: WR11 : (ConstraintGrade <> IfcConstraintEnum.USERDEFINED) OR\r\n((ConstraintGrade = IfcConstraintEnum.USERDEFINED) AND EXISTS(SELF\\IfcConstraint.UserDefinedGrade))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRUCTIONEQUIPMENTRESOURCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR \r\n(PredefinedType <> IfcConstructionEquipmentResourceTypeEnum.USERDEFINED) OR \r\n((PredefinedType = IfcConstructionEquipmentResourceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRUCTIONEQUIPMENTRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionEquipmentResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcConstructionEquipmentResourceTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcConstructionEquipmentResourceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeResource.ResourceType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRUCTIONMATERIALRESOURCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR \r\n (PredefinedType <> IfcConstructionMaterialResourceTypeEnum.USERDEFINED) OR \r\n ((PredefinedType = IfcConstructionMaterialResourceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRUCTIONMATERIALRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionMaterialResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcConstructionMaterialResourceTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcConstructionMaterialResourceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeResource.ResourceType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRUCTIONPRODUCTRESOURCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR \r\n (PredefinedType <> IfcConstructionProductResourceTypeEnum.USERDEFINED) OR \r\n ((PredefinedType = IfcConstructionProductResourceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONSTRUCTIONPRODUCTRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConstructionProductResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcConstructionProductResourceTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcConstructionProductResourceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeResource.ResourceType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONTROLLER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcControllerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcControllerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONTROLLER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONTROLLERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONTROLLERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCONTROLLERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONTROLLERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcControllerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcControllerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcControllerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONVEYORSEGMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcConveyorSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcConveyorSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONVEYORSEGMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONVEYORSEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCONVEYORSEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCONVEYORSEGMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCONVEYORSEGMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcConveyorSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcConveyorSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcConveyorSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOOLEDBEAM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCooledBeamTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCooledBeamTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOOLEDBEAM_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOOLEDBEAMTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOOLEDBEAMTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOOLEDBEAMTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOOLEDBEAMTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCooledBeamTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCooledBeamTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCooledBeamTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOOLINGTOWER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCoolingTowerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCoolingTowerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOOLINGTOWER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOOLINGTOWERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOOLINGTOWERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOOLINGTOWERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOOLINGTOWERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoolingTowerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCoolingTowerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCoolingTowerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOORDINATEREFERENCESYSTEM_NameOrWKT(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvHiIndex(ec.Inverse("WellKnownText")), parseLiteralNumber("1"), "="), wvExists(ec.Attr("Name"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvHiIndex(ec.Inverse("WellKnownText")), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvExists(ec.Attr("Name")) }))) {
 		return false, "WHERE NameOrWKT: NameOrWKT : (HIINDEX(WellKnownText) = 1) OR EXISTS(Name)"
 	}
 	return true, ""
 }
 
 func whereIFCCOURSE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCourseTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCourseTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOURSE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOURSETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOURSETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOURSETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOURSETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCourseTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCourseTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCourseTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOVERING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCoveringTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCoveringTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOVERING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOVERINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCOVERINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCOVERINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCOVERINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCoveringTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCoveringTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCoveringTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCREWRESOURCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR \r\n (PredefinedType <> IfcCrewResourceTypeEnum.USERDEFINED) OR \r\n ((PredefinedType = IfcCrewResourceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCREWRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCrewResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCrewResourceTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcCrewResourceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeResource.ResourceType))"
 	}
 	return true, ""
@@ -1277,49 +1277,49 @@ func whereIFCCSHAPEPROFILEDEF_ValidGirth(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCCSHAPEPROFILEDEF_ValidInternalFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InternalFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Width"), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="), wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("InternalFilletRadius"))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Width"), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<=") }, func() WhereValue { return wvCompareRel(ec.Attr("InternalFilletRadius"), wvSub(wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<=") }) }))) {
 		return false, "WHERE ValidInternalFilletRadius: ValidInternalFilletRadius : NOT(EXISTS(InternalFilletRadius)) OR\r\n((InternalFilletRadius <= Width/2. - WallThickness) AND (InternalFilletRadius <= Depth/2. - WallThickness))"
 	}
 	return true, ""
 }
 
 func whereIFCCSHAPEPROFILEDEF_ValidWallThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Width"), parseLiteralNumber("2.")), "<"), wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), "<")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Width"), parseLiteralNumber("2.")), "<") }, func() WhereValue { return wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.Attr("Depth"), parseLiteralNumber("2.")), "<") }))) {
 		return false, "WHERE ValidWallThickness: ValidWallThickness : (WallThickness < Width/2.) AND (WallThickness < Depth/2.)"
 	}
 	return true, ""
 }
 
 func whereIFCCURTAINWALL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcCurtainWallTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCurtainWallTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCCURTAINWALL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURTAINWALLTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCURTAINWALLTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCCURTAINWALLTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCCURTAINWALLTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcCurtainWallTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcCurtainWallTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcCurtainWallTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCCURVESTYLE_IdentifiableCurveStyle(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvExists(ec.Attr("CurveFont")), wvExists(ec.Attr("CurveWidth"))), wvExists(ec.Attr("CurveColour"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("CurveFont")) }, func() WhereValue { return wvExists(ec.Attr("CurveWidth")) }) }, func() WhereValue { return wvExists(ec.Attr("CurveColour")) }))) {
 		return false, "WHERE IdentifiableCurveStyle: IdentifiableCurveStyle : EXISTS(CurveFont) OR EXISTS(CurveWidth) OR EXISTS(CurveColour)"
 	}
 	return true, ""
 }
 
 func whereIFCCURVESTYLE_MeasureOfWidth(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("CurveWidth"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOSITIVELENGTHMEASURE"), wvTypeOf(ec.Attr("CurveWidth")))), wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDESCRIPTIVEMEASURE"), wvTypeOf(ec.Attr("CurveWidth"))), wvCompareRel(ec.Attr("CurveWidth"), wvFromString("by layer"), "="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("CurveWidth"))) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOSITIVELENGTHMEASURE"), wvTypeOf(ec.Attr("CurveWidth"))) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDESCRIPTIVEMEASURE"), wvTypeOf(ec.Attr("CurveWidth"))) }, func() WhereValue { return wvCompareRel(ec.Attr("CurveWidth"), wvFromString("by layer"), "=") }) }))) {
 		return false, "WHERE MeasureOfWidth: MeasureOfWidth : (NOT(EXISTS(CurveWidth))) OR\r\n('IFC4X3_DEV_73740fe4.IFCPOSITIVELENGTHMEASURE' IN TYPEOF(CurveWidth)) OR \r\n (('IFC4X3_DEV_73740fe4.IFCDESCRIPTIVEMEASURE' IN TYPEOF(CurveWidth)) AND\r\n (CurveWidth = 'by layer'))"
 	}
 	return true, ""
@@ -1333,28 +1333,28 @@ func whereIFCCURVESTYLEFONTPATTERN_VisibleLengthGreaterEqualZero(ec *EntityWhere
 }
 
 func whereIFCDAMPER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDamperTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDamperTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDAMPER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDAMPERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDAMPERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDAMPERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDAMPERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDamperTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDamperTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDamperTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCDEEPFOUNDATION_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDEEPFOUNDATIONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDEEPFOUNDATIONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDEEPFOUNDATIONTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
@@ -1368,14 +1368,14 @@ func whereIFCDERIVEDPROFILEDEF_InvariantProfileType(ec *EntityWhereEval) (bool, 
 }
 
 func whereIFCDERIVEDUNIT_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Attr("Elements")), parseLiteralNumber("1"), ">"), wvAnd(wvCompareRel(wvSizeOf(ec.Attr("Elements")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualAttr(ec.QualIndex(ec.Attr("Elements"), 1), "Exponent", 0), parseLiteralNumber("1"), "<>"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("Elements")), parseLiteralNumber("1"), ">") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("Elements")), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualIndex(ec.Attr("Elements"), 1), "Exponent", 0), parseLiteralNumber("1"), "<>") }) }))) {
 		return false, "WHERE WR1: WR1 : (SIZEOF (Elements) > 1) OR ((SIZEOF (Elements) = 1) AND (Elements[1].Exponent <> 1 ))"
 	}
 	return true, ""
 }
 
 func whereIFCDERIVEDUNIT_WR2(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("UnitType"), ec.QualAttr(wvFromEnumType("IfcDerivedUnitEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("UnitType"), ec.QualAttr(wvFromEnumType("IfcDerivedUnitEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.Self(), "UserDefinedType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("UnitType"), ec.QualAttr(wvFromEnumType("IfcDerivedUnitEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("UnitType"), ec.QualAttr(wvFromEnumType("IfcDerivedUnitEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.Self(), "UserDefinedType", 0)) }) }))) {
 		return false, "WHERE WR2: WR2 : (UnitType <> IfcDerivedUnitEnum.USERDEFINED) OR\r\n((UnitType = IfcDerivedUnitEnum.USERDEFINED) AND \r\n (EXISTS(SELF.UserDefinedType)))"
 	}
 	return true, ""
@@ -1389,77 +1389,77 @@ func whereIFCDIRECTION_MagnitudeGreaterZero(ec *EntityWhereEval) (bool, string) 
 }
 
 func whereIFCDIRECTRIXCURVESWEPTAREASOLID_DirectrixBounded(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvExists(ec.Attr("StartParam")), wvExists(ec.Attr("EndParam"))), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("StartParam")) }, func() WhereValue { return wvExists(ec.Attr("EndParam")) }) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=") }))) {
 		return false, "WHERE DirectrixBounded: DirectrixBounded : (EXISTS(StartParam) AND EXISTS(EndParam)) OR \r\n(SIZEOF(['IFC4X3_DEV_73740fe4.IFCCONIC', 'IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE'] * TYPEOF(Directrix)) = 1)"
 	}
 	return true, ""
 }
 
 func whereIFCDISCRETEACCESSORY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDiscreteAccessoryTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDiscreteAccessoryTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISCRETEACCESSORY_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDISCRETEACCESSORYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDISCRETEACCESSORYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDISCRETEACCESSORYTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISCRETEACCESSORYTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDiscreteAccessoryTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDiscreteAccessoryTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDiscreteAccessoryTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONBOARD_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDistributionBoardTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDistributionBoardTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONBOARD_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDISTRIBUTIONBOARDTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDISTRIBUTIONBOARDTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDISTRIBUTIONBOARDTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONBOARDTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionBoardTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDistributionBoardTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDistributionBoardTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONCHAMBERELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDistributionChamberElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDistributionChamberElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONCHAMBERELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDISTRIBUTIONCHAMBERELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDISTRIBUTIONCHAMBERELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDISTRIBUTIONCHAMBERELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONCHAMBERELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionChamberElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDistributionChamberElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDistributionChamberElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCDISTRIBUTIONSYSTEM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionSystemEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionSystemEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionSystemEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDistributionSystemEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDistributionSystemEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDistributionSystemEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -1473,63 +1473,63 @@ func whereIFCDOCUMENTREFERENCE_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCDOOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDoorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDoorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDOOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDOORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDOORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDOORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORLININGPROPERTIES_WR31(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvNot(wvAnd(wvExists(ec.Attr("LiningDepth")), wvNot(wvExists(ec.Attr("LiningThickness"))))))) {
+	if !(wvTruthy(wvNot(ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("LiningDepth")) }, func() WhereValue { return wvNot(wvExists(ec.Attr("LiningThickness"))) })))) {
 		return false, "WHERE WR31: WR31 : NOT(EXISTS(LiningDepth) AND NOT(EXISTS(LiningThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORLININGPROPERTIES_WR32(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvNot(wvAnd(wvExists(ec.Attr("ThresholdDepth")), wvNot(wvExists(ec.Attr("ThresholdThickness"))))))) {
+	if !(wvTruthy(wvNot(ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("ThresholdDepth")) }, func() WhereValue { return wvNot(wvExists(ec.Attr("ThresholdThickness"))) })))) {
 		return false, "WHERE WR32: WR32 : NOT(EXISTS(ThresholdDepth) AND NOT(EXISTS(ThresholdThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORLININGPROPERTIES_WR33(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvXor(wvAnd(wvExists(ec.Attr("TransomOffset")), wvExists(ec.Attr("TransomThickness"))), wvAnd(wvNot(wvExists(ec.Attr("TransomOffset"))), wvNot(wvExists(ec.Attr("TransomThickness"))))))) {
+	if !(wvTruthy(wvXor(ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("TransomOffset")) }, func() WhereValue { return wvExists(ec.Attr("TransomThickness")) }), ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("TransomOffset"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("TransomThickness"))) })))) {
 		return false, "WHERE WR33: WR33 : (EXISTS(TransomOffset) AND EXISTS(TransomThickness)) XOR\r\n(NOT(EXISTS(TransomOffset)) AND NOT(EXISTS(TransomThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORLININGPROPERTIES_WR34(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvXor(wvAnd(wvExists(ec.Attr("CasingDepth")), wvExists(ec.Attr("CasingThickness"))), wvAnd(wvNot(wvExists(ec.Attr("CasingDepth"))), wvNot(wvExists(ec.Attr("CasingThickness"))))))) {
+	if !(wvTruthy(wvXor(ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("CasingDepth")) }, func() WhereValue { return wvExists(ec.Attr("CasingThickness")) }), ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("CasingDepth"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("CasingThickness"))) })))) {
 		return false, "WHERE WR34: WR34 : (EXISTS(CasingDepth) AND EXISTS(CasingThickness)) XOR\r\n(NOT(EXISTS(CasingDepth)) AND NOT(EXISTS(CasingThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORLININGPROPERTIES_WR35(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDOORTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)))))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDOORTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1))) }))) {
 		return false, "WHERE WR35: WR35 : (EXISTS(SELF\\IfcPropertySetDefinition.DefinesType[1])) \r\nAND \r\n('IFC4X3_DEV_73740fe4.IFCDOORTYPE' IN TYPEOF(SELF\\IfcPropertySetDefinition.DefinesType[1]))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORPANELPROPERTIES_ApplicableToType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDOORTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)))))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDOORTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1))) }))) {
 		return false, "WHERE ApplicableToType: ApplicableToType : (EXISTS(SELF\\IfcPropertySetDefinition.DefinesType[1])) \r\nAND \r\n('IFC4X3_DEV_73740fe4.IFCDOORTYPE' IN TYPEOF(SELF\\IfcPropertySetDefinition.DefinesType[1]))"
 	}
 	return true, ""
 }
 
 func whereIFCDOORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDoorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDoorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDoorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -1550,77 +1550,77 @@ func whereIFCDRAUGHTINGPREDEFINEDCURVEFONT_PreDefinedCurveFontNames(ec *EntityWh
 }
 
 func whereIFCDUCTFITTING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDuctFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDuctFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTFITTING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDUCTFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDUCTFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDUCTFITTINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTFITTINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDuctFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDuctFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTSEGMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDuctSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDuctSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTSEGMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDUCTSEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDUCTSEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDUCTSEGMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTSEGMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDuctSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDuctSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTSILENCER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcDuctSilencerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDuctSilencerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTSILENCER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDUCTSILENCERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCDUCTSILENCERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCDUCTSILENCERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCDUCTSILENCERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcDuctSilencerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcDuctSilencerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcDuctSilencerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCEARTHWORKSCUT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksCutTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksCutTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksCutTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksCutTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcEarthworksCutTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEarthworksCutTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCEARTHWORKSFILL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksFillTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksFillTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksFillTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEarthworksFillTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcEarthworksFillTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEarthworksFillTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -1641,168 +1641,168 @@ func whereIFCEDGELOOP_IsContinuous(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCELECTRICAPPLIANCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICAPPLIANCE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICAPPLIANCETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICAPPLIANCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICDISTRIBUTIONBOARD_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricDistributionBoardTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricDistributionBoardTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICDISTRIBUTIONBOARD_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICDISTRIBUTIONBOARDTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICDISTRIBUTIONBOARDTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICDISTRIBUTIONBOARDTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICDISTRIBUTIONBOARDTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricDistributionBoardTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricDistributionBoardTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricDistributionBoardTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICFLOWSTORAGEDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricFlowStorageDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricFlowStorageDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICFLOWSTORAGEDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICFLOWSTORAGEDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICFLOWSTORAGEDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICFLOWSTORAGEDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICFLOWSTORAGEDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowStorageDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricFlowStorageDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricFlowStorageDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICFLOWTREATMENTDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricFlowTreatmentDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICFLOWTREATMENTDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICFLOWTREATMENTDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICFLOWTREATMENTDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICFLOWTREATMENTDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICFLOWTREATMENTDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricFlowTreatmentDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricFlowTreatmentDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricFlowTreatmentDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICGENERATOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricGeneratorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricGeneratorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICGENERATOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICGENERATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICGENERATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICGENERATORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICGENERATORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricGeneratorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricGeneratorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricGeneratorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICMOTOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricMotorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricMotorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICMOTOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICMOTORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICMOTORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICMOTORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICMOTORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricMotorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricMotorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricMotorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICTIMECONTROL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElectricTimeControlTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricTimeControlTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICTIMECONTROL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICTIMECONTROLTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELECTRICTIMECONTROLTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELECTRICTIMECONTROLTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELECTRICTIMECONTROLTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElectricTimeControlTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElectricTimeControlTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElectricTimeControlTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCELEMENTASSEMBLY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcElementAssemblyTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElementAssemblyTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCELEMENTASSEMBLY_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENTASSEMBLYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENTASSEMBLYTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCELEMENTASSEMBLYTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCELEMENTASSEMBLYTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcElementAssemblyTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcElementAssemblyTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcElementAssemblyTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -1816,98 +1816,98 @@ func whereIFCELEMENTQUANTITY_UniqueQuantityNames(ec *EntityWhereEval) (bool, str
 }
 
 func whereIFCENGINE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcEngineTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEngineTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCENGINE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCENGINETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCENGINETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCENGINETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCENGINETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEngineTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcEngineTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEngineTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVAPORATIVECOOLER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcEvaporativeCoolerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEvaporativeCoolerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVAPORATIVECOOLER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEVAPORATIVECOOLERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEVAPORATIVECOOLERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCEVAPORATIVECOOLERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVAPORATIVECOOLERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporativeCoolerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcEvaporativeCoolerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEvaporativeCoolerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVAPORATOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcEvaporatorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEvaporatorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVAPORATOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEVAPORATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCEVAPORATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCEVAPORATORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVAPORATORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEvaporatorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcEvaporatorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcEvaporatorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR (PredefinedType <> IfcEventTypeEnum.USERDEFINED) OR ((PredefinedType = IfcEventTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("EventTriggerType"))), wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.Attr("UserDefinedEventTriggerType")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("EventTriggerType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.Attr("UserDefinedEventTriggerType")) }) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : NOT(EXISTS(EventTriggerType)) OR (EventTriggerType <> IfcEventTriggerTypeEnum.USERDEFINED) OR ((EventTriggerType = IfcEventTriggerTypeEnum.USERDEFINED) AND EXISTS(UserDefinedEventTriggerType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVENTTYPE_CorrectEventTriggerType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.Attr("UserDefinedEventTriggerType")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("EventTriggerType"), ec.QualAttr(wvFromEnumType("IfcEventTriggerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.Attr("UserDefinedEventTriggerType")) }) }))) {
 		return false, "WHERE CorrectEventTriggerType: CorrectEventTriggerType : (EventTriggerType <> IfcEventTriggerTypeEnum.USERDEFINED) OR ((EventTriggerType = IfcEventTriggerTypeEnum.USERDEFINED) AND EXISTS(UserDefinedEventTriggerType))"
 	}
 	return true, ""
 }
 
 func whereIFCEVENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeProcess"), "ProcessType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcEventTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeProcess"), "ProcessType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcEventTypeEnum.USERDEFINED) OR ((PredefinedType = IfcEventTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeProcess.ProcessType))"
 	}
 	return true, ""
 }
 
 func whereIFCEXTERNALREFERENCE_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvExists(ec.Attr("Identification")), wvExists(ec.Attr("Location"))), wvExists(ec.Attr("Name"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("Identification")) }, func() WhereValue { return wvExists(ec.Attr("Location")) }) }, func() WhereValue { return wvExists(ec.Attr("Name")) }))) {
 		return false, "WHERE WR1: WR1 : EXISTS(Identification) OR EXISTS(Location) OR EXISTS(Name)"
 	}
 	return true, ""
@@ -1935,49 +1935,49 @@ func whereIFCFACE_HasOuterBound(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCFACILITYPARTCOMMON_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFacilityPartCommonTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFacilityPartCommonTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFacilityPartCommonTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFacilityPartCommonTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFacilityPartCommonTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFacilityPartCommonTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFAN_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFanTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFanTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFAN_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFANTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFANTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFANTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFANTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFanTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFanTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFanTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCFASTENER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFastenerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFastenerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFASTENER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFASTENERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFASTENERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFASTENERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFASTENERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFastenerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFastenerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFastenerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2026,175 +2026,175 @@ func whereIFCFILLAREASTYLE_MaxOneExtHatchStyle(ec *EntityWhereEval) (bool, strin
 }
 
 func whereIFCFILLAREASTYLEHATCHING_PatternStart2D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("PatternStart"))), wvCompareRel(ec.QualAttr(ec.Attr("PatternStart"), "Dim", 0), parseLiteralNumber("2"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PatternStart"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("PatternStart"), "Dim", 0), parseLiteralNumber("2"), "=") }))) {
 		return false, "WHERE PatternStart2D: PatternStart2D : NOT(EXISTS(PatternStart)) OR (PatternStart.Dim = 2)"
 	}
 	return true, ""
 }
 
 func whereIFCFILLAREASTYLEHATCHING_RefHatchLine2D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("PointOfReferenceHatchLine"))), wvCompareRel(ec.QualAttr(ec.Attr("PointOfReferenceHatchLine"), "Dim", 0), parseLiteralNumber("2"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PointOfReferenceHatchLine"))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("PointOfReferenceHatchLine"), "Dim", 0), parseLiteralNumber("2"), "=") }))) {
 		return false, "WHERE RefHatchLine2D: RefHatchLine2D : NOT(EXISTS(PointOfReferenceHatchLine)) OR (PointOfReferenceHatchLine.Dim = 2)"
 	}
 	return true, ""
 }
 
 func whereIFCFILTER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFilterTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFilterTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFILTER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFILTERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFILTERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFILTERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFILTERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFilterTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFilterTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFilterTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCFIRESUPPRESSIONTERMINAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFireSuppressionTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFireSuppressionTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFIRESUPPRESSIONTERMINAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFIRESUPPRESSIONTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFIRESUPPRESSIONTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFIRESUPPRESSIONTERMINALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFIRESUPPRESSIONTERMINALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFireSuppressionTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFireSuppressionTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFireSuppressionTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCFLOWINSTRUMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFlowInstrumentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFlowInstrumentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFLOWINSTRUMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFLOWINSTRUMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFLOWINSTRUMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFLOWINSTRUMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFLOWINSTRUMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowInstrumentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFlowInstrumentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFlowInstrumentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCFLOWMETER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFlowMeterTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFlowMeterTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFLOWMETER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFLOWMETERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFLOWMETERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFLOWMETERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFLOWMETERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFlowMeterTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFlowMeterTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFlowMeterTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCFOOTING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFootingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFootingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFOOTING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFOOTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFOOTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFOOTINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFOOTINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFootingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcFootingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFootingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCFURNITURE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFurnitureTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFurnitureTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCFURNITURE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFURNITURETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFURNITURETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCFURNITURETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCFURNITURETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcFurnitureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcFurnitureTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcFurnitureTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCGEOGRAPHICCRS_AngleUnitIsPlaneAngle(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.Self(), "AngleUnit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.Self(), "AngleUnit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "PLANEANGLEUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.Self(), "AngleUnit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.Self(), "AngleUnit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "PLANEANGLEUNIT", 0), "=") }))) {
 		return false, "WHERE AngleUnitIsPlaneAngle: AngleUnitIsPlaneAngle : NOT(EXISTS(SELF.AngleUnit)) OR (SELF.AngleUnit.UnitType=IfcUnitEnum.PLANEANGLEUNIT)"
 	}
 	return true, ""
 }
 
 func whereIFCGEOGRAPHICCRS_HeightUnitIsLength(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.Self(), "HeightUnit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.Self(), "HeightUnit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "LENGTHUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.Self(), "HeightUnit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.Self(), "HeightUnit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "LENGTHUNIT", 0), "=") }))) {
 		return false, "WHERE HeightUnitIsLength: HeightUnitIsLength : NOT(EXISTS(SELF.HeightUnit)) OR (SELF.HeightUnit.UnitType=IfcUnitEnum.LENGTHUNIT)"
 	}
 	return true, ""
 }
 
 func whereIFCGEOGRAPHICELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcGeographicElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcGeographicElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCGEOGRAPHICELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOGRAPHICELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOGRAPHICELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCGEOGRAPHICELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCGEOGRAPHICELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeographicElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcGeographicElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcGeographicElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2208,7 +2208,7 @@ func whereIFCGEOMETRICCURVESET_NoSurfaces(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCGEOMETRICREPRESENTATIONCONTEXT_North2D(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("TrueNorth"))), wvCompareRel(wvHiIndex(ec.QualAttr(ec.Attr("TrueNorth"), "DirectionRatios", 0)), parseLiteralNumber("2"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("TrueNorth"))) }, func() WhereValue { return wvCompareRel(wvHiIndex(ec.QualAttr(ec.Attr("TrueNorth"), "DirectionRatios", 0)), parseLiteralNumber("2"), "=") }))) {
 		return false, "WHERE North2D: North2D : NOT(EXISTS(TrueNorth)) OR (HIINDEX(TrueNorth.DirectionRatios) = 2)"
 	}
 	return true, ""
@@ -2229,7 +2229,7 @@ func whereIFCGEOMETRICREPRESENTATIONSUBCONTEXT_ParentNoSub(ec *EntityWhereEval) 
 }
 
 func whereIFCGEOMETRICREPRESENTATIONSUBCONTEXT_UserTargetProvided(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("TargetView"), ec.QualAttr(wvFromEnumType("IfcGeometricProjectionEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("TargetView"), ec.QualAttr(wvFromEnumType("IfcGeometricProjectionEnum"), "USERDEFINED", 0), "="), wvExists(ec.Attr("UserDefinedTargetView")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("TargetView"), ec.QualAttr(wvFromEnumType("IfcGeometricProjectionEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("TargetView"), ec.QualAttr(wvFromEnumType("IfcGeometricProjectionEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.Attr("UserDefinedTargetView")) }) }))) {
 		return false, "WHERE UserTargetProvided: UserTargetProvided :  (TargetView <> IfcGeometricProjectionEnum.USERDEFINED) OR \r\n((TargetView =  IfcGeometricProjectionEnum.USERDEFINED) AND EXISTS(UserDefinedTargetView))"
 	}
 	return true, ""
@@ -2243,7 +2243,7 @@ func whereIFCGEOMETRICSET_ConsistentDim(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCGEOTECHNICALSTRATUM_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeotechnicalStratumTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeotechnicalStratumTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeotechnicalStratumTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcGeotechnicalStratumTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcGeotechnicalStratumTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcGeotechnicalStratumTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -2264,91 +2264,91 @@ func whereIFCGRIDAXIS_WR2(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCHEATEXCHANGER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcHeatExchangerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcHeatExchangerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCHEATEXCHANGER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCHEATEXCHANGERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCHEATEXCHANGERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCHEATEXCHANGERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCHEATEXCHANGERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHeatExchangerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcHeatExchangerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcHeatExchangerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCHUMIDIFIER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcHumidifierTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcHumidifierTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCHUMIDIFIER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCHUMIDIFIERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCHUMIDIFIERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCHUMIDIFIERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCHUMIDIFIERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcHumidifierTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcHumidifierTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcHumidifierTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCIMPACTPROTECTIONDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcImpactProtectionDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcImpactProtectionDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCIMPACTPROTECTIONDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCIMPACTPROTECTIONDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCIMPACTPROTECTIONDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCIMPACTPROTECTIONDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCIMPACTPROTECTIONDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcImpactProtectionDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcImpactProtectionDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcImpactProtectionDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCINDEXEDPOLYCURVE_Consecutive(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Segments"))), ec.CallSchema("IfcConsecutiveSegments", []WhereValue{ec.Attr("Segments")})))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Segments"))) }, func() WhereValue { return ec.CallSchema("IfcConsecutiveSegments", []WhereValue{ec.Attr("Segments")}) }))) {
 		return false, "WHERE Consecutive: Consecutive : NOT(EXISTS(Segments)) OR IfcConsecutiveSegments(Segments)"
 	}
 	return true, ""
 }
 
 func whereIFCINTERCEPTOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcInterceptorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcInterceptorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCINTERCEPTOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCINTERCEPTORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCINTERCEPTORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCINTERCEPTORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCINTERCEPTORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcInterceptorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcInterceptorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcInterceptorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2369,7 +2369,7 @@ func whereIFCINTERSECTIONCURVE_TwoPCurves(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCISHAPEPROFILEDEF_ValidFilletRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("FilletRadius"))), wvAnd(wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<="), wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallDepth"), wvMul(parseLiteralNumber("2."), ec.Attr("FlangeThickness"))), parseLiteralNumber("2.")), "<="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("FilletRadius"))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallWidth"), ec.Attr("WebThickness")), parseLiteralNumber("2.")), "<=") }, func() WhereValue { return wvCompareRel(ec.Attr("FilletRadius"), wvDiv(wvSub(ec.Attr("OverallDepth"), wvMul(parseLiteralNumber("2."), ec.Attr("FlangeThickness"))), parseLiteralNumber("2.")), "<=") }) }))) {
 		return false, "WHERE ValidFilletRadius: ValidFilletRadius : NOT(EXISTS(FilletRadius)) OR\r\n((FilletRadius <= (OverallWidth - WebThickness)/2.) AND \r\n (FilletRadius <= (OverallDepth - (2. * FlangeThickness))/2.))"
 	}
 	return true, ""
@@ -2390,98 +2390,98 @@ func whereIFCISHAPEPROFILEDEF_ValidWebThickness(ec *EntityWhereEval) (bool, stri
 }
 
 func whereIFCJUNCTIONBOX_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcJunctionBoxTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcJunctionBoxTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCJUNCTIONBOX_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCJUNCTIONBOXTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCJUNCTIONBOXTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCJUNCTIONBOXTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCJUNCTIONBOXTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcJunctionBoxTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcJunctionBoxTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcJunctionBoxTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCKERB_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcKerbTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcKerbTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCKERB_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCKERBTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCKERBTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCKERBTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCKERBTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcKerbTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcKerbTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcKerbTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCLABORRESOURCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR \r\n (PredefinedType <> IfcLaborResourceTypeEnum.USERDEFINED) OR \r\n ((PredefinedType = IfcLaborResourceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCLABORRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLaborResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcLaborResourceTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcLaborResourceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeResource.ResourceType))"
 	}
 	return true, ""
 }
 
 func whereIFCLAMP_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcLampTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcLampTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCLAMP_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLAMPTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLAMPTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCLAMPTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCLAMPTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLampTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcLampTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcLampTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCLIGHTFIXTURE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcLightFixtureTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcLightFixtureTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCLIGHTFIXTURE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLIGHTFIXTURETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLIGHTFIXTURETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCLIGHTFIXTURETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCLIGHTFIXTURETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLightFixtureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcLightFixtureTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcLightFixtureTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2495,21 +2495,21 @@ func whereIFCLINE_SameDim(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCLIQUIDTERMINAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcLiquidTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcLiquidTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCLIQUIDTERMINAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLIQUIDTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLIQUIDTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCLIQUIDTERMINALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCLIQUIDTERMINALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLiquidTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcLiquidTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcLiquidTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2523,7 +2523,7 @@ func whereIFCLOCALPLACEMENT_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCLSHAPEPROFILEDEF_ValidThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("Thickness"), ec.Attr("Depth"), "<"), wvOr(wvNot(wvExists(ec.Attr("Width"))), wvCompareRel(ec.Attr("Thickness"), ec.Attr("Width"), "<"))))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("Thickness"), ec.Attr("Depth"), "<") }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Width"))) }, func() WhereValue { return wvCompareRel(ec.Attr("Thickness"), ec.Attr("Width"), "<") }) }))) {
 		return false, "WHERE ValidThickness: ValidThickness : (Thickness < Depth) AND (NOT(EXISTS(Width)) OR (Thickness < Width))"
 	}
 	return true, ""
@@ -2537,14 +2537,14 @@ func whereIFCMAPCONVERSION_TargetCRSOnlyProjected(ec *EntityWhereEval) (bool, st
 }
 
 func whereIFCMARINEFACILITY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarineFacilityTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarineFacilityTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarineFacilityTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarineFacilityTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMarineFacilityTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMarineFacilityTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMARINEPART_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarinePartTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarinePartTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarinePartTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMarinePartTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMarinePartTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMarinePartTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -2558,140 +2558,140 @@ func whereIFCMATERIALDEFINITIONREPRESENTATION_OnlyStyledRepresentations(ec *Enti
 }
 
 func whereIFCMATERIALLAYER_NormalizedPriority(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Priority"))), wvAnd(wvCompareRel(parseLiteralNumber("0"), ec.Attr("Priority"), "<="), wvCompareRel(ec.Attr("Priority"), parseLiteralNumber("100"), "<="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Priority"))) }, func() WhereValue { return wvAnd(wvCompareRel(parseLiteralNumber("0"), ec.Attr("Priority"), "<="), wvCompareRel(ec.Attr("Priority"), parseLiteralNumber("100"), "<=")) }))) {
 		return false, "WHERE NormalizedPriority: NormalizedPriority : NOT(EXISTS(Priority)) OR {0 <= Priority <= 100}"
 	}
 	return true, ""
 }
 
 func whereIFCMATERIALPROFILE_NormalizedPriority(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Priority"))), wvAnd(wvCompareRel(parseLiteralNumber("0"), ec.Attr("Priority"), "<="), wvCompareRel(ec.Attr("Priority"), parseLiteralNumber("100"), "<="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Priority"))) }, func() WhereValue { return wvAnd(wvCompareRel(parseLiteralNumber("0"), ec.Attr("Priority"), "<="), wvCompareRel(ec.Attr("Priority"), parseLiteralNumber("100"), "<=")) }))) {
 		return false, "WHERE NormalizedPriority: NormalizedPriority : NOT(EXISTS(Priority)) OR {0 <= Priority <= 100}"
 	}
 	return true, ""
 }
 
 func whereIFCMECHANICALFASTENER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMechanicalFastenerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMechanicalFastenerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMECHANICALFASTENER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMECHANICALFASTENERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMECHANICALFASTENERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCMECHANICALFASTENERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCMECHANICALFASTENERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMechanicalFastenerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcMechanicalFastenerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMechanicalFastenerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCMEDICALDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMedicalDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMedicalDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMEDICALDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMEDICALDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMEDICALDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCMEDICALDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCMEDICALDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMedicalDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcMedicalDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMedicalDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCMEMBER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMemberTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMemberTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMEMBER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMEMBERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMEMBERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCMEMBERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCMEMBERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMemberTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcMemberTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMemberTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOBILETELECOMMUNICATIONSAPPLIANCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMobileTelecommunicationsApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMobileTelecommunicationsApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOBILETELECOMMUNICATIONSAPPLIANCE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMOBILETELECOMMUNICATIONSAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMOBILETELECOMMUNICATIONSAPPLIANCETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCMOBILETELECOMMUNICATIONSAPPLIANCETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOBILETELECOMMUNICATIONSAPPLIANCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMobileTelecommunicationsApplianceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcMobileTelecommunicationsApplianceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMobileTelecommunicationsApplianceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOORINGDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMooringDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMooringDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOORINGDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMOORINGDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMOORINGDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCMOORINGDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOORINGDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMooringDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcMooringDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMooringDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOTORCONNECTION_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcMotorConnectionTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMotorConnectionTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOTORCONNECTION_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMOTORCONNECTIONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMOTORCONNECTIONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCMOTORCONNECTIONTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCMOTORCONNECTIONTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcMotorConnectionTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcMotorConnectionTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcMotorConnectionTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2705,42 +2705,42 @@ func whereIFCNAMEDUNIT_WR1(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCNAVIGATIONELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcNavigationElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcNavigationElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCNAVIGATIONELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCNAVIGATIONELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCNAVIGATIONELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCNAVIGATIONELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCNAVIGATIONELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcNavigationElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcNavigationElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcNavigationElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCOBJECT_UniquePropertySetNames(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsDefinedBy")), parseLiteralNumber("0"), "="), ec.CallSchema("IfcUniqueDefinitionNames", []WhereValue{ec.Inverse("IsDefinedBy")})))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsDefinedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return ec.CallSchema("IfcUniqueDefinitionNames", []WhereValue{ec.Inverse("IsDefinedBy")}) }))) {
 		return false, "WHERE UniquePropertySetNames: UniquePropertySetNames : ((SIZEOF(IsDefinedBy) = 0) OR IfcUniqueDefinitionNames(IsDefinedBy))"
 	}
 	return true, ""
 }
 
 func whereIFCOBJECTIVE_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("ObjectiveQualifier"), ec.QualAttr(wvFromEnumType("IfcObjectiveEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("ObjectiveQualifier"), ec.QualAttr(wvFromEnumType("IfcObjectiveEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjective"), "UserDefinedQualifier", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("ObjectiveQualifier"), ec.QualAttr(wvFromEnumType("IfcObjectiveEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("ObjectiveQualifier"), ec.QualAttr(wvFromEnumType("IfcObjectiveEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjective"), "UserDefinedQualifier", 0)) }) }))) {
 		return false, "WHERE WR21: WR21 : (ObjectiveQualifier <> IfcObjectiveEnum.USERDEFINED) OR\r\n((ObjectiveQualifier = IfcObjectiveEnum.USERDEFINED) AND EXISTS(SELF\\IfcObjective.UserDefinedQualifier))"
 	}
 	return true, ""
 }
 
 func whereIFCOCCUPANT_WR31(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOccupantTypeEnum"), "USERDEFINED", 0), "=")), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOccupantTypeEnum"), "USERDEFINED", 0), "=")) }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE WR31: WR31 : NOT(PredefinedType = IfcOccupantTypeEnum.USERDEFINED) \r\nOR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
@@ -2775,14 +2775,14 @@ func whereIFCOPENCROSSPROFILEDEF_CorrespondingSlopeWidths(ec *EntityWhereEval) (
 }
 
 func whereIFCOPENCROSSPROFILEDEF_CorrespondingTags(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Tags"))), wvCompareRel(wvSizeOf(ec.Attr("Tags")), wvAdd(wvSizeOf(ec.Attr("Slopes")), parseLiteralNumber("1")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Tags"))) }, func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("Tags")), wvAdd(wvSizeOf(ec.Attr("Slopes")), parseLiteralNumber("1")), "=") }))) {
 		return false, "WHERE CorrespondingTags: CorrespondingTags : (NOT EXISTS (Tags)) OR (SIZEOF(Tags) = (SIZEOF(Slopes) + 1))"
 	}
 	return true, ""
 }
 
 func whereIFCOPENINGELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOpeningElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOpeningElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOpeningElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOpeningElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcOpeningElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcOpeningElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -2796,28 +2796,28 @@ func whereIFCORIENTEDEDGE_EdgeElementNotOriented(ec *EntityWhereEval) (bool, str
 }
 
 func whereIFCOUTLET_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcOutletTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcOutletTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCOUTLET_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOUTLETTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOUTLETTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCOUTLETTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCOUTLETTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcOutletTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcOutletTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcOutletTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCOWNERHISTORY_CorrectChangeAction(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvExists(ec.Attr("LastModifiedDate")), wvAnd(wvNot(wvExists(ec.Attr("LastModifiedDate"))), wvNot(wvExists(ec.Attr("ChangeAction"))))), wvAnd(wvAnd(wvNot(wvExists(ec.Attr("LastModifiedDate"))), wvExists(ec.Attr("ChangeAction"))), wvOr(wvCompareRel(ec.Attr("ChangeAction"), ec.QualAttr(wvFromEnumType("IfcChangeActionEnum"), "NOTDEFINED", 0), "="), wvCompareRel(ec.Attr("ChangeAction"), ec.QualAttr(wvFromEnumType("IfcChangeActionEnum"), "NOCHANGE", 0), "=")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("LastModifiedDate")) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("LastModifiedDate"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("ChangeAction"))) }) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("LastModifiedDate"))) }, func() WhereValue { return wvExists(ec.Attr("ChangeAction")) }) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("ChangeAction"), ec.QualAttr(wvFromEnumType("IfcChangeActionEnum"), "NOTDEFINED", 0), "=") }, func() WhereValue { return wvCompareRel(ec.Attr("ChangeAction"), ec.QualAttr(wvFromEnumType("IfcChangeActionEnum"), "NOCHANGE", 0), "=") }) }) }))) {
 		return false, "WHERE CorrectChangeAction: CorrectChangeAction : (EXISTS(LastModifiedDate)) OR\r\n(NOT(EXISTS(LastModifiedDate)) AND NOT(EXISTS(ChangeAction))) OR\r\n(NOT(EXISTS(LastModifiedDate)) AND EXISTS(ChangeAction) AND ((ChangeAction = IfcChangeActionEnum.NOTDEFINED) OR (ChangeAction = IfcChangeActionEnum.NOCHANGE)))"
 	}
 	return true, ""
@@ -2831,21 +2831,21 @@ func whereIFCPATH_IsContinuous(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPAVEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcPavementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPavementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPAVEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPAVEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPAVEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPAVEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPAVEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPavementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcPavementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPavementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2859,14 +2859,14 @@ func whereIFCPCURVE_DimIs2D(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPERSON_IdentifiablePerson(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvExists(ec.Attr("Identification")), wvExists(ec.Attr("FamilyName"))), wvExists(ec.Attr("GivenName"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("Identification")) }, func() WhereValue { return wvExists(ec.Attr("FamilyName")) }) }, func() WhereValue { return wvExists(ec.Attr("GivenName")) }))) {
 		return false, "WHERE IdentifiablePerson: IdentifiablePerson : EXISTS(Identification) OR EXISTS(FamilyName) OR EXISTS(GivenName)"
 	}
 	return true, ""
 }
 
 func whereIFCPERSON_ValidSetOfNames(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("MiddleNames"))), wvExists(ec.Attr("FamilyName"))), wvExists(ec.Attr("GivenName"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("MiddleNames"))) }, func() WhereValue { return wvExists(ec.Attr("FamilyName")) }) }, func() WhereValue { return wvExists(ec.Attr("GivenName")) }))) {
 		return false, "WHERE ValidSetOfNames: ValidSetOfNames : NOT EXISTS(MiddleNames) OR EXISTS(FamilyName) OR EXISTS(GivenName)"
 	}
 	return true, ""
@@ -2887,63 +2887,63 @@ func whereIFCPHYSICALCOMPLEXQUANTITY_UniqueQuantityNames(ec *EntityWhereEval) (b
 }
 
 func whereIFCPILE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcPileTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPileTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPILE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPILETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPILETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPILETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPILETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPileTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcPileTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPileTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCPIPEFITTING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcPipeFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPipeFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPIPEFITTING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPIPEFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPIPEFITTINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPIPEFITTINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPIPEFITTINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeFittingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcPipeFittingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPipeFittingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCPIPESEGMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcPipeSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPipeSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPIPESEGMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPIPESEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPIPESEGMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPIPESEGMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPIPESEGMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPipeSegmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcPipeSegmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPipeSegmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -2971,7 +2971,7 @@ func whereIFCPIXELTEXTURE_NumberOfColours(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPIXELTEXTURE_PixelAsByteAndSameLength(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Pixel"), func(temp WhereValue) WhereValue { return wvAnd(wvCompareRel(wvMod(wvBLength(temp), parseLiteralNumber("8")), parseLiteralNumber("0"), "="), wvCompareRel(wvBLength(temp), wvBLength(ec.QualIndex(ec.Attr("Pixel"), 1)), "=")) })), wvSizeOf(ec.Attr("Pixel")), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Pixel"), func(temp WhereValue) WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(wvMod(wvBLength(temp), parseLiteralNumber("8")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvCompareRel(wvBLength(temp), wvBLength(ec.QualIndex(ec.Attr("Pixel"), 1)), "=") }) })), wvSizeOf(ec.Attr("Pixel")), "="))) {
 		return false, "WHERE PixelAsByteAndSameLength: PixelAsByteAndSameLength : SIZEOF(QUERY(temp<* Pixel |\r\n (BLENGTH(temp) MOD 8 = 0) AND\r\n (BLENGTH(temp) = BLENGTH(Pixel[1]))\r\n)) = SIZEOF(Pixel)"
 	}
 	return true, ""
@@ -2985,21 +2985,21 @@ func whereIFCPIXELTEXTURE_SizeOfPixelList(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPLATE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcPlateTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPlateTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPLATE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLATETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLATETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPLATETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPLATETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPlateTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcPlateTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPlateTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -3034,14 +3034,14 @@ func whereIFCPOLYLOOP_AllPointsSameDim(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPOLYNOMIALCURVE_CorrectPositionDim(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvCompareRel(ec.QualAttr(ec.Attr("Position"), "Dim", 0), parseLiteralNumber("2"), "="), wvNot(wvExists(ec.Attr("CoefficientsZ")))), wvCompareRel(ec.QualAttr(ec.Attr("Position"), "Dim", 0), parseLiteralNumber("3"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("Position"), "Dim", 0), parseLiteralNumber("2"), "=") }, func() WhereValue { return wvNot(wvExists(ec.Attr("CoefficientsZ"))) }) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Attr("Position"), "Dim", 0), parseLiteralNumber("3"), "=") }))) {
 		return false, "WHERE CorrectPositionDim: CorrectPositionDim : ((Position.Dim=2) AND (NOT EXISTS(CoefficientsZ))) OR (Position.Dim=3)"
 	}
 	return true, ""
 }
 
 func whereIFCPOLYNOMIALCURVE_ValidCoefficients(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvOr(wvAnd(wvExists(ec.Attr("CoefficientsX")), wvExists(ec.Attr("CoefficientsY"))), wvAnd(wvExists(ec.Attr("CoefficientsX")), wvExists(ec.Attr("CoefficientsZ")))), wvAnd(wvExists(ec.Attr("CoefficientsY")), wvExists(ec.Attr("CoefficientsZ")))), wvAnd(wvAnd(wvExists(ec.Attr("CoefficientsX")), wvExists(ec.Attr("CoefficientsY"))), wvExists(ec.Attr("CoefficientsZ")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("CoefficientsX")) }, func() WhereValue { return wvExists(ec.Attr("CoefficientsY")) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("CoefficientsX")) }, func() WhereValue { return wvExists(ec.Attr("CoefficientsZ")) }) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("CoefficientsY")) }, func() WhereValue { return wvExists(ec.Attr("CoefficientsZ")) }) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("CoefficientsX")) }, func() WhereValue { return wvExists(ec.Attr("CoefficientsY")) }) }, func() WhereValue { return wvExists(ec.Attr("CoefficientsZ")) }) }))) {
 		return false, "WHERE ValidCoefficients: ValidCoefficients : (EXISTS(CoefficientsX) AND EXISTS(CoefficientsY)) OR (EXISTS(CoefficientsX) AND EXISTS(CoefficientsZ)) OR (EXISTS(CoefficientsY) AND EXISTS(CoefficientsZ)) OR (EXISTS(CoefficientsX) AND EXISTS(CoefficientsY) AND EXISTS(CoefficientsZ))"
 	}
 	return true, ""
@@ -3055,7 +3055,7 @@ func whereIFCPOSITIONINGELEMENT_HasPlacement(ec *EntityWhereEval) (bool, string)
 }
 
 func whereIFCPOSTALADDRESS_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvOr(wvOr(wvOr(wvOr(wvExists(ec.Attr("InternalLocation")), wvExists(ec.Attr("AddressLines"))), wvExists(ec.Attr("PostalBox"))), wvExists(ec.Attr("PostalCode"))), wvExists(ec.Attr("Town"))), wvExists(ec.Attr("Region"))), wvExists(ec.Attr("Country"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("InternalLocation")) }, func() WhereValue { return wvExists(ec.Attr("AddressLines")) }) }, func() WhereValue { return wvExists(ec.Attr("PostalBox")) }) }, func() WhereValue { return wvExists(ec.Attr("PostalCode")) }) }, func() WhereValue { return wvExists(ec.Attr("Town")) }) }, func() WhereValue { return wvExists(ec.Attr("Region")) }) }, func() WhereValue { return wvExists(ec.Attr("Country")) }))) {
 		return false, "WHERE WR1: WR1 : EXISTS (InternalLocation) OR \r\nEXISTS (AddressLines) OR\r\nEXISTS (PostalBox) OR\r\nEXISTS (PostalCode) OR\r\nEXISTS (Town) OR \r\nEXISTS (Region) OR  \r\nEXISTS (Country)"
 	}
 	return true, ""
@@ -3076,7 +3076,7 @@ func whereIFCPRESENTATIONLAYERWITHSTYLE_ApplicableOnlyToItems(ec *EntityWhereEva
 }
 
 func whereIFCPROCEDURE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR (PredefinedType <> IfcProcedureTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcProcedureTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -3090,14 +3090,14 @@ func whereIFCPROCEDURE_HasName(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPROCEDURETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeProcess"), "ProcessType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProcedureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeProcess"), "ProcessType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcProcedureTypeEnum.USERDEFINED) OR ((PredefinedType = IfcProcedureTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeProcess.ProcessType))"
 	}
 	return true, ""
 }
 
 func whereIFCPRODUCT_PlacementForShapeRepresentation(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvAnd(wvExists(ec.Attr("Representation")), wvExists(ec.Attr("ObjectPlacement"))), wvAnd(wvExists(ec.Attr("Representation")), wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.Attr("Representation"), "Representations", 0), func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSHAPEREPRESENTATION"), wvTypeOf(temp)) })), parseLiteralNumber("0"), "="))), wvNot(wvExists(ec.Attr("Representation")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("Representation")) }, func() WhereValue { return wvExists(ec.Attr("ObjectPlacement")) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("Representation")) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.Attr("Representation"), "Representations", 0), func(temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSHAPEREPRESENTATION"), wvTypeOf(temp)) })), parseLiteralNumber("0"), "=") }) }) }, func() WhereValue { return wvNot(wvExists(ec.Attr("Representation"))) }))) {
 		return false, "WHERE PlacementForShapeRepresentation: PlacementForShapeRepresentation : (EXISTS(Representation) AND EXISTS(ObjectPlacement))\r\n            OR (EXISTS(Representation) AND \r\n      (SIZEOF(QUERY(temp <* Representation.Representations | 'IFC4X3_DEV_73740fe4.IFCSHAPEREPRESENTATION' IN TYPEOF(temp))) = 0))\r\n            OR (NOT(EXISTS(Representation)))"
 	}
 	return true, ""
@@ -3111,7 +3111,7 @@ func whereIFCPRODUCTDEFINITIONSHAPE_OnlyShapeModel(ec *EntityWhereEval) (bool, s
 }
 
 func whereIFCPROJECT_CorrectContext(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcContext"), "RepresentationContexts", 0))), wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcContext"), "RepresentationContexts", 0), func(Temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICREPRESENTATIONSUBCONTEXT"), wvTypeOf(Temp)) })), parseLiteralNumber("0"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcContext"), "RepresentationContexts", 0))) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcContext"), "RepresentationContexts", 0), func(Temp WhereValue) WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCGEOMETRICREPRESENTATIONSUBCONTEXT"), wvTypeOf(Temp)) })), parseLiteralNumber("0"), "=") }))) {
 		return false, "WHERE CorrectContext: CorrectContext : NOT(EXISTS(SELF\\IfcContext.RepresentationContexts)) OR\r\n(SIZEOF(QUERY(Temp <* SELF\\IfcContext.RepresentationContexts |\r\n 'IFC4X3_DEV_73740fe4.IFCGEOMETRICREPRESENTATIONSUBCONTEXT' IN TYPEOF(Temp)\r\n  )) = 0)"
 	}
 	return true, ""
@@ -3132,35 +3132,35 @@ func whereIFCPROJECT_NoDecomposition(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCPROJECTEDCRS_MapUnitIsLength(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.Self(), "MapUnit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.Self(), "MapUnit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "LENGTHUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.Self(), "MapUnit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.Self(), "MapUnit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "LENGTHUNIT", 0), "=") }))) {
 		return false, "WHERE MapUnitIsLength: MapUnitIsLength : NOT(EXISTS(SELF.MapUnit)) OR (SELF.MapUnit.UnitType = IfcUnitEnum.LENGTHUNIT)"
 	}
 	return true, ""
 }
 
 func whereIFCPROJECTIONELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProjectionElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProjectionElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProjectionElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProjectionElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcProjectionElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcProjectionElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPROPERTYBOUNDEDVALUE_SameUnitLowerSet(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("LowerBoundValue"))), wvNot(wvExists(ec.Attr("SetPointValue")))), wvCompareRel(wvTypeOf(ec.Attr("LowerBoundValue")), wvTypeOf(ec.Attr("SetPointValue")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("LowerBoundValue"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("SetPointValue"))) }) }, func() WhereValue { return wvCompareRel(wvTypeOf(ec.Attr("LowerBoundValue")), wvTypeOf(ec.Attr("SetPointValue")), "=") }))) {
 		return false, "WHERE SameUnitLowerSet: SameUnitLowerSet : NOT(EXISTS(LowerBoundValue)) OR NOT(EXISTS(SetPointValue)) OR\r\n(TYPEOF(LowerBoundValue) = TYPEOF(SetPointValue))"
 	}
 	return true, ""
 }
 
 func whereIFCPROPERTYBOUNDEDVALUE_SameUnitUpperLower(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("UpperBoundValue"))), wvNot(wvExists(ec.Attr("LowerBoundValue")))), wvCompareRel(wvTypeOf(ec.Attr("UpperBoundValue")), wvTypeOf(ec.Attr("LowerBoundValue")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("UpperBoundValue"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("LowerBoundValue"))) }) }, func() WhereValue { return wvCompareRel(wvTypeOf(ec.Attr("UpperBoundValue")), wvTypeOf(ec.Attr("LowerBoundValue")), "=") }))) {
 		return false, "WHERE SameUnitUpperLower: SameUnitUpperLower : NOT(EXISTS(UpperBoundValue)) OR NOT(EXISTS(LowerBoundValue)) OR\r\n(TYPEOF(UpperBoundValue) = TYPEOF(LowerBoundValue))"
 	}
 	return true, ""
 }
 
 func whereIFCPROPERTYBOUNDEDVALUE_SameUnitUpperSet(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("UpperBoundValue"))), wvNot(wvExists(ec.Attr("SetPointValue")))), wvCompareRel(wvTypeOf(ec.Attr("UpperBoundValue")), wvTypeOf(ec.Attr("SetPointValue")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("UpperBoundValue"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("SetPointValue"))) }) }, func() WhereValue { return wvCompareRel(wvTypeOf(ec.Attr("UpperBoundValue")), wvTypeOf(ec.Attr("SetPointValue")), "=") }))) {
 		return false, "WHERE SameUnitUpperSet: SameUnitUpperSet : NOT(EXISTS(UpperBoundValue)) OR NOT(EXISTS(SetPointValue)) OR\r\n(TYPEOF(UpperBoundValue) = TYPEOF(SetPointValue))"
 	}
 	return true, ""
@@ -3174,7 +3174,7 @@ func whereIFCPROPERTYDEPENDENCYRELATIONSHIP_NoSelfReference(ec *EntityWhereEval)
 }
 
 func whereIFCPROPERTYENUMERATEDVALUE_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("EnumerationReference"))), wvNot(wvExists(ec.Attr("EnumerationValues")))), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("EnumerationValues"), func(temp WhereValue) WhereValue { return wvIn(temp, ec.QualAttr(ec.Attr("EnumerationReference"), "EnumerationValues", 0)) })), wvSizeOf(ec.Attr("EnumerationValues")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("EnumerationReference"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("EnumerationValues"))) }) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.Attr("EnumerationValues"), func(temp WhereValue) WhereValue { return wvIn(temp, ec.QualAttr(ec.Attr("EnumerationReference"), "EnumerationValues", 0)) })), wvSizeOf(ec.Attr("EnumerationValues")), "=") }))) {
 		return false, "WHERE WR21: WR21 : NOT(EXISTS(EnumerationReference)) \r\nOR  NOT(EXISTS(EnumerationValues)) \r\nOR  (SIZEOF(QUERY(temp <* EnumerationValues |\r\n    temp IN EnumerationReference.EnumerationValues))\r\n    = SIZEOF(EnumerationValues))"
 	}
 	return true, ""
@@ -3223,91 +3223,91 @@ func whereIFCPROPERTYSETTEMPLATE_UniquePropertyNames(ec *EntityWhereEval) (bool,
 }
 
 func whereIFCPROPERTYTABLEVALUE_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvNot(wvExists(ec.Attr("DefiningValues"))), wvNot(wvExists(ec.Attr("DefinedValues")))), wvCompareRel(wvSizeOf(ec.Attr("DefiningValues")), wvSizeOf(ec.Attr("DefinedValues")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("DefiningValues"))) }, func() WhereValue { return wvNot(wvExists(ec.Attr("DefinedValues"))) }) }, func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("DefiningValues")), wvSizeOf(ec.Attr("DefinedValues")), "=") }))) {
 		return false, "WHERE WR21: WR21 : (NOT(EXISTS(DefiningValues)) AND NOT(EXISTS(DefinedValues)))\r\nOR (SIZEOF(DefiningValues) = SIZEOF(DefinedValues))"
 	}
 	return true, ""
 }
 
 func whereIFCPROPERTYTABLEVALUE_WR22(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("DefiningValues"))), wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.Self(), "DefiningValues", 0), func(temp WhereValue) WhereValue { return wvCompareRel(wvTypeOf(temp), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.Self(), "DefiningValues", 0), 1)), "<>") })), parseLiteralNumber("0"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("DefiningValues"))) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.Self(), "DefiningValues", 0), func(temp WhereValue) WhereValue { return wvCompareRel(wvTypeOf(temp), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.Self(), "DefiningValues", 0), 1)), "<>") })), parseLiteralNumber("0"), "=") }))) {
 		return false, "WHERE WR22: WR22 : NOT(EXISTS(DefiningValues)) OR \r\n(SIZEOF(QUERY(temp <* SELF.DefiningValues | TYPEOF(temp) <> TYPEOF(SELF.DefiningValues[1])\r\n)) = 0)"
 	}
 	return true, ""
 }
 
 func whereIFCPROPERTYTABLEVALUE_WR23(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("DefinedValues"))), wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.Self(), "DefinedValues", 0), func(temp WhereValue) WhereValue { return wvCompareRel(wvTypeOf(temp), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.Self(), "DefinedValues", 0), 1)), "<>") })), parseLiteralNumber("0"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("DefinedValues"))) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.Self(), "DefinedValues", 0), func(temp WhereValue) WhereValue { return wvCompareRel(wvTypeOf(temp), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.Self(), "DefinedValues", 0), 1)), "<>") })), parseLiteralNumber("0"), "=") }))) {
 		return false, "WHERE WR23: WR23 : NOT(EXISTS(DefinedValues)) OR \r\n(SIZEOF(QUERY(temp <* SELF.DefinedValues | TYPEOF(temp) <> TYPEOF(SELF.DefinedValues[1])\r\n)) = 0)"
 	}
 	return true, ""
 }
 
 func whereIFCPROTECTIVEDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcProtectiveDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcProtectiveDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPROTECTIVEDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROTECTIVEDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROTECTIVEDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPROTECTIVEDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPROTECTIVEDEVICETRIPPINGUNIT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcProtectiveDeviceTrippingUnitTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcProtectiveDeviceTrippingUnitTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPROTECTIVEDEVICETRIPPINGUNIT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROTECTIVEDEVICETRIPPINGUNITTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROTECTIVEDEVICETRIPPINGUNITTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPROTECTIVEDEVICETRIPPINGUNITTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPROTECTIVEDEVICETRIPPINGUNITTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTrippingUnitTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcProtectiveDeviceTrippingUnitTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcProtectiveDeviceTrippingUnitTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCPROTECTIVEDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcProtectiveDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcProtectiveDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcProtectiveDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCPUMP_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcPumpTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPumpTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCPUMP_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPUMPTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPUMPTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCPUMPTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCPUMPTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcPumpTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcPumpTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcPumpTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCQUANTITYAREA_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "AREAUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "AREAUNIT", 0), "=") }))) {
 		return false, "WHERE WR21: WR21 : NOT(EXISTS(SELF\\IfcPhysicalSimpleQuantity.Unit)) OR\r\n   (SELF\\IfcPhysicalSimpleQuantity.Unit.UnitType = IfcUnitEnum.AREAUNIT)"
 	}
 	return true, ""
@@ -3328,7 +3328,7 @@ func whereIFCQUANTITYCOUNT_WR21(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYLENGTH_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "LENGTHUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "LENGTHUNIT", 0), "=") }))) {
 		return false, "WHERE WR21: WR21 : NOT(EXISTS(SELF\\IfcPhysicalSimpleQuantity.Unit)) OR\r\n   (SELF\\IfcPhysicalSimpleQuantity.Unit.UnitType = IfcUnitEnum.LENGTHUNIT)"
 	}
 	return true, ""
@@ -3342,7 +3342,7 @@ func whereIFCQUANTITYLENGTH_WR22(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYTIME_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "TIMEUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "TIMEUNIT", 0), "=") }))) {
 		return false, "WHERE WR21: WR21 : NOT(EXISTS(SELF\\IfcPhysicalSimpleQuantity.Unit)) OR\r\n   (SELF\\IfcPhysicalSimpleQuantity.Unit.UnitType = IfcUnitEnum.TIMEUNIT)"
 	}
 	return true, ""
@@ -3356,7 +3356,7 @@ func whereIFCQUANTITYTIME_WR22(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYVOLUME_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "VOLUMEUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "VOLUMEUNIT", 0), "=") }))) {
 		return false, "WHERE WR21: WR21 : NOT(EXISTS(SELF\\IfcPhysicalSimpleQuantity.Unit)) OR\r\n   (SELF\\IfcPhysicalSimpleQuantity.Unit.UnitType = IfcUnitEnum.VOLUMEUNIT)"
 	}
 	return true, ""
@@ -3370,7 +3370,7 @@ func whereIFCQUANTITYVOLUME_WR22(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCQUANTITYWEIGHT_WR21(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))), wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "MASSUNIT", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPhysicalSimpleQuantity"), "Unit", 0), "UnitType", 0), ec.QualAttr(wvFromEnumType("IfcUnitEnum"), "MASSUNIT", 0), "=") }))) {
 		return false, "WHERE WR21: WR21 : NOT(EXISTS(SELF\\IfcPhysicalSimpleQuantity.Unit)) OR\r\n   (SELF\\IfcPhysicalSimpleQuantity.Unit.UnitType = IfcUnitEnum.MASSUNIT)"
 	}
 	return true, ""
@@ -3384,98 +3384,98 @@ func whereIFCQUANTITYWEIGHT_WR22(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCRAIL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRailTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRailTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAIL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAILTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAILTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCRAILTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAILING_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRailingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRailingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAILING_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAILINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAILINGTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCRAILINGTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAILINGTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailingTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcRailingTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRailingTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAILTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcRailTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRailTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAILWAY_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRailwayTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRailwayTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAILWAYPART_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayPartTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayPartTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayPartTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRailwayPartTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRailwayPartTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRailwayPartTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAMP_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRampTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRampTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAMP_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAMPTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAMPTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCRAMPTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAMPFLIGHT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRampFlightTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRampFlightTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAMPFLIGHT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAMPFLIGHTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRAMPFLIGHTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCRAMPFLIGHTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAMPFLIGHTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampFlightTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcRampFlightTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRampFlightTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCRAMPTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRampTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcRampTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRampTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -3496,7 +3496,7 @@ func whereIFCRATIONALBSPLINECURVEWITHKNOTS_WeightsGreaterZero(ec *EntityWhereEva
 }
 
 func whereIFCRATIONALBSPLINESURFACEWITHKNOTS_CorrespondingWeightsDataLists(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(wvSizeOf(ec.Attr("WeightsData")), wvSizeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcBSplineSurface"), "ControlPointsList", 0)), "="), wvCompareRel(wvSizeOf(ec.QualIndex(ec.Attr("WeightsData"), 1)), wvSizeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcBSplineSurface"), "ControlPointsList", 0), 1)), "=")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("WeightsData")), wvSizeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcBSplineSurface"), "ControlPointsList", 0)), "=") }, func() WhereValue { return wvCompareRel(wvSizeOf(ec.QualIndex(ec.Attr("WeightsData"), 1)), wvSizeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcBSplineSurface"), "ControlPointsList", 0), 1)), "=") }))) {
 		return false, "WHERE CorrespondingWeightsDataLists: CorrespondingWeightsDataLists : (SIZEOF(WeightsData) = SIZEOF(SELF\\IfcBSplineSurface.ControlPointsList))\r\nAND \r\n(SIZEOF(WeightsData[1]) = SIZEOF(SELF\\IfcBSplineSurface.ControlPointsList[1]))"
 	}
 	return true, ""
@@ -3510,21 +3510,21 @@ func whereIFCRATIONALBSPLINESURFACEWITHKNOTS_WeightValuesGreaterZero(ec *EntityW
 }
 
 func whereIFCRECTANGLEHOLLOWPROFILEDEF_ValidInnerRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InnerFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="), wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("InnerFilletRadius"))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<=") }, func() WhereValue { return wvCompareRel(ec.Attr("InnerFilletRadius"), wvSub(wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), ec.Attr("WallThickness")), "<=") }) }))) {
 		return false, "WHERE ValidInnerRadius: ValidInnerRadius : NOT(EXISTS(InnerFilletRadius)) OR \r\n((InnerFilletRadius <= (SELF\\IfcRectangleProfileDef.XDim/2. - WallThickness)) AND \r\n (InnerFilletRadius <= (SELF\\IfcRectangleProfileDef.YDim/2. - WallThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCRECTANGLEHOLLOWPROFILEDEF_ValidOuterRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("OuterFilletRadius"))), wvAnd(wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<="), wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("OuterFilletRadius"))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<=") }, func() WhereValue { return wvCompareRel(ec.Attr("OuterFilletRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<=") }) }))) {
 		return false, "WHERE ValidOuterRadius: ValidOuterRadius : NOT(EXISTS(OuterFilletRadius)) OR \r\n((OuterFilletRadius <= (SELF\\IfcRectangleProfileDef.XDim/2.)) AND \r\n (OuterFilletRadius <= (SELF\\IfcRectangleProfileDef.YDim/2.)))"
 	}
 	return true, ""
 }
 
 func whereIFCRECTANGLEHOLLOWPROFILEDEF_ValidWallThickness(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<"), wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<") }, func() WhereValue { return wvCompareRel(ec.Attr("WallThickness"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<") }))) {
 		return false, "WHERE ValidWallThickness: ValidWallThickness : (WallThickness < (SELF\\IfcRectangleProfileDef.XDim/2.)) AND \r\n(WallThickness < (SELF\\IfcRectangleProfileDef.YDim/2.))"
 	}
 	return true, ""
@@ -3538,7 +3538,7 @@ func whereIFCRECTANGULARTRIMMEDSURFACE_U1AndU2Different(ec *EntityWhereEval) (bo
 }
 
 func whereIFCRECTANGULARTRIMMEDSURFACE_UsenseCompatible(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENTARYSURFACE"), wvTypeOf(ec.Attr("BasisSurface"))), wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLANE"), wvTypeOf(ec.Attr("BasisSurface"))))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACEOFREVOLUTION"), wvTypeOf(ec.Attr("BasisSurface")))), wvCompareRel(ec.Attr("Usense"), wvCompareRel(ec.Attr("U2"), ec.Attr("U1"), ">"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCELEMENTARYSURFACE"), wvTypeOf(ec.Attr("BasisSurface"))) }, func() WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLANE"), wvTypeOf(ec.Attr("BasisSurface")))) }) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSURFACEOFREVOLUTION"), wvTypeOf(ec.Attr("BasisSurface"))) }) }, func() WhereValue { return wvCompareRel(ec.Attr("Usense"), wvCompareRel(ec.Attr("U2"), ec.Attr("U1"), ">"), "=") }))) {
 		return false, "WHERE UsenseCompatible: UsenseCompatible : (('IFC4X3_DEV_73740fe4.IFCELEMENTARYSURFACE' IN TYPEOF(BasisSurface)) AND\r\n         (NOT ('IFC4X3_DEV_73740fe4.IFCPLANE' IN TYPEOF(BasisSurface)))) OR\r\n         ('IFC4X3_DEV_73740fe4.IFCSURFACEOFREVOLUTION' IN TYPEOF(BasisSurface)) OR\r\n         (Usense = (U2 > U1))"
 	}
 	return true, ""
@@ -3559,63 +3559,63 @@ func whereIFCRECTANGULARTRIMMEDSURFACE_VsenseCompatible(ec *EntityWhereEval) (bo
 }
 
 func whereIFCREINFORCEDSOIL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcedSoilTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcedSoilTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcedSoilTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcedSoilTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcReinforcedSoilTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcReinforcedSoilTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGBAR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcReinforcingBarTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcReinforcingBarTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGBAR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCREINFORCINGBARTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCREINFORCINGBARTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCREINFORCINGBARTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGBARTYPE_BendingShapeCodeProvided(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("BendingParameters"))), wvExists(ec.Attr("BendingShapeCode"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("BendingParameters"))) }, func() WhereValue { return wvExists(ec.Attr("BendingShapeCode")) }))) {
 		return false, "WHERE BendingShapeCodeProvided: BendingShapeCodeProvided : NOT EXISTS(BendingParameters) OR EXISTS(BendingShapeCode)"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGBARTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingBarTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcReinforcingBarTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcReinforcingBarTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGMESH_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcReinforcingMeshTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcReinforcingMeshTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGMESH_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCREINFORCINGMESHTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCREINFORCINGMESHTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCREINFORCINGMESHTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGMESHTYPE_BendingShapeCodeProvided(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("BendingParameters"))), wvExists(ec.Attr("BendingShapeCode"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("BendingParameters"))) }, func() WhereValue { return wvExists(ec.Attr("BendingShapeCode")) }))) {
 		return false, "WHERE BendingShapeCodeProvided: BendingShapeCodeProvided : NOT EXISTS(BendingParameters) OR EXISTS(BendingShapeCode)"
 	}
 	return true, ""
 }
 
 func whereIFCREINFORCINGMESHTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcReinforcingMeshTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcReinforcingMeshTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcReinforcingMeshTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -3678,7 +3678,7 @@ func whereIFCRELASSOCIATESMATERIAL_AllowedElements(ec *EntityWhereEval) (bool, s
 }
 
 func whereIFCRELASSOCIATESMATERIAL_NoVoidElement(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRelAssociates"), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFEATUREELEMENTSUBTRACTION"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT"), wvTypeOf(temp))) })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRelAssociates"), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCFEATUREELEMENTSUBTRACTION"), wvTypeOf(temp)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT"), wvTypeOf(temp)) }) })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE NoVoidElement: NoVoidElement : SIZEOF(QUERY(temp <* SELF\\IfcRelAssociates.RelatedObjects | \r\n  ('IFC4X3_DEV_73740fe4.IFCFEATUREELEMENTSUBTRACTION' IN TYPEOF(temp)) OR \r\n  ('IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT' IN TYPEOF(temp)) \r\n)) = 0"
 	}
 	return true, ""
@@ -3692,14 +3692,14 @@ func whereIFCRELCONNECTSELEMENTS_NoSelfReference(ec *EntityWhereEval) (bool, str
 }
 
 func whereIFCRELCONNECTSPATHELEMENTS_NormalizedRelatedPriorities(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Attr("RelatedPriorities")), parseLiteralNumber("0"), "="), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("RelatedPriorities"), func(temp WhereValue) WhereValue { return wvAnd(wvCompareRel(parseLiteralNumber("0"), temp, "<="), wvCompareRel(temp, parseLiteralNumber("100"), "<=")) })), wvSizeOf(ec.Attr("RelatedPriorities")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("RelatedPriorities")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.Attr("RelatedPriorities"), func(temp WhereValue) WhereValue { return wvAnd(wvCompareRel(parseLiteralNumber("0"), temp, "<="), wvCompareRel(temp, parseLiteralNumber("100"), "<=")) })), wvSizeOf(ec.Attr("RelatedPriorities")), "=") }))) {
 		return false, "WHERE NormalizedRelatedPriorities: NormalizedRelatedPriorities : (SIZEOF(RelatedPriorities) = 0)\r\nOR\r\n(SIZEOF (QUERY (temp <* RelatedPriorities\r\n  | {0 <= temp <= 100}\r\n  )) = SIZEOF(RelatedPriorities))"
 	}
 	return true, ""
 }
 
 func whereIFCRELCONNECTSPATHELEMENTS_NormalizedRelatingPriorities(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Attr("RelatingPriorities")), parseLiteralNumber("0"), "="), wvCompareRel(wvSizeOf(wvQuery(ec.Attr("RelatingPriorities"), func(temp WhereValue) WhereValue { return wvAnd(wvCompareRel(parseLiteralNumber("0"), temp, "<="), wvCompareRel(temp, parseLiteralNumber("100"), "<=")) })), wvSizeOf(ec.Attr("RelatingPriorities")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("RelatingPriorities")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.Attr("RelatingPriorities"), func(temp WhereValue) WhereValue { return wvAnd(wvCompareRel(parseLiteralNumber("0"), temp, "<="), wvCompareRel(temp, parseLiteralNumber("100"), "<=")) })), wvSizeOf(ec.Attr("RelatingPriorities")), "=") }))) {
 		return false, "WHERE NormalizedRelatingPriorities: NormalizedRelatingPriorities : (SIZEOF(RelatingPriorities) = 0)\r\nOR\r\n(SIZEOF (QUERY (temp <* RelatingPriorities\r\n  | {0 <= temp <= 100}\r\n  )) = SIZEOF(RelatingPriorities))"
 	}
 	return true, ""
@@ -3755,7 +3755,7 @@ func whereIFCRELPOSITIONS_NoSelfReference(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCRELREFERENCEDINSPATIALSTRUCTURE_AllowedRelatedElements(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("RelatedElements"), func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALSTRUCTUREELEMENT"), wvTypeOf(temp)), wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACE"), wvTypeOf(temp)))) })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("RelatedElements"), func(temp WhereValue) WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALSTRUCTUREELEMENT"), wvTypeOf(temp)) }, func() WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACE"), wvTypeOf(temp))) }) })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE AllowedRelatedElements: AllowedRelatedElements : SIZEOF(QUERY(temp <* RelatedElements | ('IFC4X3_DEV_73740fe4.IFCSPATIALSTRUCTUREELEMENT' IN TYPEOF(temp)) AND (NOT ('IFC4X3_DEV_73740fe4.IFCSPACE' IN TYPEOF(temp)))\r\n)) = 0"
 	}
 	return true, ""
@@ -3769,14 +3769,14 @@ func whereIFCRELSEQUENCE_AvoidInconsistentSequence(ec *EntityWhereEval) (bool, s
 }
 
 func whereIFCRELSEQUENCE_CorrectSequenceType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("SequenceType"), ec.QualAttr(wvFromEnumType("IfcSequenceEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("SequenceType"), ec.QualAttr(wvFromEnumType("IfcSequenceEnum"), "USERDEFINED", 0), "="), wvExists(ec.Attr("UserDefinedSequenceType")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("SequenceType"), ec.QualAttr(wvFromEnumType("IfcSequenceEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("SequenceType"), ec.QualAttr(wvFromEnumType("IfcSequenceEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.Attr("UserDefinedSequenceType")) }) }))) {
 		return false, "WHERE CorrectSequenceType: CorrectSequenceType : (SequenceType <> IfcSequenceEnum.USERDEFINED) OR ((SequenceType = IfcSequenceEnum.USERDEFINED) AND EXISTS(UserDefinedSequenceType))"
 	}
 	return true, ""
 }
 
 func whereIFCRELSPACEBOUNDARY_CorrectPhysOrVirt(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvAnd(wvCompareRel(ec.Attr("PhysicalOrVirtualBoundary"), ec.QualAttr(wvFromEnumType("IfcPhysicalOrVirtualEnum"), "Physical", 0), "="), wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT"), wvTypeOf(ec.Attr("RelatedBuildingElement"))))), wvAnd(wvCompareRel(ec.Attr("PhysicalOrVirtualBoundary"), ec.QualAttr(wvFromEnumType("IfcPhysicalOrVirtualEnum"), "Virtual", 0), "="), wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT"), wvTypeOf(ec.Attr("RelatedBuildingElement"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOPENINGELEMENT"), wvTypeOf(ec.Attr("RelatedBuildingElement")))))), wvCompareRel(ec.Attr("PhysicalOrVirtualBoundary"), ec.QualAttr(wvFromEnumType("IfcPhysicalOrVirtualEnum"), "NotDefined", 0), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PhysicalOrVirtualBoundary"), ec.QualAttr(wvFromEnumType("IfcPhysicalOrVirtualEnum"), "Physical", 0), "=") }, func() WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT"), wvTypeOf(ec.Attr("RelatedBuildingElement")))) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PhysicalOrVirtualBoundary"), ec.QualAttr(wvFromEnumType("IfcPhysicalOrVirtualEnum"), "Virtual", 0), "=") }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT"), wvTypeOf(ec.Attr("RelatedBuildingElement"))) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCOPENINGELEMENT"), wvTypeOf(ec.Attr("RelatedBuildingElement"))) }) }) }) }, func() WhereValue { return wvCompareRel(ec.Attr("PhysicalOrVirtualBoundary"), ec.QualAttr(wvFromEnumType("IfcPhysicalOrVirtualEnum"), "NotDefined", 0), "=") }))) {
 		return false, "WHERE CorrectPhysOrVirt: CorrectPhysOrVirt : ((PhysicalOrVirtualBoundary = IfcPhysicalOrVirtualEnum.Physical) \r\n  AND (NOT('IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT' IN TYPEOF(RelatedBuildingElement)))) \r\nOR \r\n((PhysicalOrVirtualBoundary = IfcPhysicalOrVirtualEnum.Virtual) \r\n  AND (('IFC4X3_DEV_73740fe4.IFCVIRTUALELEMENT' IN TYPEOF(RelatedBuildingElement)) \r\n  OR   ('IFC4X3_DEV_73740fe4.IFCOPENINGELEMENT' IN TYPEOF(RelatedBuildingElement)))) \r\nOR \r\n(PhysicalOrVirtualBoundary = IfcPhysicalOrVirtualEnum.NotDefined)"
 	}
 	return true, ""
@@ -3804,7 +3804,7 @@ func whereIFCREVOLVEDAREASOLID_AxisDirectionInXY(ec *EntityWhereEval) (bool, str
 }
 
 func whereIFCREVOLVEDAREASOLID_AxisStartInXY(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT"), wvTypeOf(ec.QualAttr(ec.Attr("Axis"), "Location", 0))), wvCompareRel(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.Attr("Axis"), "Location", 0), "IfcCartesianPoint"), "Coordinates", 0), 3), parseLiteralNumber("0.0"), "=")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT"), wvTypeOf(ec.QualAttr(ec.Attr("Axis"), "Location", 0))) }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.Attr("Axis"), "Location", 0), "IfcCartesianPoint"), "Coordinates", 0), 3), parseLiteralNumber("0.0"), "=") }))) {
 		return false, "WHERE AxisStartInXY: AxisStartInXY : ('IFC4X3_DEV_73740fe4.IFCCARTESIANPOINT' IN TYPEOF(Axis.Location)) AND (Axis.Location\\IfcCartesianPoint.Coordinates[3] = 0.0)"
 	}
 	return true, ""
@@ -3818,70 +3818,70 @@ func whereIFCREVOLVEDAREASOLIDTAPERED_CorrectProfileAssignment(ec *EntityWhereEv
 }
 
 func whereIFCRIGIDOPERATION_SameCoordinateType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.Attr("FirstCoordinate"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.Attr("SecondCoordinate")))), wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLANEANGLEMEASURE"), wvTypeOf(ec.Attr("FirstCoordinate"))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLANEANGLEMEASURE"), wvTypeOf(ec.Attr("SecondCoordinate"))))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.Attr("FirstCoordinate"))) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.Attr("SecondCoordinate"))) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLANEANGLEMEASURE"), wvTypeOf(ec.Attr("FirstCoordinate"))) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPLANEANGLEMEASURE"), wvTypeOf(ec.Attr("SecondCoordinate"))) }) }))) {
 		return false, "WHERE SameCoordinateType: SameCoordinateType : (('IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE' IN TYPEOF(FirstCoordinate)) AND ('IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE' IN TYPEOF(SecondCoordinate))) OR (('IFC4X3_DEV_73740fe4.IFCPLANEANGLEMEASURE' IN TYPEOF(FirstCoordinate)) AND ('IFC4X3_DEV_73740fe4.IFCPLANEANGLEMEASURE' IN TYPEOF(SecondCoordinate)))"
 	}
 	return true, ""
 }
 
 func whereIFCROAD_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRoadTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRoadTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCROADPART_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadPartTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadPartTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadPartTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoadPartTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRoadPartTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRoadPartTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCROOF_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcRoofTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRoofTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCROOF_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCROOFTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCROOFTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCROOFTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCROOFTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcRoofTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcRoofTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcRoofTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCROUNDEDRECTANGLEPROFILEDEF_ValidRadius(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<="), wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<=")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "XDim", 0), parseLiteralNumber("2.")), "<=") }, func() WhereValue { return wvCompareRel(ec.Attr("RoundingRadius"), wvDiv(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcRectangleProfileDef"), "YDim", 0), parseLiteralNumber("2.")), "<=") }))) {
 		return false, "WHERE ValidRadius: ValidRadius : ((RoundingRadius <= (SELF\\IfcRectangleProfileDef.XDim/2.)) AND \r\n (RoundingRadius <= (SELF\\IfcRectangleProfileDef.YDim/2.)))"
 	}
 	return true, ""
 }
 
 func whereIFCSANITARYTERMINAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSanitaryTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSanitaryTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSANITARYTERMINAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSANITARYTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSANITARYTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSANITARYTERMINALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSANITARYTERMINALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSanitaryTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSanitaryTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSanitaryTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -3979,7 +3979,7 @@ func whereIFCSECTIONEDSURFACE_DirectrixIs3D(ec *EntityWhereEval) (bool, string) 
 }
 
 func whereIFCSECTIONEDSURFACE_NoOffsets(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("CrossSectionPositions"), func(temp WhereValue) WhereValue { return wvOr(wvOr(wvExists(ec.QualAttr(ec.QualAttr(temp, "Location", 0), "OffsetLateral", 0)), wvExists(ec.QualAttr(ec.QualAttr(temp, "Location", 0), "OffsetVertical", 0))), wvExists(ec.QualAttr(ec.QualAttr(temp, "Location", 0), "OffsetLongitudinal", 0))) })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("CrossSectionPositions"), func(temp WhereValue) WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.QualAttr(ec.QualAttr(temp, "Location", 0), "OffsetLateral", 0)) }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualAttr(temp, "Location", 0), "OffsetVertical", 0)) }) }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualAttr(temp, "Location", 0), "OffsetLongitudinal", 0)) }) })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE NoOffsets: NoOffsets : SIZEOF(QUERY(temp <* CrossSectionPositions | EXISTS(temp.Location.OffsetLateral) OR EXISTS(temp.Location.OffsetVertical) OR EXISTS(temp.Location.OffsetLongitudinal))) = 0"
 	}
 	return true, ""
@@ -3993,42 +3993,42 @@ func whereIFCSECTIONEDSURFACE_SectionsSameType(ec *EntityWhereEval) (bool, strin
 }
 
 func whereIFCSENSOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSensorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSensorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSENSOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSENSORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSENSORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSENSORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSENSORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSensorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSensorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSensorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSHADINGDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcShadingDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcShadingDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSHADINGDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSHADINGDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSHADINGDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSHADINGDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSHADINGDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcShadingDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcShadingDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcShadingDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -4070,245 +4070,245 @@ func whereIFCSHAPEREPRESENTATION_HasRepresentationType(ec *EntityWhereEval) (boo
 }
 
 func whereIFCSHAPEREPRESENTATION_NoTopologicalItem(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Items"), func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTOPOLOGICALREPRESENTATIONITEM"), wvTypeOf(temp)), wvNot(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCVERTEXPOINT"), wvFromString("IFC4X3_DEV_73740fe4.IFCEDGECURVE"), wvFromString("IFC4X3_DEV_73740fe4.IFCFACESURFACE")}), wvTypeOf(temp))), parseLiteralNumber("1"), "="))) })), parseLiteralNumber("0"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.Attr("Items"), func(temp WhereValue) WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTOPOLOGICALREPRESENTATIONITEM"), wvTypeOf(temp)) }, func() WhereValue { return wvNot(wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCVERTEXPOINT"), wvFromString("IFC4X3_DEV_73740fe4.IFCEDGECURVE"), wvFromString("IFC4X3_DEV_73740fe4.IFCFACESURFACE")}), wvTypeOf(temp))), parseLiteralNumber("1"), "=")) }) })), parseLiteralNumber("0"), "="))) {
 		return false, "WHERE NoTopologicalItem: NoTopologicalItem : SIZEOF(QUERY(temp <* Items | \r\n  ('IFC4X3_DEV_73740fe4.IFCTOPOLOGICALREPRESENTATIONITEM' IN TYPEOF(temp))\r\n    AND (NOT(SIZEOF(\r\n      ['IFC4X3_DEV_73740fe4.IFCVERTEXPOINT',\r\n       'IFC4X3_DEV_73740fe4.IFCEDGECURVE',\r\n       'IFC4X3_DEV_73740fe4.IFCFACESURFACE'] * TYPEOF(temp)) = 1))\r\n)) = 0"
 	}
 	return true, ""
 }
 
 func whereIFCSIGN_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSignTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSignTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSIGN_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSIGNTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSIGNTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSIGNTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSIGNAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSignalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSignalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSIGNAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSIGNALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSIGNALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSIGNALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSIGNALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSignalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSignalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSIGNTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSignTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSignTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSignTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSLAB_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSlabTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSlabTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSLAB_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSLABTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSLABTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSLABTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSLABTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSlabTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSlabTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSlabTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSOLARDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSolarDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSolarDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSOLARDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSOLARDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSOLARDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSOLARDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSOLARDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSolarDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSolarDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSolarDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPACE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSpaceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSpaceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPACE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSPACETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPACEHEATER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSpaceHeaterTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSpaceHeaterTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPACEHEATER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACEHEATERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACEHEATERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSPACEHEATERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPACEHEATERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceHeaterTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSpaceHeaterTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSpaceHeaterTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPACETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSpatialElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpaceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSpatialElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSpaceTypeEnum.USERDEFINED) OR \r\n((PredefinedType = IfcSpaceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcSpatialElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPATIALSTRUCTUREELEMENT_WR41(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvAnd(wvCompareRel(wvHiIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0)), parseLiteralNumber("1"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRELAGGREGATES"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0), 1)))), wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROJECT"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0), 1), "RelatingObject", 0))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALSTRUCTUREELEMENT"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0), 1), "RelatingObject", 0))))))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(wvHiIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0)), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRELAGGREGATES"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0), 1))) }) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPROJECT"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0), 1), "RelatingObject", 0))) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALSTRUCTUREELEMENT"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObjectDefinition"), "Decomposes", 0), 1), "RelatingObject", 0))) }) }))) {
 		return false, "WHERE WR41: WR41 : (HIINDEX(SELF\\IfcObjectDefinition.Decomposes) = 1) \r\nAND\r\n('IFC4X3_DEV_73740fe4.IFCRELAGGREGATES' IN TYPEOF(SELF\\IfcObjectDefinition.Decomposes[1])) \r\nAND\r\n(('IFC4X3_DEV_73740fe4.IFCPROJECT' IN TYPEOF (SELF\\IfcObjectDefinition.Decomposes[1].RelatingObject)) OR\r\n ('IFC4X3_DEV_73740fe4.IFCSPATIALSTRUCTUREELEMENT' IN TYPEOF (SELF\\IfcObjectDefinition.Decomposes[1].RelatingObject))\r\n)"
 	}
 	return true, ""
 }
 
 func whereIFCSPATIALZONE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSpatialZoneTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSpatialZoneTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPATIALZONE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALZONETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALZONETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSPATIALZONETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSPATIALZONETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSpatialElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSpatialZoneTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSpatialElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSpatialZoneTypeEnum.USERDEFINED) OR \r\n((PredefinedType = IfcSpatialZoneTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcSpatialElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTACKTERMINAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcStackTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcStackTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTACKTERMINAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSTACKTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSTACKTERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSTACKTERMINALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTACKTERMINALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStackTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcStackTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcStackTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTAIR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcStairTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcStairTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTAIR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSTAIRTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSTAIRTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSTAIRTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTAIRFLIGHT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcStairFlightTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcStairFlightTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTAIRFLIGHT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSTAIRFLIGHTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSTAIRFLIGHTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSTAIRFLIGHTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTAIRFLIGHTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairFlightTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcStairFlightTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcStairFlightTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTAIRTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStairTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcStairTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcStairTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALANALYSISMODEL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAnalysisModelTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAnalysisModelTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAnalysisModelTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcAnalysisModelTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcAnalysisModelTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcAnalysisModelTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALCURVEACTION_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (PredefinedType <> IfcStructuralCurveActivityTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALCURVEACTION_ProjectedIsGlobal(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ProjectedOrTrue"))), wvOr(wvCompareRel(ec.Attr("ProjectedOrTrue"), wvFromEnumStepLiteral("PROJECTED_LENGTH"), "<>"), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), wvFromEnumStepLiteral("GLOBAL_COORDS"), "="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("ProjectedOrTrue"))) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("ProjectedOrTrue"), wvFromEnumStepLiteral("PROJECTED_LENGTH"), "<>") }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), wvFromEnumStepLiteral("GLOBAL_COORDS"), "=") }) }))) {
 		return false, "WHERE ProjectedIsGlobal: ProjectedIsGlobal : (NOT EXISTS(ProjectedOrTrue)) OR\r\n((ProjectedOrTrue <> PROJECTED_LENGTH) OR\r\n (SELF\\IfcStructuralActivity.GlobalOrLocal = GLOBAL_COORDS))"
 	}
 	return true, ""
@@ -4322,21 +4322,21 @@ func whereIFCSTRUCTURALCURVEACTION_SuitablePredefinedType(ec *EntityWhereEval) (
 }
 
 func whereIFCSTRUCTURALCURVEMEMBER_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveMemberTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveMemberTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (PredefinedType <> IfcStructuralCurveMemberTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALCURVEREACTION_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (PredefinedType <> IfcStructuralCurveActivityTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALCURVEREACTION_SuitablePredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "SINUS", 0), "<>"), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "PARABOLA", 0), "<>")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "SINUS", 0), "<>") }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralCurveActivityTypeEnum"), "PARABOLA", 0), "<>") }))) {
 		return false, "WHERE SuitablePredefinedType: SuitablePredefinedType : (PredefinedType <> IfcStructuralCurveActivityTypeEnum.SINUS) AND (PredefinedType <> IfcStructuralCurveActivityTypeEnum.PARABOLA)"
 	}
 	return true, ""
@@ -4364,14 +4364,14 @@ func whereIFCSTRUCTURALLOADCASE_IsLoadCasePredefinedType(ec *EntityWhereEval) (b
 }
 
 func whereIFCSTRUCTURALLOADCONFIGURATION_ValidListSize(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("Locations"))), wvCompareRel(wvSizeOf(ec.Attr("Locations")), wvSizeOf(ec.Attr("Values")), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("Locations"))) }, func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("Locations")), wvSizeOf(ec.Attr("Values")), "=") }))) {
 		return false, "WHERE ValidListSize: ValidListSize : NOT EXISTS(Locations) OR (SIZEOF(Locations) = SIZEOF(Values))"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALLOADGROUP_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLoadGroupTypeEnum"), "USERDEFINED", 0), "<>"), wvCompareRel(ec.Attr("ActionType"), ec.QualAttr(wvFromEnumType("IfcActionTypeEnum"), "USERDEFINED", 0), "<>")), wvCompareRel(ec.Attr("ActionSource"), ec.QualAttr(wvFromEnumType("IfcActionSourceTypeEnum"), "USERDEFINED", 0), "<>")), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcLoadGroupTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvCompareRel(ec.Attr("ActionType"), ec.QualAttr(wvFromEnumType("IfcActionTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return wvCompareRel(ec.Attr("ActionSource"), ec.QualAttr(wvFromEnumType("IfcActionSourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (\r\n  (PredefinedType <> IfcLoadGroupTypeEnum.USERDEFINED) AND\r\n  (ActionType <> IfcActionTypeEnum.USERDEFINED) AND\r\n  (ActionSource <> IfcActionSourceTypeEnum.USERDEFINED)\r\n) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
@@ -4406,35 +4406,35 @@ func whereIFCSTRUCTURALPOINTREACTION_SuitableLoadType(ec *EntityWhereEval) (bool
 }
 
 func whereIFCSTRUCTURALRESULTGROUP_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("TheoryType"), ec.QualAttr(wvFromEnumType("IfcAnalysisTheoryTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("TheoryType"), ec.QualAttr(wvFromEnumType("IfcAnalysisTheoryTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (TheoryType <> IfcAnalysisTheoryTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALSURFACEACTION_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralSurfaceActivityTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralSurfaceActivityTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (PredefinedType <> IfcStructuralSurfaceActivityTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALSURFACEACTION_ProjectedIsGlobal(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ProjectedOrTrue"))), wvOr(wvCompareRel(ec.Attr("ProjectedOrTrue"), wvFromEnumStepLiteral("PROJECTED_LENGTH"), "<>"), wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), wvFromEnumStepLiteral("GLOBAL_COORDS"), "="))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("ProjectedOrTrue"))) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("ProjectedOrTrue"), wvFromEnumStepLiteral("PROJECTED_LENGTH"), "<>") }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcStructuralActivity"), "GlobalOrLocal", 0), wvFromEnumStepLiteral("GLOBAL_COORDS"), "=") }) }))) {
 		return false, "WHERE ProjectedIsGlobal: ProjectedIsGlobal : (NOT EXISTS(ProjectedOrTrue)) OR\r\n((ProjectedOrTrue <> PROJECTED_LENGTH) OR\r\n (SELF\\IfcStructuralActivity.GlobalOrLocal = GLOBAL_COORDS))"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALSURFACEMEMBER_HasObjectType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralSurfaceMemberTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralSurfaceMemberTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasObjectType: HasObjectType : (PredefinedType <> IfcStructuralSurfaceMemberTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
 }
 
 func whereIFCSTRUCTURALSURFACEREACTION_HasPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralSurfaceActivityTypeEnum"), "USERDEFINED", 0), "<>"), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcStructuralSurfaceActivityTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }))) {
 		return false, "WHERE HasPredefinedType: HasPredefinedType : (PredefinedType <> IfcStructuralSurfaceActivityTypeEnum.USERDEFINED) OR EXISTS(SELF\\IfcObject.ObjectType)"
 	}
 	return true, ""
@@ -4455,14 +4455,14 @@ func whereIFCSTYLEDREPRESENTATION_OnlyStyledItems(ec *EntityWhereEval) (bool, st
 }
 
 func whereIFCSUBCONTRACTRESOURCE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR \r\n (PredefinedType <> IfcSubContractResourceTypeEnum.USERDEFINED) OR \r\n ((PredefinedType = IfcSubContractResourceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSUBCONTRACTRESOURCETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSubContractResourceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeResource"), "ResourceType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSubContractResourceTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcSubContractResourceTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeResource.ResourceType))"
 	}
 	return true, ""
@@ -4483,7 +4483,7 @@ func whereIFCSURFACECURVE_CurveIsNotPcurve(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCSURFACEFEATURE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSurfaceFeatureTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSurfaceFeatureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSurfaceFeatureTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSurfaceFeatureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSurfaceFeatureTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSurfaceFeatureTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -4497,28 +4497,28 @@ func whereIFCSURFACEOFLINEAREXTRUSION_DepthGreaterZero(ec *EntityWhereEval) (boo
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_NonnegativeArea1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("SurfaceReinforcement1"))), wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), parseLiteralNumber("0."), ">="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 2), parseLiteralNumber("0."), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement1")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), parseLiteralNumber("0."), ">=")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("SurfaceReinforcement1"))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), parseLiteralNumber("0."), ">=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 2), parseLiteralNumber("0."), ">=") }) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement1")), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement1"), 1), parseLiteralNumber("0."), ">=") }) }) }))) {
 		return false, "WHERE NonnegativeArea1: NonnegativeArea1 : (NOT EXISTS(SurfaceReinforcement1)) OR (\r\n    (SurfaceReinforcement1[1] >= 0.) AND\r\n    (SurfaceReinforcement1[2] >= 0.) AND\r\n    ((SIZEOF(SurfaceReinforcement1) = 1) OR (SurfaceReinforcement1[1] >= 0.))\r\n)"
 	}
 	return true, ""
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_NonnegativeArea2(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("SurfaceReinforcement2"))), wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), parseLiteralNumber("0."), ">="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 2), parseLiteralNumber("0."), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement2")), parseLiteralNumber("1"), "="), wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), parseLiteralNumber("0."), ">=")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("SurfaceReinforcement2"))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), parseLiteralNumber("0."), ">=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 2), parseLiteralNumber("0."), ">=") }) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Attr("SurfaceReinforcement2")), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Attr("SurfaceReinforcement2"), 1), parseLiteralNumber("0."), ">=") }) }) }))) {
 		return false, "WHERE NonnegativeArea2: NonnegativeArea2 : (NOT EXISTS(SurfaceReinforcement2)) OR (\r\n    (SurfaceReinforcement2[1] >= 0.) AND\r\n    (SurfaceReinforcement2[2] >= 0.) AND\r\n    ((SIZEOF(SurfaceReinforcement2) = 1) OR (SurfaceReinforcement2[1] >= 0.))\r\n)"
 	}
 	return true, ""
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_NonnegativeArea3(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("ShearReinforcement"))), wvCompareRel(ec.Attr("ShearReinforcement"), parseLiteralNumber("0."), ">=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("ShearReinforcement"))) }, func() WhereValue { return wvCompareRel(ec.Attr("ShearReinforcement"), parseLiteralNumber("0."), ">=") }))) {
 		return false, "WHERE NonnegativeArea3: NonnegativeArea3 : (NOT EXISTS(ShearReinforcement)) OR (ShearReinforcement >= 0.)"
 	}
 	return true, ""
 }
 
 func whereIFCSURFACEREINFORCEMENTAREA_SurfaceAndOrShearAreaSpecified(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvExists(ec.Attr("SurfaceReinforcement1")), wvExists(ec.Attr("SurfaceReinforcement2"))), wvExists(ec.Attr("ShearReinforcement"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("SurfaceReinforcement1")) }, func() WhereValue { return wvExists(ec.Attr("SurfaceReinforcement2")) }) }, func() WhereValue { return wvExists(ec.Attr("ShearReinforcement")) }))) {
 		return false, "WHERE SurfaceAndOrShearAreaSpecified: SurfaceAndOrShearAreaSpecified : EXISTS(SurfaceReinforcement1) OR EXISTS(SurfaceReinforcement2) OR EXISTS(ShearReinforcement)"
 	}
 	return true, ""
@@ -4567,7 +4567,7 @@ func whereIFCSWEPTAREASOLID_SweptAreaType(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCSWEPTDISKSOLID_DirectrixBounded(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvExists(ec.Attr("StartParam")), wvExists(ec.Attr("EndParam"))), wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("StartParam")) }, func() WhereValue { return wvExists(ec.Attr("EndParam")) }) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvMul(wvFromList([]WhereValue{wvFromString("IFC4X3_DEV_73740fe4.IFCCONIC"), wvFromString("IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE")}), wvTypeOf(ec.Attr("Directrix")))), parseLiteralNumber("1"), "=") }))) {
 		return false, "WHERE DirectrixBounded: DirectrixBounded : (EXISTS(StartParam) AND EXISTS(EndParam)) OR \r\n(SIZEOF(['IFC4X3_DEV_73740fe4.IFCCONIC', 'IFC4X3_DEV_73740fe4.IFCBOUNDEDCURVE'] * TYPEOF(Directrix)) = 1)"
 	}
 	return true, ""
@@ -4581,21 +4581,21 @@ func whereIFCSWEPTDISKSOLID_DirectrixDim(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCSWEPTDISKSOLID_InnerRadiusSize(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("InnerRadius"))), wvCompareRel(ec.Attr("Radius"), ec.Attr("InnerRadius"), ">")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("InnerRadius"))) }, func() WhereValue { return wvCompareRel(ec.Attr("Radius"), ec.Attr("InnerRadius"), ">") }))) {
 		return false, "WHERE InnerRadiusSize: InnerRadiusSize : (NOT EXISTS(InnerRadius)) OR (Radius > InnerRadius)"
 	}
 	return true, ""
 }
 
 func whereIFCSWEPTDISKSOLIDPOLYGONAL_CorrectRadii(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("FilletRadius"))), wvCompareRel(ec.Attr("FilletRadius"), ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Radius", 0), ">=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("FilletRadius"))) }, func() WhereValue { return wvCompareRel(ec.Attr("FilletRadius"), ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Radius", 0), ">=") }))) {
 		return false, "WHERE CorrectRadii: CorrectRadii : NOT(EXISTS(FilletRadius)) OR (FilletRadius >= SELF\\IfcSweptDiskSolid.Radius)"
 	}
 	return true, ""
 }
 
 func whereIFCSWEPTDISKSOLIDPOLYGONAL_DirectrixIsPolyline(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOLYLINE"), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Directrix", 0))), wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE"), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Directrix", 0))), wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Directrix", 0), "IfcIndexedPolyCurve"), "Segments", 0))))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPOLYLINE"), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Directrix", 0))) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE"), wvTypeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Directrix", 0))) }, func() WhereValue { return wvNot(wvExists(ec.QualAttr(ec.QualEntity(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcSweptDiskSolid"), "Directrix", 0), "IfcIndexedPolyCurve"), "Segments", 0))) }) }))) {
 		return false, "WHERE DirectrixIsPolyline: DirectrixIsPolyline : ('IFC4X3_DEV_73740fe4.IFCPOLYLINE' IN TYPEOF(SELF\\IfcSweptDiskSolid.Directrix)) OR\r\n(('IFC4X3_DEV_73740fe4.IFCINDEXEDPOLYCURVE' IN TYPEOF(SELF\\IfcSweptDiskSolid.Directrix)) AND NOT(EXISTS(SELF\\IfcSweptDiskSolid.Directrix\\IfcIndexedPolyCurve.Segments)))"
 	}
 	return true, ""
@@ -4609,42 +4609,42 @@ func whereIFCSWEPTSURFACE_SweptCurveType(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCSWITCHINGDEVICE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSwitchingDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSwitchingDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSWITCHINGDEVICE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSWITCHINGDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSWITCHINGDEVICETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSWITCHINGDEVICETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSWITCHINGDEVICETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSwitchingDeviceTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcSwitchingDeviceTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSwitchingDeviceTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCSYSTEMFURNITUREELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSystemFurnitureElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSystemFurnitureElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCSYSTEMFURNITUREELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSYSTEMFURNITUREELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSYSTEMFURNITUREELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSYSTEMFURNITUREELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCSYSTEMFURNITUREELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcSystemFurnitureElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcSystemFurnitureElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcSystemFurnitureElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -4665,28 +4665,28 @@ func whereIFCTABLE_WR2(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCTANK_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTankTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTankTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTANK_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTANKTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTANKTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTANKTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTANKTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTankTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTankTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTankTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCTASK_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR (PredefinedType <> IfcTaskTypeEnum.USERDEFINED) OR ((PredefinedType = IfcTaskTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
@@ -4700,77 +4700,77 @@ func whereIFCTASK_HasName(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCTASKTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeProcess"), "ProcessType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTaskTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeProcess"), "ProcessType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTaskTypeEnum.USERDEFINED) OR ((PredefinedType = IfcTaskTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcTypeProcess.ProcessType))"
 	}
 	return true, ""
 }
 
 func whereIFCTELECOMADDRESS_MinimumDataProvided(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvOr(wvOr(wvOr(wvExists(ec.Attr("TelephoneNumbers")), wvExists(ec.Attr("FacsimileNumbers"))), wvExists(ec.Attr("PagerNumber"))), wvExists(ec.Attr("ElectronicMailAddresses"))), wvExists(ec.Attr("WWWHomePageURL"))), wvExists(ec.Attr("MessagingIDs"))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvExists(ec.Attr("TelephoneNumbers")) }, func() WhereValue { return wvExists(ec.Attr("FacsimileNumbers")) }) }, func() WhereValue { return wvExists(ec.Attr("PagerNumber")) }) }, func() WhereValue { return wvExists(ec.Attr("ElectronicMailAddresses")) }) }, func() WhereValue { return wvExists(ec.Attr("WWWHomePageURL")) }) }, func() WhereValue { return wvExists(ec.Attr("MessagingIDs")) }))) {
 		return false, "WHERE MinimumDataProvided: MinimumDataProvided : EXISTS (TelephoneNumbers) OR\r\nEXISTS (FacsimileNumbers) OR \r\nEXISTS (PagerNumber) OR\r\nEXISTS (ElectronicMailAddresses) OR \r\nEXISTS (WWWHomePageURL) OR\r\nEXISTS (MessagingIDs)"
 	}
 	return true, ""
 }
 
 func whereIFCTENDON_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTendonTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTendonTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDON_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTENDONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTENDONTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTENDONTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONANCHOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTendonAnchorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTendonAnchorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONANCHOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTENDONANCHORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTENDONANCHORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTENDONANCHORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONANCHORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonAnchorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTendonAnchorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTendonAnchorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONCONDUIT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTendonConduitTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTendonConduitTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONCONDUIT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTENDONCONDUITTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTENDONCONDUITTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTENDONCONDUITTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONCONDUITTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonConduitTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTendonConduitTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTendonConduitTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCTENDONTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTendonTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTendonTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTendonTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -4784,7 +4784,7 @@ func whereIFCTEXTLITERALWITHEXTENT_WR31(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCTEXTSTYLEFONTMODEL_MeasureOfFontSize(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.QualAttr(ec.Self(), "FontSize", 0))), wvCompareRel(ec.QualAttr(ec.Self(), "FontSize", 0), parseLiteralNumber("0."), ">")))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE"), wvTypeOf(ec.QualAttr(ec.Self(), "FontSize", 0))) }, func() WhereValue { return wvCompareRel(ec.QualAttr(ec.Self(), "FontSize", 0), parseLiteralNumber("0."), ">") }))) {
 		return false, "WHERE MeasureOfFontSize: MeasureOfFontSize : ('IFC4X3_DEV_73740fe4.IFCLENGTHMEASURE' IN TYPEOF(SELF.FontSize)) AND\r\n(SELF.FontSize > 0.)"
 	}
 	return true, ""
@@ -4819,63 +4819,63 @@ func whereIFCTOROIDALSURFACE_MajorLargerMinor(ec *EntityWhereEval) (bool, string
 }
 
 func whereIFCTRACKELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTrackElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTrackElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRACKELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRACKELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRACKELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTRACKELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRACKELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTrackElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTrackElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTrackElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRANSFORMER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTransformerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTransformerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRANSFORMER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRANSFORMERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRANSFORMERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTRANSFORMERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRANSFORMERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransformerTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTransformerTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTransformerTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRANSPORTELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTransportElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTransportElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRANSPORTELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRANSPORTELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTRANSPORTELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTRANSPORTELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTRANSPORTELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTransportElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTransportElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTransportElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -4896,14 +4896,14 @@ func whereIFCTRIMMEDCURVE_NoTrimOfBoundedCurves(ec *EntityWhereEval) (bool, stri
 }
 
 func whereIFCTRIMMEDCURVE_Trim1ValuesConsistent(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvHiIndex(ec.Attr("Trim1")), parseLiteralNumber("1"), "="), wvCompareRel(wvTypeOf(ec.QualIndex(ec.Attr("Trim1"), 1)), wvTypeOf(ec.QualIndex(ec.Attr("Trim1"), 2)), "<>")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvHiIndex(ec.Attr("Trim1")), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvCompareRel(wvTypeOf(ec.QualIndex(ec.Attr("Trim1"), 1)), wvTypeOf(ec.QualIndex(ec.Attr("Trim1"), 2)), "<>") }))) {
 		return false, "WHERE Trim1ValuesConsistent: Trim1ValuesConsistent : (HIINDEX(Trim1) = 1) OR (TYPEOF(Trim1[1]) <> TYPEOF(Trim1[2]))"
 	}
 	return true, ""
 }
 
 func whereIFCTRIMMEDCURVE_Trim2ValuesConsistent(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvHiIndex(ec.Attr("Trim2")), parseLiteralNumber("1"), "="), wvCompareRel(wvTypeOf(ec.QualIndex(ec.Attr("Trim2"), 1)), wvTypeOf(ec.QualIndex(ec.Attr("Trim2"), 2)), "<>")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvHiIndex(ec.Attr("Trim2")), parseLiteralNumber("1"), "=") }, func() WhereValue { return wvCompareRel(wvTypeOf(ec.QualIndex(ec.Attr("Trim2"), 1)), wvTypeOf(ec.QualIndex(ec.Attr("Trim2"), 2)), "<>") }))) {
 		return false, "WHERE Trim2ValuesConsistent: Trim2ValuesConsistent : (HIINDEX(Trim2) = 1) OR (TYPEOF(Trim2[1]) <> TYPEOF(Trim2[2]))"
 	}
 	return true, ""
@@ -4924,21 +4924,21 @@ func whereIFCTSHAPEPROFILEDEF_ValidWebThickness(ec *EntityWhereEval) (bool, stri
 }
 
 func whereIFCTUBEBUNDLE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcTubeBundleTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTubeBundleTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCTUBEBUNDLE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTUBEBUNDLETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCTUBEBUNDLETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCTUBEBUNDLETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCTUBEBUNDLETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcTubeBundleTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcTubeBundleTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcTubeBundleTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -4952,56 +4952,56 @@ func whereIFCTYPEOBJECT_NameRequired(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCTYPEOBJECT_UniquePropertySetNames(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.Attr("HasPropertySets"))), ec.CallSchema("IfcUniquePropertySetNames", []WhereValue{ec.Attr("HasPropertySets")})))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("HasPropertySets"))) }, func() WhereValue { return ec.CallSchema("IfcUniquePropertySetNames", []WhereValue{ec.Attr("HasPropertySets")}) }))) {
 		return false, "WHERE UniquePropertySetNames: UniquePropertySetNames : (NOT(EXISTS(HasPropertySets))) OR IfcUniquePropertySetNames(HasPropertySets)"
 	}
 	return true, ""
 }
 
 func whereIFCTYPEPRODUCT_ApplicableOccurrence(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvNot(wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeObject"), "Types", 0), 1))), wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeObject"), "Types", 0), 1), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPRODUCT"), wvTypeOf(temp))) })), parseLiteralNumber("0"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeObject"), "Types", 0), 1))) }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcTypeObject"), "Types", 0), 1), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvNot(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCPRODUCT"), wvTypeOf(temp))) })), parseLiteralNumber("0"), "=") }))) {
 		return false, "WHERE ApplicableOccurrence: ApplicableOccurrence : NOT(EXISTS(SELF\\IfcTypeObject.Types[1])) OR\r\n(SIZEOF(QUERY(temp <* SELF\\IfcTypeObject.Types[1].RelatedObjects |\r\n  NOT('IFC4X3_DEV_73740fe4.IFCPRODUCT' IN TYPEOF(temp)))\r\n) = 0)"
 	}
 	return true, ""
 }
 
 func whereIFCUNITARYCONTROLELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcUnitaryControlElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcUnitaryControlElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCUNITARYCONTROLELEMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCUNITARYCONTROLELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCUNITARYCONTROLELEMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCUNITARYCONTROLELEMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCUNITARYCONTROLELEMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryControlElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcUnitaryControlElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcUnitaryControlElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCUNITARYEQUIPMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcUnitaryEquipmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcUnitaryEquipmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCUNITARYEQUIPMENT_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCUNITARYEQUIPMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCUNITARYEQUIPMENTTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCUNITARYEQUIPMENTTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCUNITARYEQUIPMENTTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcUnitaryEquipmentTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcUnitaryEquipmentTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcUnitaryEquipmentTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -5029,21 +5029,21 @@ func whereIFCUSHAPEPROFILEDEF_ValidWebThickness(ec *EntityWhereEval) (bool, stri
 }
 
 func whereIFCVALVE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcValveTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcValveTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCVALVE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVALVETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVALVETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCVALVETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCVALVETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcValveTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcValveTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcValveTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
@@ -5057,210 +5057,210 @@ func whereIFCVECTOR_MagGreaterOrEqualZero(ec *EntityWhereEval) (bool, string) {
 }
 
 func whereIFCVEHICLE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcVehicleTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVehicleTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCVEHICLE_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVEHICLETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVEHICLETYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCVEHICLETYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCVEHICLETYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVehicleTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcVehicleTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVehicleTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIBRATIONDAMPER_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcVibrationDamperTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVibrationDamperTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIBRATIONDAMPER_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIBRATIONDAMPERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIBRATIONDAMPERTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCVIBRATIONDAMPERTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIBRATIONDAMPERTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationDamperTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcVibrationDamperTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVibrationDamperTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIBRATIONISOLATOR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcVibrationIsolatorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVibrationIsolatorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIBRATIONISOLATOR_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIBRATIONISOLATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCVIBRATIONISOLATORTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCVIBRATIONISOLATORTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIBRATIONISOLATORTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVibrationIsolatorTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcVibrationIsolatorTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVibrationIsolatorTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCVIRTUALELEMENT_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVirtualElementTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVirtualElementTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVirtualElementTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVirtualElementTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcVirtualElementTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVirtualElementTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCVOIDINGFEATURE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVoidingFeatureTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVoidingFeatureTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVoidingFeatureTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcVoidingFeatureTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcVoidingFeatureTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcVoidingFeatureTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCWALL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcWallTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcWallTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCWALL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWALLTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWALLTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCWALLTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCWALLSTANDARDCASE_HasMaterialLayerSetUsage(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.UsedIn(ec.Self(), "IFC4X3_DEV_73740fe4.IFCRELASSOCIATES.RELATEDOBJECTS"), func(temp WhereValue) WhereValue { return wvAnd(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRELASSOCIATESMATERIAL"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMATERIALLAYERSETUSAGE"), wvTypeOf(ec.QualAttr(temp, "RelatingMaterial", 0)))) })), parseLiteralNumber("1"), "="))) {
+	if !(wvTruthy(wvCompareRel(wvSizeOf(wvQuery(ec.UsedIn(ec.Self(), "IFC4X3_DEV_73740fe4.IFCRELASSOCIATES.RELATEDOBJECTS"), func(temp WhereValue) WhereValue { return ec.WvAndLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCRELASSOCIATESMATERIAL"), wvTypeOf(temp)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCMATERIALLAYERSETUSAGE"), wvTypeOf(ec.QualAttr(temp, "RelatingMaterial", 0))) }) })), parseLiteralNumber("1"), "="))) {
 		return false, "WHERE HasMaterialLayerSetUsage: HasMaterialLayerSetUsage : SIZEOF (QUERY(temp <* USEDIN(SELF, 'IFC4X3_DEV_73740fe4.IFCRELASSOCIATES.RELATEDOBJECTS') |\r\n              ('IFC4X3_DEV_73740fe4.IFCRELASSOCIATESMATERIAL' IN TYPEOF(temp)) AND\r\n              ('IFC4X3_DEV_73740fe4.IFCMATERIALLAYERSETUSAGE' IN TYPEOF(temp.RelatingMaterial))\r\n              )) = 1"
 	}
 	return true, ""
 }
 
 func whereIFCWALLTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWallTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcWallTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcWallTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCWASTETERMINAL_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcWasteTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcWasteTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCWASTETERMINAL_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWASTETERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWASTETERMINALTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCWASTETERMINALTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCWASTETERMINALTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWasteTerminalTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcWasteTerminalTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcWasteTerminalTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOW_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR\r\n (PredefinedType <> IfcWindowTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcWindowTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOW_CorrectTypeAssigned(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "="), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWINDOWTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Inverse("IsTypedBy")), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWINDOWTYPE"), wvTypeOf(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "IsTypedBy", 0), 1), "RelatingType", 0))) }))) {
 		return false, "WHERE CorrectTypeAssigned: CorrectTypeAssigned : (SIZEOF(IsTypedBy) = 0) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCWINDOWTYPE' IN TYPEOF(SELF\\IfcObject.IsTypedBy[1].RelatingType))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOWLININGPROPERTIES_WR31(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvNot(wvAnd(wvExists(ec.Attr("LiningDepth")), wvNot(wvExists(ec.Attr("LiningThickness"))))))) {
+	if !(wvTruthy(wvNot(ec.WvAndLazy(func() WhereValue { return wvExists(ec.Attr("LiningDepth")) }, func() WhereValue { return wvNot(wvExists(ec.Attr("LiningThickness"))) })))) {
 		return false, "WHERE WR31: WR31 : NOT(EXISTS(LiningDepth) AND NOT(EXISTS(LiningThickness)))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOWLININGPROPERTIES_WR32(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvNot(wvAnd(wvNot(wvExists(ec.Attr("FirstTransomOffset"))), wvExists(ec.Attr("SecondTransomOffset")))))) {
+	if !(wvTruthy(wvNot(ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("FirstTransomOffset"))) }, func() WhereValue { return wvExists(ec.Attr("SecondTransomOffset")) })))) {
 		return false, "WHERE WR32: WR32 : NOT(NOT(EXISTS(FirstTransomOffset)) AND EXISTS(SecondTransomOffset))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOWLININGPROPERTIES_WR33(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvNot(wvAnd(wvNot(wvExists(ec.Attr("FirstMullionOffset"))), wvExists(ec.Attr("SecondMullionOffset")))))) {
+	if !(wvTruthy(wvNot(ec.WvAndLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("FirstMullionOffset"))) }, func() WhereValue { return wvExists(ec.Attr("SecondMullionOffset")) })))) {
 		return false, "WHERE WR33: WR33 : NOT(NOT(EXISTS(FirstMullionOffset)) AND EXISTS(SecondMullionOffset))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOWLININGPROPERTIES_WR34(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWINDOWTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)))))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWINDOWTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1))) }))) {
 		return false, "WHERE WR34: WR34 : (EXISTS(SELF\\IfcPropertySetDefinition.DefinesType[1])) \r\nAND \r\n('IFC4X3_DEV_73740fe4.IFCWINDOWTYPE' IN TYPEOF(SELF\\IfcPropertySetDefinition.DefinesType[1]))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOWPANELPROPERTIES_ApplicableToType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvAnd(wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWINDOWTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)))))) {
+	if !(wvTruthy(ec.WvAndLazy(func() WhereValue { return wvExists(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCWINDOWTYPE"), wvTypeOf(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcPropertySetDefinition"), "DefinesType", 0), 1))) }))) {
 		return false, "WHERE ApplicableToType: ApplicableToType : (EXISTS(SELF\\IfcPropertySetDefinition.DefinesType[1])) \r\nAND \r\n('IFC4X3_DEV_73740fe4.IFCWINDOWTYPE' IN TYPEOF(SELF\\IfcPropertySetDefinition.DefinesType[1]))"
 	}
 	return true, ""
 }
 
 func whereIFCWINDOWTYPE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "<>"), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "<>") }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWindowTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcElementType"), "ElementType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : (PredefinedType <> IfcWindowTypeEnum.USERDEFINED) OR\r\n ((PredefinedType = IfcWindowTypeEnum.USERDEFINED) AND EXISTS (SELF\\IfcElementType.ElementType))"
 	}
 	return true, ""
 }
 
 func whereIFCWORKCALENDAR_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkCalendarTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkCalendarTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkCalendarTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkCalendarTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR (PredefinedType <> IfcWorkCalendarTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcWorkCalendarTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCWORKPLAN_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkPlanTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkPlanTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkPlanTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkPlanTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR (PredefinedType <> IfcWorkPlanTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcWorkPlanTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCWORKSCHEDULE_CorrectPredefinedType(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvOr(wvNot(wvExists(ec.Attr("PredefinedType"))), wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkScheduleTypeEnum"), "USERDEFINED", 0), "<>")), wvAnd(wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkScheduleTypeEnum"), "USERDEFINED", 0), "="), wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvNot(wvExists(ec.Attr("PredefinedType"))) }, func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkScheduleTypeEnum"), "USERDEFINED", 0), "<>") }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.Attr("PredefinedType"), ec.QualAttr(wvFromEnumType("IfcWorkScheduleTypeEnum"), "USERDEFINED", 0), "=") }, func() WhereValue { return wvExists(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcObject"), "ObjectType", 0)) }) }))) {
 		return false, "WHERE CorrectPredefinedType: CorrectPredefinedType : NOT(EXISTS(PredefinedType)) OR (PredefinedType <> IfcWorkScheduleTypeEnum.USERDEFINED) OR\r\n((PredefinedType = IfcWorkScheduleTypeEnum.USERDEFINED) AND EXISTS(SELF\\IfcObject.ObjectType))"
 	}
 	return true, ""
 }
 
 func whereIFCZONE_WR1(ec *EntityWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcGroup"), "IsGroupedBy", 0)), parseLiteralNumber("0"), "="), wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcGroup"), "IsGroupedBy", 0), 1), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvNot(wvOr(wvOr(wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCZONE"), wvTypeOf(temp)), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACE"), wvTypeOf(temp))), wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALZONE"), wvTypeOf(temp)))) })), parseLiteralNumber("0"), "=")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcGroup"), "IsGroupedBy", 0)), parseLiteralNumber("0"), "=") }, func() WhereValue { return wvCompareRel(wvSizeOf(wvQuery(ec.QualAttr(ec.QualIndex(ec.QualAttr(ec.QualEntity(ec.Self(), "IfcGroup"), "IsGroupedBy", 0), 1), "RelatedObjects", 0), func(temp WhereValue) WhereValue { return wvNot(ec.WvOrLazy(func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCZONE"), wvTypeOf(temp)) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPACE"), wvTypeOf(temp)) }) }, func() WhereValue { return wvIn(wvFromString("IFC4X3_DEV_73740fe4.IFCSPATIALZONE"), wvTypeOf(temp)) })) })), parseLiteralNumber("0"), "=") }))) {
 		return false, "WHERE WR1: WR1 : (SIZEOF(SELF\\IfcGroup.IsGroupedBy) = 0) OR\r\n (SIZEOF (QUERY (temp <* SELF\\IfcGroup.IsGroupedBy[1].RelatedObjects |  \r\n  NOT(('IFC4X3_DEV_73740fe4.IFCZONE' IN TYPEOF(temp)) OR \r\n  ('IFC4X3_DEV_73740fe4.IFCSPACE' IN TYPEOF(temp)) OR\r\n  ('IFC4X3_DEV_73740fe4.IFCSPATIALZONE' IN TYPEOF(temp))\r\n ))) = 0)"
 	}
 	return true, ""

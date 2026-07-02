@@ -8,9 +8,7 @@ import (
 )
 
 const (
-	StepFile__Start = iota
-	StepFile__Stop
-	EXCHANGE_FILE__Start
+	EXCHANGE_FILE__Start = iota
 	EXCHANGE_FILE__Stop
 	HEADER_SECTION__Start
 	HEADER_SECTION__Stop
@@ -54,8 +52,6 @@ const (
 	SIMPLE_RECORD__Stop
 	SUBSUPER_RECORD__Start
 	SUBSUPER_RECORD__Stop
-	StepFile__Basic_0
-	StepFile__Basic_1
 	EXCHANGE_FILE_ISODash10303Dash21Semicolon
 	EXCHANGE_FILE__Basic_0
 	EXCHANGE_FILE__Basic_1
@@ -205,9 +201,7 @@ func ATN() *parser.RuntimeATN {
 	return atn
 }
 func BuildATN() *parser.RuntimeATN {
-	states := make([]*parser.RuntimeATNState, 185)
-	states[StepFile__Start] = parser.NewATNState(StepFile__Start, parser.ATNRuleStart, true)
-	states[StepFile__Stop] = parser.NewATNState(StepFile__Stop, parser.ATNRuleStop, false)
+	states := make([]*parser.RuntimeATNState, 181)
 	states[EXCHANGE_FILE__Start] = parser.NewATNState(EXCHANGE_FILE__Start, parser.ATNRuleStart, true)
 	states[EXCHANGE_FILE__Stop] = parser.NewATNState(EXCHANGE_FILE__Stop, parser.ATNRuleStop, false)
 	states[HEADER_SECTION__Start] = parser.NewATNState(HEADER_SECTION__Start, parser.ATNRuleStart, true)
@@ -252,8 +246,6 @@ func BuildATN() *parser.RuntimeATN {
 	states[SIMPLE_RECORD__Stop] = parser.NewATNState(SIMPLE_RECORD__Stop, parser.ATNRuleStop, false)
 	states[SUBSUPER_RECORD__Start] = parser.NewATNState(SUBSUPER_RECORD__Start, parser.ATNRuleStart, true)
 	states[SUBSUPER_RECORD__Stop] = parser.NewATNState(SUBSUPER_RECORD__Stop, parser.ATNRuleStop, false)
-	states[StepFile__Basic_0] = parser.NewATNState(StepFile__Basic_0, parser.ATNBasic, true)
-	states[StepFile__Basic_1] = parser.NewATNState(StepFile__Basic_1, parser.ATNBasic, true)
 	states[EXCHANGE_FILE_ISODash10303Dash21Semicolon] = parser.NewATNState(EXCHANGE_FILE_ISODash10303Dash21Semicolon, parser.ATNBasic, false)
 	states[EXCHANGE_FILE__Basic_0] = parser.NewATNState(EXCHANGE_FILE__Basic_0, parser.ATNBasic, true)
 	states[EXCHANGE_FILE__Basic_1] = parser.NewATNState(EXCHANGE_FILE__Basic_1, parser.ATNBasic, true)
@@ -391,9 +383,6 @@ func BuildATN() *parser.RuntimeATN {
 	states[SUBSUPER_RECORD__LoopEnd] = parser.NewATNState(SUBSUPER_RECORD__LoopEnd, parser.ATNLoopEnd, true)
 	states[SUBSUPER_RECORD_RightParen] = parser.NewATNState(SUBSUPER_RECORD_RightParen, parser.ATNBasic, false)
 	states[SUBSUPER_RECORD__Basic_2] = parser.NewATNState(SUBSUPER_RECORD__Basic_2, parser.ATNBasic, true)
-	states[StepFile__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[StepFile__Basic_0]),
-	)
 	states[EXCHANGE_FILE__Start].AppendTransitions(
 		parser.NewEpsilonTransition(states[EXCHANGE_FILE_ISODash10303Dash21Semicolon]),
 	)
@@ -459,12 +448,6 @@ func BuildATN() *parser.RuntimeATN {
 	)
 	states[SUBSUPER_RECORD__Start].AppendTransitions(
 		parser.NewEpsilonTransition(states[SUBSUPER_RECORD_LeftParen]),
-	)
-	states[StepFile__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[EXCHANGE_FILE__Start], states[StepFile__Basic_1], nil),
-	)
-	states[StepFile__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[StepFile__Stop]),
 	)
 	states[EXCHANGE_FILE_ISODash10303Dash21Semicolon].AppendTransitions(
 		parser.NewAtomTransition(states[EXCHANGE_FILE__Basic_0], Keyword_ISODash10303Dash21Semicolon, nil),

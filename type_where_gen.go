@@ -38,14 +38,14 @@ func typeWhereIfcCompoundPlaneAngleMeasure_SecondsInRange(ec *TypeWhereEval) (bo
 }
 
 func typeWhereIfcCompoundPlaneAngleMeasure_MicrosecondsInRange(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvCompareRel(wvSizeOf(ec.Self()), parseLiteralNumber("3"), "="), wvCompareRel(wvAbs(ec.QualIndex(ec.Self(), 4)), parseLiteralNumber("1000000"), "<")))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Self()), parseLiteralNumber("3"), "=") }, func() WhereValue { return wvCompareRel(wvAbs(ec.QualIndex(ec.Self(), 4)), parseLiteralNumber("1000000"), "<") }))) {
 		return false, "WHERE MicrosecondsInRange: MicrosecondsInRange : (SIZEOF(SELF) = 3) OR (ABS(SELF[4]) < 1000000)"
 	}
 	return true, ""
 }
 
 func typeWhereIfcCompoundPlaneAngleMeasure_ConsistentSign(ec *TypeWhereEval) (bool, string) {
-	if !(wvTruthy(wvOr(wvAnd(wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Self(), 1), parseLiteralNumber("0"), ">="), wvCompareRel(ec.QualIndex(ec.Self(), 2), parseLiteralNumber("0"), ">=")), wvCompareRel(ec.QualIndex(ec.Self(), 3), parseLiteralNumber("0"), ">=")), wvOr(wvCompareRel(wvSizeOf(ec.Self()), parseLiteralNumber("3"), "="), wvCompareRel(ec.QualIndex(ec.Self(), 4), parseLiteralNumber("0"), ">="))), wvAnd(wvAnd(wvAnd(wvCompareRel(ec.QualIndex(ec.Self(), 1), parseLiteralNumber("0"), "<="), wvCompareRel(ec.QualIndex(ec.Self(), 2), parseLiteralNumber("0"), "<=")), wvCompareRel(ec.QualIndex(ec.Self(), 3), parseLiteralNumber("0"), "<=")), wvOr(wvCompareRel(wvSizeOf(ec.Self()), parseLiteralNumber("3"), "="), wvCompareRel(ec.QualIndex(ec.Self(), 4), parseLiteralNumber("0"), "<=")))))) {
+	if !(wvTruthy(ec.WvOrLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 1), parseLiteralNumber("0"), ">=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 2), parseLiteralNumber("0"), ">=") }) }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 3), parseLiteralNumber("0"), ">=") }) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Self()), parseLiteralNumber("3"), "=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 4), parseLiteralNumber("0"), ">=") }) }) }, func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return ec.WvAndLazy(func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 1), parseLiteralNumber("0"), "<=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 2), parseLiteralNumber("0"), "<=") }) }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 3), parseLiteralNumber("0"), "<=") }) }, func() WhereValue { return ec.WvOrLazy(func() WhereValue { return wvCompareRel(wvSizeOf(ec.Self()), parseLiteralNumber("3"), "=") }, func() WhereValue { return wvCompareRel(ec.QualIndex(ec.Self(), 4), parseLiteralNumber("0"), "<=") }) }) }))) {
 		return false, "WHERE ConsistentSign: ConsistentSign : ((SELF[1] >= 0) AND (SELF[2] >= 0) AND (SELF[3] >= 0) AND ((SIZEOF(SELF) = 3) OR (SELF[4] >= 0)))\r\nOR\r\n((SELF[1] <= 0) AND (SELF[2] <= 0) AND (SELF[3] <= 0) AND ((SIZEOF(SELF) = 3) OR (SELF[4] <= 0)))"
 	}
 	return true, ""

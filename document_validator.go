@@ -3,6 +3,7 @@ package ifc
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/util/service"
@@ -23,7 +24,7 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 	pop := BuildPopulation(ctx, doc)
 	ctx = WithPopulation(ctx, pop)
 	diags := v.inner.Validate(ctx, doc, level)
-	if doc != nil && doc.Root != nil {
+	if doc != nil && doc.Root != nil && !documentHasParseErrors(doc) {
 		var accept core.ValidationAcceptor = func(d *core.Diagnostic) {
 			diags = append(diags, d)
 		}
@@ -31,6 +32,30 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 		validateUniqueRules(ctx, accept)
 	}
 	return diags
+}
+
+func documentHasParseErrors(doc *core.Document) bool {
+	return len(doc.LexerErrors) > 0 || len(doc.ParserErrors) > 0
+}
+
+func validationAnchorNode(root core.AstNode) (core.AstNode, *core.Token) {
+	file, ok := root.(EXCHANGE_FILE)
+	if !ok || file == nil {
+		return root, nil
+	}
+	header := file.HeaderSection()
+	if header == nil {
+		return root, nil
+	}
+	for _, entity := range header.HeaderEntityList() {
+		if entity == nil {
+			continue
+		}
+		if strings.EqualFold(entity.Keyword(), "FILE_SCHEMA") {
+			return entity, entity.KeywordToken()
+		}
+	}
+	return root, nil
 }
 
 func validateEntityWhereRules(

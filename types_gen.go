@@ -6,65 +6,6 @@ import (
 	core "typefox.dev/fastbelt"
 )
 
-type StepFile interface {
-	core.AstNode
-
-	IsStepFile()
-	File() EXCHANGE_FILE
-	SetFile(value EXCHANGE_FILE)
-}
-
-func NewStepFile() StepFile {
-	return &StepFileImpl{
-		AstNodeBase:  core.NewAstNode(),
-		StepFileData: NewStepFileData(),
-	}
-}
-
-type StepFileData struct {
-	file EXCHANGE_FILE
-}
-
-func NewStepFileData() StepFileData {
-	return StepFileData{}
-}
-
-func (i *StepFileData) IsStepFile() {}
-
-func (i *StepFileData) ForEachNode(fn func(core.AstNode)) {
-	if i.file != nil {
-		fn(i.file)
-	}
-}
-
-func (i *StepFileData) ForEachReference(fn func(core.UntypedReference)) {
-}
-
-func (i *StepFileData) File() EXCHANGE_FILE {
-	if i != nil && i.file != nil {
-		return i.file
-	} else {
-		return nil
-	}
-}
-
-func (i *StepFileData) SetFile(value EXCHANGE_FILE) {
-	i.file = value
-}
-
-type StepFileImpl struct {
-	core.AstNodeBase
-	StepFileData
-}
-
-func (i *StepFileImpl) ForEachNode(fn func(core.AstNode)) {
-	i.StepFileData.ForEachNode(fn)
-}
-
-func (i *StepFileImpl) ForEachReference(fn func(core.UntypedReference)) {
-	i.StepFileData.ForEachReference(fn)
-}
-
 type EXCHANGE_FILE interface {
 	core.AstNode
 
@@ -1565,7 +1506,6 @@ var IfcSyntheticFactories = map[string]func() core.AstNode{
 	"SIMPLE_RECORD":           func() core.AstNode { return NewSIMPLE_RECORD() },
 	"STRING_LITERAL":          func() core.AstNode { return NewSTRING_LITERAL() },
 	"SUBSUPER_RECORD":         func() core.AstNode { return NewSUBSUPER_RECORD() },
-	"StepFile":                func() core.AstNode { return NewStepFile() },
 	"TYPED_PARAMETER":         func() core.AstNode { return NewTYPED_PARAMETER() },
 	"UNTYPED_PARAMETER":       func() core.AstNode { return NewUNTYPED_PARAMETER() },
 }

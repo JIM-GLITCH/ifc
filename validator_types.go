@@ -309,17 +309,7 @@ func validateEntityReference(
 	pop := PopulationFromContext(ctx)
 	inst := resolveEntityReference(ctx, pop, param)
 	if inst == nil {
-		text := strings.TrimSpace(ref.Text())
-		if text != "" {
-			info := parameterInfoFrom(param)
-			opts := append(diagnosticTokenOptions(info.token), core.WithCode(evalUnknownCode), core.WithReference(ref))
-			accept(core.NewDiagnostic(
-				core.SeverityError,
-				fmt.Sprintf("Unresolved entity reference %s", text),
-				owner,
-				opts...,
-			))
-		}
+		// Unresolved # references are reported by the fastbelt linker.
 		return
 	}
 	actualStepName, ok := instanceStepName(inst)

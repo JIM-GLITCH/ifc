@@ -4,14 +4,7 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
-
-### Changed
-
-- **`ifc-eval-unknown`** — evaluation failures (unresolved `#` references, parameter conversion failures, DERIVE errors, UNIQUE key failures) now report `ifc-eval-unknown` instead of silently skipping. Optional `$` / absent values still skip Type WHERE as before.
-- Entity WHERE / Global RULE collect real evaluation failures during rule checks; EXPRESS type-narrowing paths (`QualEntity` mismatch, empty inverse lists) remain silent `unknown` for Kleene logic.
-
-## [0.0.7] - 2026-06-30
+## [0.0.7] - 2026-06-26
 
 ### Added
 
@@ -25,7 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Aggregate `OF UNIQUE` element uniqueness (`ifc-unique-aggregate`).
 - **Aggregate bounds** — validate declared sizes such as `LIST [1:3]`, `SET [0:?]`, `ARRAY [1:2]` (`ifc-aggregate-bounds`).
 - **Derived attribute checks** — `*` on DERIVE attributes: Type WHERE and aggregate bounds run on computed DERIVE values where evaluators exist.
-- Tests: `unique_rule_test.go`, `aggregate_bounds_test.go`, `validator_where_type_test.go`, schema function regression tests.
+- **`ifc-eval-unknown`** — report evaluation failures (parameter conversion, DERIVE errors, UNIQUE key failures) instead of silently skipping; documented in README diagnostic table.
+- Tests: `unique_rule_test.go`, `aggregate_bounds_test.go`, `validator_where_type_test.go`, `eval_unknown_test.go`, schema function regression tests.
 
 ### Changed
 
@@ -33,12 +27,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **EXPRESS `?` and `$`** — compile to `wvAbsentVal()` (was `unknown`); aligns with absent-parameter semantics in WHERE/DERIVE.
 - **WHERE three-valued logic** — `unknown`/`absent` are falsy in `wvTruthy`; `wvAnd`/`wvOr`/`wvXor`/`wvNot` use Kleene logic so indeterminate conditions no longer pass by default.
 - **Schema function codegen** — emit all 48 IFC schema functions (including unreferenced ones such as `IfcVectorSum`); 192 DERIVE slots with 50 shared evaluators.
-- **README** — documents full EXPRESS validation coverage, diagnostic codes, and updated limitations (runtime unknown handling, not a geometry/IDS cert tool).
+- **Unresolved `#` references** — reported by the linker only (`Could not resolve reference to '#…'`); validator no longer emits duplicate `ifc-eval-unknown` for the same unresolved reference.
+- Entity WHERE / Global RULE collect real evaluation failures during rule checks; EXPRESS type-narrowing paths (`QualEntity` mismatch, empty inverse lists) remain silent `unknown` for Kleene logic.
+- **README** — documents full EXPRESS validation coverage, diagnostic codes, and updated limitations (eval-unknown vs linker, not a geometry/IDS cert tool).
 
 ### Fixed
 
 - Schema function codegen: `TYPEOF` / `IN TYPEOF` no longer miscompiled to entity subtype shortcuts; `IfcScalarTimesVector`, `IfcUniquePropertySetNames`, and similar functions evaluate correctly.
 - `wvEntityInTypeOf` fallback for record-typed WHERE values.
+- **QualEntity** — no longer falls back to `SELF` before checking the parameter entity instance; fixes false `ifc-entity-where` on e.g. `#150` / `UniquePropertySetNames`.
+- **UNIQUE `GlobalId`** — case-sensitive key comparison; fixes false `ifc-unique` when only letter case differs (e.g. `#64609` / `#65761`).
 
 ## [0.0.6] - 2026-06-29
 

@@ -156,6 +156,9 @@ func validateTypeWhereConstraints(
 	pop := PopulationFromContext(ctx)
 	value, convOK := parameterToWhereValueCtx(ctx, pop, param)
 	if !convOK {
+		if parameterBlockedByUnresolvedEntityRef(ctx, pop, param) {
+			return
+		}
 		acceptEvalUnknown(accept, diagnosticNode, token, parameterEvalFailureReason(ctx, pop, param))
 		return
 	}
@@ -176,20 +179,28 @@ func validateDerivedParameterChecks(
 	if !ok || stepName == "" || attrName == "" {
 		return
 	}
+	token := info.token
+	if token == nil {
+		token = inst.NameToken()
+	}
+	diagnosticNode := info.node
+	if diagnosticNode == nil {
+		diagnosticNode = inst
+	}
 	pop := PopulationFromContext(ctx)
 	ec := NewEntityWhereEval(ctx, stepName, inst, instanceParams(inst), pop)
 	derived := evalDerivedAttr(ec, inst, attrName)
 	notes := ec.takeEvalUnknowns()
-	acceptEvalUnknowns(accept, info.node, info.token, notes)
+	acceptEvalUnknowns(accept, diagnosticNode, token, notes)
 	if derived.kind == wvKindUnknown {
 		if len(notes) == 0 {
-			acceptEvalUnknown(accept, info.node, info.token, fmt.Sprintf("Cannot evaluate DERIVE attribute %q on %s", attrName, stepName))
+			acceptEvalUnknown(accept, diagnosticNode, token, fmt.Sprintf("Cannot evaluate DERIVE attribute %q on %s", attrName, stepName))
 		}
 		return
 	}
-	validateTypeWhereOnWhereValue(attr, derived, info.node, info.token, accept)
+	validateTypeWhereOnWhereValue(attr, derived, diagnosticNode, token, accept)
 	if derived.kind == wvKindList {
-		validateAggregateBoundsCount(info.node, attr, len(derived.list), accept)
+		validateAggregateBoundsCount(diagnosticNode, attr, len(derived.list), accept)
 	}
 }
 
