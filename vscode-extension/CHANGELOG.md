@@ -4,6 +4,25 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.8] - 2026-06-26
+
+### Added
+
+- **Labeled `ifc-eval-unknown` for WHERE / RULE** — Entity WHERE and Global RULE evaluation failures include the rule name in the message (e.g. `Entity "IFCBUILDING" WHERE "UniquePropertySetNames": …`, `Global RULE "IfcSingleProjectContext": …`) for easier filtering in the Problems panel.
+- **Lazy WHERE codegen** — generated entity WHERE rules use `WvOrLazy` / `WvAndLazy` so OR/AND branches stop after the first eval-unknown instead of evaluating the rest of the expression.
+- Tests: `where_lazy_test.go`, `eval_unknown_range_test.go`, `subcontext_diag_test.go`.
+
+### Changed
+
+- **Entity WHERE / Global RULE** — stop checking further rules in the same chain after the first eval-unknown (per entity instance or global rule pass).
+- **Global RULE diagnostics** — eval-unknown side effects are no longer re-reported on the entire document root; anchors use `FILE_SCHEMA`, entity `#id`, or parameter tokens.
+- **`ifc-eval-unknown` anchoring** — skip full-document root spans; prefer parameter tokens and entity instance name tokens so squiggles land on the affected `#id` or attribute.
+- **Parse-error files** — skip Global RULE and UNIQUE validation when the file has lexer/parser errors (reduces cascading noise on broken STEP text).
+
+### Fixed
+
+- **Full-file red squiggles** — `ifc-eval-unknown` on parse-broken files no longer spans the entire `.ifc` file when global rules or mis-anchored diagnostics would previously paint line 1 through end of file.
+
 ## [0.0.7] - 2026-06-26
 
 ### Added

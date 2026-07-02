@@ -59,6 +59,10 @@ Validation goes beyond STEP syntax and attribute typing — it evaluates **EXPRE
 
 Optional `$` values are treated as absent (no type-level WHERE on missing data). Derived `*` values are checked using computed DERIVE results where evaluators are available.
 
+WHERE and RULE evaluation uses **lazy short-circuiting**: once a branch cannot be evaluated, later OR/AND branches in the same rule are skipped, and further WHERE rules on the same entity may be skipped when an eval-unknown is already recorded.
+
+Diagnostics are **anchored** to the most specific location available: derived `*` tokens, other parameter tokens, or the declaring entity `#id`. Related entities in a reference chain (e.g. a parent `IFCGEOMETRICREPRESENTATIONCONTEXT` and its `IFCGEOMETRICREPRESENTATIONSUBCONTEXT` children) may each report issues so you can see the full impact radius.
+
 Diagnostic codes (shown in the Problems panel):
 
 | Code | Meaning |
@@ -78,7 +82,7 @@ Diagnostic codes (shown in the Problems panel):
 | `ifc-unique` | Violates an entity UNIQUE constraint |
 | `ifc-unique-aggregate` | Duplicate element in a `UNIQUE` aggregate |
 | `ifc-aggregate-bounds` | Aggregate element count outside declared `[low:high]` bounds |
-| `ifc-eval-unknown` | Expression or constraint check could not be evaluated (e.g. DERIVE failure, parameter conversion failure) |
+| `ifc-eval-unknown` | Expression or constraint check could not be evaluated (e.g. DERIVE failure, parameter conversion failure). Entity WHERE / Global RULE messages include the rule label when applicable. |
 
 ## Requirements
 
@@ -106,6 +110,7 @@ After installation, open any `.ifc` file to start using syntax highlighting and 
 
 - Support targets the ISO 10303-21 physical file format (`.ifc` text files). Other IFC representations (e.g. IFC-XML, IFC-ZIP) are not covered.
 - Validation uses a compiled **IFC4X3** schema; entities or types from other schema releases may not be recognized.
-- **DERIVE** codegen covers all schema DERIVE slots; failed DERIVE/type-WHERE evaluation reports `ifc-eval-unknown` instead of silently skipping. Unresolved `#` references are reported by the linker only. Optional `$` / EXPRESS absent values still skip checks.
+- **DERIVE** codegen covers all schema DERIVE slots; failed DERIVE/type-WHERE evaluation reports `ifc-eval-unknown` instead of silently skipping. Unresolved `#` references are reported by the linker only (not duplicated as eval-unknown). Optional `$` / EXPRESS absent values still skip checks.
+- Files with **parse errors** skip Global RULE and UNIQUE validation; remaining EXPRESS checks may still report eval-unknown on affected entities and parameters.
 - This is an **EXPRESS / schema** validator, not a full BIM certification tool: no geometry kernel, IDS/MVD filtering, or clash detection.
 - The extension focuses on single-file editing; cross-file workspace analysis depends on how your files are organized.

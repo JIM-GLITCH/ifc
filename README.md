@@ -1,15 +1,18 @@
 # Ifc
 
-This repository was generated with [fastbelt](https://github.com/TypeFox/fastbelt) using `fastbelt scaffold`.
+IFC (`.ifc`) language server and VS Code extension built on [fastbelt](https://github.com/TypeFox/fastbelt). Validates ISO 10303-21 STEP physical files against the **IFC4X3** EXPRESS schema: entity/type WHERE rules, global RULE, UNIQUE constraints, aggregate bounds, and DERIVE attribute checks.
 
-It includes:
+**Current extension release:** `0.0.8` — see [`vscode-extension/CHANGELOG.md`](vscode-extension/CHANGELOG.md) and [`vscode-extension/README.md`](vscode-extension/README.md) for features, diagnostic codes, and packaging.
 
-- **`ifc.fb`** — minimal fastbelt grammar (`IfcModel`).
+This repository includes:
+
+- **`ifc.fb`** — ISO 10303-21 STEP physical file grammar.
 - **`gen.go`** — `//go:generate` running `go tool typefox.dev/fastbelt/cmd/fastbelt generate` to emit `*_gen.go`.
+- **`schema_gen.go`**, **`entity_where_gen.go`**, **`derived_gen.go`**, etc. — EXPRESS schema and constraint codegen (via `npm run generate`).
 - **`services.go`** — LSP service wiring (document, workspace, linking, generated lexer/parser).
 - **`cmd/ifc-lsp`** — language server entrypoint (stdio JSON-RPC).
-- **`vscode-extension/`** — VS Code language client + TextMate grammar skeleton.
-- **Root `package.json`** — npm workspace so you can build and package the extension from the repo root.
+- **`vscode-extension/`** — VS Code language client, TextMate grammar, and packaged LSP binary.
+- **Root `package.json`** — npm workspace for building and packaging the extension from the repo root.
 
 ## Requirements
 
