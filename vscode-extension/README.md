@@ -2,6 +2,8 @@
 
 VS Code extension for editing **IFC physical files** (`.ifc`) — the text-based exchange format defined by [ISO 10303-21](https://www.iso.org/standard/63141.html), commonly used in building information modeling (BIM) and other STEP-based workflows.
 
+**Core capability: full EXPRESS WHERE validation.** Most `.ifc` editors stop at syntax or attribute typing. This extension evaluates the **IFC4X3 EXPRESS schema** in depth — **752 entity WHERE rules**, type WHERE, Global RULE, UNIQUE constraints, and DERIVE expressions — so constraint violations surface inline in the Problems panel as you edit.
+
 Open any `.ifc` file and the extension activates automatically. No extra configuration is required.
 
 ## Features
@@ -32,7 +34,7 @@ A built-in language server analyzes your file as you edit and integrates with st
 
 | Feature | What it does |
 |---------|----------------|
-| **Diagnostics** | Syntax errors plus **EXPRESS schema validation** inline and in the Problems panel |
+| **Diagnostics** | Syntax errors plus **EXPRESS WHERE validation** — entity/type WHERE, Global RULE, UNIQUE, and DERIVE — inline and in the Problems panel |
 | **Go to Definition** | Jump to the entity instance referenced by a `#` id |
 | **Find All References** | See every place an entity instance is used in the file |
 | **Completion** | Context-aware suggestions based on the ISO 10303-21 grammar |
