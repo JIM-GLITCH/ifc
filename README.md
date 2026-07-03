@@ -2,7 +2,7 @@
 
 IFC (`.ifc`) language server and VS Code extension built on [fastbelt](https://github.com/TypeFox/fastbelt). Validates ISO 10303-21 STEP physical files against the **IFC4X3** EXPRESS schema: entity/type WHERE rules, global RULE, UNIQUE constraints, aggregate bounds, and DERIVE attribute checks.
 
-**Current extension release:** `0.0.9` — see [`vscode-extension/CHANGELOG.md`](vscode-extension/CHANGELOG.md) and [`vscode-extension/README.md`](vscode-extension/README.md) for features, diagnostic codes, and packaging.
+**Current extension release:** `0.0.9` — validation tier toggles (Structure / Types / Rules) in the status bar, per-document eval cache, and configuration sync with the language server. See [`vscode-extension/CHANGELOG.md`](vscode-extension/CHANGELOG.md) and [`vscode-extension/README.md`](vscode-extension/README.md) for details, diagnostic codes, and packaging.
 
 This repository includes:
 

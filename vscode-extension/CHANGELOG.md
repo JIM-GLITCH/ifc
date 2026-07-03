@@ -16,14 +16,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Validation layers consolidated from eight granular toggles to **three tiers**: Structure, Types, and Rules. Legacy eight-key settings are still read when the new keys are absent.
-- Extension README documents the status bar, settings keys, and validation layer table.
+- **Per-document eval cache** — DERIVE and attribute `WhereValue` results are cached for the duration of a validation pass, so Types and Rules layers (and repeated derived `*` on the same entity) do not recompute the same attributes or parameter conversions. EXPRESS inverse relations are indexed once in the population pass (not re-scanned during WHERE evaluation).
+- Extension README documents the status bar, settings keys, validation tiers, and performance notes.
 
 ### Fixed
 
 - Validation layer toggles now take effect immediately: `workspace/didChangeConfiguration` settings from VS Code are parsed correctly when wrapped as `{ ifc: { validation: … } }`, and the extension explicitly notifies the language server on `ifc.validation` changes.
-- **Per-document eval cache** — DERIVE and attribute `WhereValue` results are cached for the duration of a validation pass, so Types and Rules layers (and repeated `*` on the same entity) do not recompute the same derived attributes or parameter conversions.
 
-## [0.0.8] - 2026-06-26
+## [0.0.8] - 2026-07-02
 
 ### Added
 
@@ -42,7 +42,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Full-file red squiggles** — `ifc-eval-unknown` on parse-broken files no longer spans the entire `.ifc` file when global rules or mis-anchored diagnostics would previously paint line 1 through end of file.
 
-## [0.0.7] - 2026-06-26
+## [0.0.7] - 2026-07-01
 
 ### Added
 
@@ -87,7 +87,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Extension version: `0.0.5` → `0.0.6`.
 - Updated `README.md` with initial schema validation section and diagnostic codes.
 
-## [0.0.5] - 2026-06-28 / 2026-06-29
+## [0.0.5] - 2026-06-28
 
 ### Added
 
