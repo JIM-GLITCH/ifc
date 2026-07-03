@@ -357,13 +357,20 @@ func validateParameterValue(
 	position int,
 	accept core.ValidationAcceptor,
 ) {
+	settings := ValidationSettingsFromContext(ctx)
 	if typed, ok := param.(TYPED_PARAMETER); ok {
-		validateTypedParameter(ctx, owner, attr, typed, position, accept)
+		if settings.Structure {
+			validateTypedParameter(ctx, owner, attr, typed, position, accept)
+		}
 		return
 	}
 
-	validateParameterValueCore(ctx, owner, attr, param, position, accept)
-	validateTypeWhereForParameter(ctx, owner, stepName, attrName, attr, param, accept)
+	if settings.Structure {
+		validateParameterValueCore(ctx, owner, attr, param, position, accept)
+	}
+	if settings.Types {
+		validateTypeWhereForParameter(ctx, owner, stepName, attrName, attr, param, accept)
+	}
 }
 
 func validateParameterValueCore(
@@ -374,6 +381,7 @@ func validateParameterValueCore(
 	position int,
 	accept core.ValidationAcceptor,
 ) {
+	settings := ValidationSettingsFromContext(ctx)
 	info := parameterInfoFrom(param)
 	diagnosticNode := info.node
 	if diagnosticNode == nil {
@@ -381,6 +389,9 @@ func validateParameterValueCore(
 	}
 	if info.kind == paramKindOmitted {
 		if attr.Derived {
+			return
+		}
+		if !settings.Structure {
 			return
 		}
 		opts := append(diagnosticTokenOptions(info.token), core.WithCode("ifc-param-derived"))
@@ -393,6 +404,9 @@ func validateParameterValueCore(
 		return
 	}
 	if info.kind == paramKindUnset {
+		if !settings.Structure {
+			return
+		}
 		if !attr.Optional {
 			opts := append(diagnosticTokenOptions(info.token), core.WithCode("ifc-param-required"))
 			accept(core.NewDiagnostic(
@@ -402,6 +416,9 @@ func validateParameterValueCore(
 				opts...,
 			))
 		}
+		return
+	}
+	if !settings.Structure {
 		return
 	}
 	if !parameterKindAllowed(attr, info.kind) {

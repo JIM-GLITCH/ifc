@@ -7,7 +7,11 @@ import (
 )
 
 func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeyword string, keywordToken *core.Token, params []PARAMETER, accept core.ValidationAcceptor) {
-	def, ok := validateEntityName(owner, recordKeyword, keywordToken, accept)
+	settings := ValidationSettingsFromContext(ctx)
+	if !settings.Structure && !settings.Types && !settings.Rules {
+		return
+	}
+	def, ok := validateEntityName(ctx, owner, recordKeyword, keywordToken, accept)
 	if !ok {
 		return
 	}
@@ -17,7 +21,11 @@ func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeywo
 	validateEntityWhereConstraints(ctx, owner, recordKeyword, params, accept)
 }
 
-func validateEntityName(owner core.AstNode, recordKeyword string, keywordToken *core.Token, accept core.ValidationAcceptor) (EntityDef, bool) {
+func validateEntityName(ctx context.Context, owner core.AstNode, recordKeyword string, keywordToken *core.Token, accept core.ValidationAcceptor) (EntityDef, bool) {
+	if !validationEnabled(ctx, LayerStepEncoding) {
+		def, ok := LookupEntity(recordKeyword)
+		return def, ok
+	}
 	def, ok := LookupEntity(recordKeyword)
 	if !ok {
 		accept(core.NewDiagnostic(
@@ -42,17 +50,22 @@ func validateEntityName(owner core.AstNode, recordKeyword string, keywordToken *
 }
 
 func validateEntityParameters(ctx context.Context, owner core.AstNode, def EntityDef, params []PARAMETER, keywordToken *core.Token, accept core.ValidationAcceptor) bool {
-	if valid, message := validateParameterCount(def, len(params)); !valid {
-		accept(core.NewDiagnostic(
-			core.SeverityError,
-			message,
-			owner,
-			core.WithToken(keywordToken),
-			core.WithCode("ifc-param-count"),
-		))
-		return false
+	settings := ValidationSettingsFromContext(ctx)
+	if settings.Structure {
+		if valid, message := validateParameterCount(def, len(params)); !valid {
+			accept(core.NewDiagnostic(
+				core.SeverityError,
+				message,
+				owner,
+				core.WithToken(keywordToken),
+				core.WithCode("ifc-param-count"),
+			))
+			return false
+		}
 	}
-	validateParameterTypes(ctx, owner, def, params, accept)
+	if settings.Structure || settings.Types {
+		validateParameterTypes(ctx, owner, def, params, accept)
+	}
 	return true
 }
 

@@ -227,7 +227,23 @@ func (ec *EntityWhereEval) parameterToWhereValue(param PARAMETER) (WhereValue, b
 	return parameterToWhereValueCtx(ec.ctx, ec.pop, param)
 }
 
+func (ec *EntityWhereEval) storeCachedAttr(inst SIMPLE_ENTITY_INSTANCE, name string, value WhereValue) WhereValue {
+	if ec != nil && inst != nil {
+		if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
+			cache.store(inst, name, value)
+		}
+	}
+	return value
+}
+
 func (ec *EntityWhereEval) Attr(name string) WhereValue {
+	if ec.self != nil {
+		if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
+			if v, ok := cache.lookup(ec.self, name); ok {
+				return v
+			}
+		}
+	}
 	if entityHasDerivedAttr(ec.stepName, name) {
 		if ec.self == nil {
 			return ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q: missing entity instance", name))
@@ -242,16 +258,16 @@ func (ec *EntityWhereEval) Attr(name string) WhereValue {
 		return wvUnknownVal()
 	}
 	if idx >= len(ec.params) {
-		return ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q on %s: parameter missing", name, ec.stepName))
+		return ec.storeCachedAttr(ec.self, name, ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q on %s: parameter missing", name, ec.stepName)))
 	}
 	value, ok := ec.parameterToWhereValue(ec.params[idx])
 	if !ok {
 		if parameterBlockedByUnresolvedEntityRef(ec.ctx, ec.pop, ec.params[idx]) {
-			return wvUnknownVal()
+			return ec.storeCachedAttr(ec.self, name, wvUnknownVal())
 		}
-		return ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, ec.params[idx]))
+		return ec.storeCachedAttr(ec.self, name, ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, ec.params[idx])))
 	}
-	return value
+	return ec.storeCachedAttr(ec.self, name, value)
 }
 
 func (ec *EntityWhereEval) Derived(name string) WhereValue {
@@ -329,12 +345,24 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 	if inst == nil {
 		return wvUnknownVal()
 	}
+	if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
+		if cached, ok := cache.lookup(inst, attrName); ok {
+			if index > 0 {
+				return ec.QualIndex(cached, index)
+			}
+			return cached
+		}
+	}
 	step, ok := instanceStepName(inst)
 	if !ok {
 		return wvUnknownVal()
 	}
 	if entityHasDerivedAttr(step, attrName) {
-		return evalDerivedAttr(ec, inst, attrName)
+		attrVal := evalDerivedAttr(ec, inst, attrName)
+		if index > 0 {
+			return ec.QualIndex(attrVal, index)
+		}
+		return attrVal
 	}
 	idx := attrIndex(step, attrName)
 	if idx < 0 {
@@ -345,14 +373,30 @@ func (ec *EntityWhereEval) QualAttr(v WhereValue, attrName string, index int) Wh
 	}
 	params := instanceParams(inst)
 	if idx >= len(params) {
-		return ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q on %s: parameter missing", attrName, step))
+		attrVal := ec.unknown(fmt.Sprintf("Cannot evaluate attribute %q on %s: parameter missing", attrName, step))
+		ec.storeCachedAttr(inst, attrName, attrVal)
+		if index > 0 {
+			return ec.QualIndex(attrVal, index)
+		}
+		return attrVal
 	}
 	value, ok := ec.parameterToWhereValue(params[idx])
 	if !ok {
+		var attrVal WhereValue
 		if parameterBlockedByUnresolvedEntityRef(ec.ctx, ec.pop, params[idx]) {
-			return wvUnknownVal()
+			attrVal = wvUnknownVal()
+		} else {
+			attrVal = ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, params[idx]))
 		}
-		return ec.unknown(parameterEvalFailureReason(ec.ctx, ec.pop, params[idx]))
+		ec.storeCachedAttr(inst, attrName, attrVal)
+		if index > 0 {
+			return ec.QualIndex(attrVal, index)
+		}
+		return attrVal
+	}
+	ec.storeCachedAttr(inst, attrName, value)
+	if index > 0 {
+		return ec.QualIndex(value, index)
 	}
 	return value
 }

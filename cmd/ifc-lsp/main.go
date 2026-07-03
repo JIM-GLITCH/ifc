@@ -9,6 +9,7 @@ import (
 	"log"
 
 	lang "ifc"
+
 	"typefox.dev/fastbelt/server"
 	"typefox.dev/fastbelt/util/service"
 )
@@ -18,6 +19,7 @@ func CreateServices() *service.Container {
 	sc := service.NewContainer()
 	lang.SetupServices(sc)
 	server.SetupDefaultServices(sc)
+	lang.SetupIfcLanguageServer(sc)
 	server.SetupStdioServices(sc)
 	sc.Seal()
 	return sc

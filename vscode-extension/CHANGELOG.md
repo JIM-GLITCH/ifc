@@ -4,6 +4,25 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.9] - 2026-07-03
+
+### Added
+
+- **Validation layer status bar** — when an `.ifc` file is active, the status bar shows `IFC n/3` (enabled validation layers). Click to open a quick pick and toggle each layer on or off.
+- **Settings** — `ifc.validation.structure`, `ifc.validation.types`, and `ifc.validation.rules`. Syntax/linker diagnostics are always reported.
+- **LSP configuration sync** — the language server reads validation settings from `initializationOptions` and `workspace/didChangeConfiguration`, then re-validates open documents.
+- Command **IFC: Toggle Validation Layers** (`ifc.showValidationLayers`).
+
+### Changed
+
+- Validation layers consolidated from eight granular toggles to **three tiers**: Structure, Types, and Rules. Legacy eight-key settings are still read when the new keys are absent.
+- Extension README documents the status bar, settings keys, and validation layer table.
+
+### Fixed
+
+- Validation layer toggles now take effect immediately: `workspace/didChangeConfiguration` settings from VS Code are parsed correctly when wrapped as `{ ifc: { validation: … } }`, and the extension explicitly notifies the language server on `ifc.validation` changes.
+- **Per-document eval cache** — DERIVE and attribute `WhereValue` results are cached for the duration of a validation pass, so Types and Rules layers (and repeated `*` on the same entity) do not recompute the same derived attributes or parameter conversions.
+
 ## [0.0.8] - 2026-06-26
 
 ### Added

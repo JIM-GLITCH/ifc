@@ -6,6 +6,23 @@ import (
 )
 
 func evalDerivedAttr(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE, attrName string) WhereValue {
+	if ec != nil {
+		if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
+			if v, ok := cache.lookup(inst, attrName); ok {
+				return v
+			}
+		}
+	}
+	result := evalDerivedAttrUncached(ec, inst, attrName)
+	if ec != nil {
+		if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
+			cache.store(inst, attrName, result)
+		}
+	}
+	return result
+}
+
+func evalDerivedAttrUncached(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE, attrName string) WhereValue {
 	step, ok := instanceStepName(inst)
 	if !ok {
 		if ec != nil {

@@ -40,6 +40,20 @@ A built-in language server analyzes your file as you edit and integrates with st
 
 Server activity is logged in the **Output** panel under **Ifc Language Server**.
 
+### Validation layer status bar
+
+When an `.ifc` file is the active editor, the status bar shows **`IFC n/3`** — how many of the three validation tiers are enabled. Click it (or run **IFC: Toggle Validation Layers**) to open a quick pick:
+
+| Tier | Setting | What it controls |
+|------|---------|------------------|
+| **Structure** | `ifc.validation.structure` | STEP encoding (`ifc-param-*`), attribute types (`ifc-param-type`, `ifc-entity-type`, `ifc-enum-*`), aggregate bounds, unknown/abstract entity |
+| **Types** | `ifc.validation.types` | Type WHERE (`ifc-type-where`), DERIVE `*` evaluation (`ifc-eval-unknown` on derived attributes) |
+| **Rules** | `ifc.validation.rules` | Entity WHERE (`ifc-entity-where`), Global RULE (`ifc-global-rule`), UNIQUE (`ifc-unique`, `ifc-unique-aggregate`) |
+
+Lexer/parser errors and unresolved `#` linker diagnostics are **always** reported regardless of these toggles. Changing a setting re-validates open `.ifc` files automatically.
+
+You can also edit the same keys under **Settings → Ifc**.
+
 ### EXPRESS schema validation (IFC4 / IFC4X3)
 
 This extension validates `.ifc` files against the **IFC4X3** EXPRESS schema (compiled from the official schema; files declaring `IFC4`, `IFC4X3`, or `IFC4X3_DEV_*` in `FILE_SCHEMA` are accepted).

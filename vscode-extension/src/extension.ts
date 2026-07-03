@@ -5,12 +5,22 @@
 import * as vscode from 'vscode';
 import type { LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node.js';
 import * as path from 'node:path';
-import { LanguageClient, TransportKind } from 'vscode-languageclient/node.js';
+import { DidChangeConfigurationNotification, LanguageClient, TransportKind } from 'vscode-languageclient/node.js';
+import { buildInitializationOptions } from './validationLayers';
+import { registerValidationStatusBar } from './statusBar';
 
 let client: LanguageClient;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+    registerValidationStatusBar(context);
     client = await startLanguageClient(context);
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            if (event.affectsConfiguration('ifc.validation')) {
+                void pushValidationSettingsToServer(client);
+            }
+        })
+    );
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -18,6 +28,14 @@ export function deactivate(): Thenable<void> | undefined {
         return client.stop();
     }
     return undefined;
+}
+
+function pushValidationSettingsToServer(lc: LanguageClient): Thenable<void> {
+    // Send the same shape as initializationOptions; the server also accepts the
+    // vscode-languageclient wrapper { ifc: { validation: ... } }.
+    return lc.sendNotification(DidChangeConfigurationNotification.type, {
+        settings: buildInitializationOptions()
+    });
 }
 
 async function startLanguageClient(context: vscode.ExtensionContext): Promise<LanguageClient> {
@@ -29,11 +47,11 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<La
 
     const clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'ifc' }],
-        // explicitly create an output channel enabling monitoring the LS logs from the beginning in vs code's 'output' view
-        // (by default vs code creates such channels lazily on the first message)
-        outputChannel: vscode.window.createOutputChannel(
-            'Ifc Language Server'
-        )
+        outputChannel: vscode.window.createOutputChannel('Ifc Language Server'),
+        initializationOptions: buildInitializationOptions(),
+        synchronize: {
+            configurationSection: 'ifc'
+        }
     };
     const lc = new LanguageClient(
         'ifc',

@@ -318,11 +318,15 @@ func validateAggregateBoundsCount(
 }
 
 func validateAggregateBounds(
+	ctx context.Context,
 	owner core.AstNode,
 	attr SchemaAttr,
 	list LIST,
 	accept core.ValidationAcceptor,
 ) {
+	if !validationEnabled(ctx, LayerAggregateBounds) {
+		return
+	}
 	validateAggregateBoundsCount(owner, attr, len(list.Parameters()), accept)
 }
 
@@ -333,13 +337,13 @@ func validateAggregateElements(
 	list LIST,
 	accept core.ValidationAcceptor,
 ) {
-	validateAggregateBounds(owner, attr, list, accept)
+	validateAggregateBounds(ctx, owner, attr, list, accept)
 	elementType := aggregateElementTypeName(aggregateExpressionForAttr(attr))
 	if elementType == "" {
 		return
 	}
 	aggExpr := aggregateExpressionForAttr(attr)
-	if aggregateHasUniqueElements(aggExpr) {
+	if aggregateHasUniqueElements(aggExpr) && validationEnabled(ctx, LayerUnique) {
 		validateAggregateUniqueElements(ctx, owner, list, accept)
 	}
 	elementAttr := schemaAttrForTypeName(elementType)

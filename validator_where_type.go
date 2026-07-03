@@ -200,7 +200,9 @@ func validateDerivedParameterChecks(
 	}
 	validateTypeWhereOnWhereValue(attr, derived, diagnosticNode, token, accept)
 	if derived.kind == wvKindList {
-		validateAggregateBoundsCount(diagnosticNode, attr, len(derived.list), accept)
+		if validationEnabled(ctx, LayerAggregateBounds) {
+			validateAggregateBoundsCount(diagnosticNode, attr, len(derived.list), accept)
+		}
 	}
 }
 
@@ -218,7 +220,13 @@ func validateTypeWhereForParameter(
 		return
 	}
 	if info.kind == paramKindOmitted && attr.Derived {
+		if !validationEnabled(ctx, LayerDerived) {
+			return
+		}
 		validateDerivedParameterChecks(ctx, owner, stepName, attrName, attr, param, accept)
+		return
+	}
+	if !validationEnabled(ctx, LayerTypeWhere) {
 		return
 	}
 	validateTypeWhereConstraints(ctx, attr, param, info.node, info.token, accept)

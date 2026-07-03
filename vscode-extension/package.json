@@ -3,7 +3,7 @@
   "publisher": "lilr",
   "displayName": "Ifc",
   "description": "IFC (.ifc) language support for VS Code — syntax highlighting, diagnostics, go-to-definition, and LSP for ISO 10303-21 STEP files in BIM workflows.",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "UNLICENSED",
   "icon": "icon.png",
   "keywords": [
@@ -27,6 +27,33 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "ifc.showValidationLayers",
+        "title": "IFC: Toggle Validation Layers",
+        "category": "IFC"
+      }
+    ],
+    "configuration": {
+      "title": "Ifc",
+      "properties": {
+        "ifc.validation.structure": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate STEP encoding, attribute types, aggregate bounds, and entity keywords."
+        },
+        "ifc.validation.types": {
+          "type": "boolean",
+          "default": true,
+          "description": "Evaluate Type WHERE rules and DERIVE expressions for * attributes."
+        },
+        "ifc.validation.rules": {
+          "type": "boolean",
+          "default": true,
+          "description": "Evaluate entity WHERE rules, Global RULE, and UNIQUE constraints."
+        }
+      }
+    },
     "languages": [
       {
         "id": "ifc",

@@ -12,24 +12,31 @@ import (
 
 type IfcDocumentValidator struct {
 	inner workspace.DocumentValidator
+	sc    *service.Container
 }
 
 func NewIfcDocumentValidator(sc *service.Container) workspace.DocumentValidator {
 	return &IfcDocumentValidator{
 		inner: workspace.NewDefaultDocumentValidator(sc),
+		sc:    sc,
 	}
 }
 
 func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document, level string) []*core.Diagnostic {
 	pop := BuildPopulation(ctx, doc)
 	ctx = WithPopulation(ctx, pop)
+	ctx = WithEntityEvalCache(ctx)
+	settings := ValidationSettingsFromService(v.sc)
+	ctx = WithValidationSettings(ctx, settings)
 	diags := v.inner.Validate(ctx, doc, level)
 	if doc != nil && doc.Root != nil && !documentHasParseErrors(doc) {
 		var accept core.ValidationAcceptor = func(d *core.Diagnostic) {
 			diags = append(diags, d)
 		}
-		validateGlobalRules(ctx, doc.Root, accept)
-		validateUniqueRules(ctx, accept)
+		if settings.Rules {
+			validateGlobalRules(ctx, doc.Root, accept)
+			validateUniqueRules(ctx, accept)
+		}
 	}
 	return diags
 }
@@ -66,6 +73,9 @@ func validateEntityWhereRules(
 	params []PARAMETER,
 	accept core.ValidationAcceptor,
 ) {
+	if !validationEnabled(ctx, LayerEntityWhere) {
+		return
+	}
 	pop := PopulationFromContext(ctx)
 	ok, detail, evalUnknowns := CheckEntityWhereRules(ctx, stepName, self, params, pop)
 	token := self.NameToken()
