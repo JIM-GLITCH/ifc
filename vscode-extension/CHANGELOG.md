@@ -4,6 +4,12 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.11] - 2026-10-22
+
+### Fixed
+
+- **Linux package executable bit** — the bundled language server binary (`dist/server`) now has the Unix executable bit set inside the `linux-x64` VSIX, so it runs on Linux without `EACCES: permission denied`.
+
 ## [0.0.10] - 2026-10-22
 
 ### Added

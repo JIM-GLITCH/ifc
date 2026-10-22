@@ -3,6 +3,7 @@ src/**
 *.map
 esbuild.js
 build-server.js
+fix-vsix-exec.js
 tsconfig.json
 .gitignore
 node_modules/**
