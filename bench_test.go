@@ -146,6 +146,32 @@ func BenchmarkCheckUniqueRules(b *testing.B) {
 	}
 }
 
+// BenchmarkLink measures build phase 2 (symbol tables + reference linking)
+// alone, by resetting a fully built document back to the parsed state and
+// rebuilding it with all validation tiers off. The remaining cost is phases
+// 1-2 plus the tier-off validation walk (population build + AST traversal).
+func BenchmarkLink(b *testing.B) {
+	sc := CreateServices()
+	fixture := fbtest.New(b, sc)
+	raw, err := os.ReadFile("t.ifc")
+	if err != nil {
+		b.Fatal(err)
+	}
+	doc := fixture.Parse(string(raw))
+	lock := service.MustGet[workspace.Lock](sc)
+	builder := service.MustGet[workspace.Builder](sc)
+	ctx := WithValidationSettings(context.Background(), ValidationSettings{})
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		lock.Write(ctx, func(ctx context.Context, downgrade func()) {
+			builder.Reset(doc.Document, core.DocStateParsed)
+			if err := builder.Build(ctx, []*core.Document{doc.Document}, downgrade); err != nil {
+				b.Fatal(err)
+			}
+		})
+	}
+}
+
 // BenchmarkMergedForwardInverses measures the per-instance forward-inverse
 // merge performed while building inverse links.
 func BenchmarkMergedForwardInverses(b *testing.B) {

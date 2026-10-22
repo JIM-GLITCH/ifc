@@ -20,6 +20,9 @@ func SetupServices(sc *service.Container) {
 	workspace.SetupDefaultServices(sc)
 	service.Put(sc, NewValidationSettingsStore())
 	service.Override[workspace.DocumentValidator](sc, NewIfcDocumentValidator(sc))
+	// Registered before SetupGeneratedServices so the generated default
+	// (linear-scan SeqScope) is skipped; see ifc_scope.go.
+	service.Put[IfcScopeProvider](sc, ifcScopeProvider{})
 	SetupGeneratedServices(sc)
 }
 
