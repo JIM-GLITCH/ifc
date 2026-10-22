@@ -150,8 +150,14 @@ func BenchmarkCheckUniqueRules(b *testing.B) {
 // alone, by resetting a fully built document back to the parsed state and
 // rebuilding it with all validation tiers off. The remaining cost is phases
 // 1-2 plus the tier-off validation walk (population build + AST traversal).
+//
+// Note: tiers must be disabled through the ValidationSettingsStore, not the
+// context - IfcDocumentValidator.Validate re-reads settings from the store and
+// overrides whatever the incoming context carries.
 func BenchmarkLink(b *testing.B) {
 	sc := CreateServices()
+	store := service.MustGet[*ValidationSettingsStore](sc)
+	store.Set(ValidationSettings{})
 	fixture := fbtest.New(b, sc)
 	raw, err := os.ReadFile("t.ifc")
 	if err != nil {
@@ -160,7 +166,7 @@ func BenchmarkLink(b *testing.B) {
 	doc := fixture.Parse(string(raw))
 	lock := service.MustGet[workspace.Lock](sc)
 	builder := service.MustGet[workspace.Builder](sc)
-	ctx := WithValidationSettings(context.Background(), ValidationSettings{})
+	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		lock.Write(ctx, func(ctx context.Context, downgrade func()) {
