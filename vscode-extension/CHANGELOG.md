@@ -4,6 +4,13 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.10] - 2026-10-22
+
+### Added
+
+- **Platform-specific distribution** — the extension is now published as separate VSIX packages per platform (`win32-x64`, `linux-x64`). The Marketplace serves the matching build automatically based on the user's OS and CPU architecture.
+- The bundled Go language server is cross-compiled for each target (`GOOS`/`GOARCH`), producing a static `CGO_ENABLED=0` binary on Linux so it runs across glibc versions without extra dependencies.
+
 ## [0.0.9] - 2026-07-03
 
 ### Added

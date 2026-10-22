@@ -3,8 +3,16 @@
   "publisher": "lilr",
   "displayName": "Ifc",
   "description": "IFC (.ifc) language support with full EXPRESS WHERE validation — entity & type WHERE rules, Global RULE, UNIQUE, and DERIVE checks on ISO 10303-21 STEP files. Syntax highlighting, diagnostics, go-to-definition, and LSP for BIM workflows.",
-  "version": "0.0.9",
-  "license": "UNLICENSED",
+  "version": "0.0.10",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JIM-GLITCH/ifc.git"
+  },
+  "homepage": "https://github.com/JIM-GLITCH/ifc#readme",
+  "bugs": {
+    "url": "https://github.com/JIM-GLITCH/ifc/issues"
+  },
   "icon": "icon.png",
   "keywords": [
     "ifc",
@@ -80,14 +88,20 @@
   "scripts": {
     "build": "npm run check-types && node esbuild.js && npm run build-server",
     "bundle": "node esbuild.js --production",
-    "package": "vsce package --no-dependencies --allow-missing-repository",
-    "publish-vsce": "vsce publish --no-dependencies --allow-missing-repository",
+    "build-server": "node build-server.js",
+    "build-server:win32-x64": "node build-server.js win32-x64",
+    "build-server:linux-x64": "node build-server.js linux-x64",
+    "package": "vsce package --no-dependencies",
+    "package:win32-x64": "node build-server.js win32-x64 && vsce package --target win32-x64 --no-dependencies -o dist/ifc-vscode-win32-x64.vsix",
+    "package:linux-x64": "node build-server.js linux-x64 && vsce package --target linux-x64 --no-dependencies -o dist/ifc-vscode-linux-x64.vsix",
+    "package:all": "npm run package:win32-x64 && npm run package:linux-x64",
+    "publish-vsce": "vsce publish --no-dependencies",
+    "publish:all": "vsce publish dist/ifc-vscode-win32-x64.vsix dist/ifc-vscode-linux-x64.vsix",
     "publish-ovsx": "ovsx publish --no-dependencies",
     "watch": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch",
     "vscode:prepublish": "npm run check-types && node esbuild.js --production",
-    "check-types": "tsc --noEmit",
-    "build-server": "go build -o dist/server.exe ../cmd/ifc-lsp"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "vscode-languageclient": "~9.0.1"

@@ -6,6 +6,8 @@ VS Code extension for editing **IFC physical files** (`.ifc`) — the text-based
 
 Open any `.ifc` file and the extension activates automatically. No extra configuration is required.
 
+**Repository:** [github.com/JIM-GLITCH/ifc](https://github.com/JIM-GLITCH/ifc) · **Issues:** [github.com/JIM-GLITCH/ifc/issues](https://github.com/JIM-GLITCH/ifc/issues) · Licensed under [MIT](LICENSE).
+
 ## Features
 
 ### Language recognition
