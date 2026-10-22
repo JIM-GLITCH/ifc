@@ -3,8 +3,10 @@ package ifc
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"sort"
 	"strings"
+	"sync"
 
 	core "typefox.dev/fastbelt"
 )
@@ -111,68 +113,111 @@ func formatInstanceNames(insts []SIMPLE_ENTITY_INSTANCE) string {
 	return strings.Join(names, ", ")
 }
 
+// uniqueRuleResult is one rule's outcome, collected for order-preserving merge.
+type uniqueRuleResult struct {
+	violations []UniqueViolation
+	failures   []UniqueEvalFailure
+}
+
+// CheckUniqueRules evaluates every UNIQUE constraint. Rules are independent
+// (each builds its own key map), so they run concurrently with per-rule eval
+// caches; results are merged in rule order to match sequential output.
 func CheckUniqueRules(ctx context.Context, pop *Population) ([]UniqueViolation, []UniqueEvalFailure) {
 	if len(UniqueRuleChecks) == 0 || pop == nil {
 		return nil, nil
 	}
-	eval := NewGlobalRuleEval(ctx, pop)
+	results := make([]uniqueRuleResult, len(UniqueRuleChecks))
+	workers := runtime.GOMAXPROCS(0)
+	if workers > len(UniqueRuleChecks) {
+		workers = len(UniqueRuleChecks)
+	}
+	if workers <= 1 {
+		for i, rule := range UniqueRuleChecks {
+			results[i] = runUniqueRule(ctx, pop, rule)
+		}
+	} else {
+		var wg sync.WaitGroup
+		for w := 0; w < workers; w++ {
+			wg.Add(1)
+			go func(w int) {
+				defer wg.Done()
+				for i := w; i < len(UniqueRuleChecks); i += workers {
+					results[i] = runUniqueRule(ctx, pop, UniqueRuleChecks[i])
+				}
+			}(w)
+		}
+		wg.Wait()
+	}
+
 	var violations []UniqueViolation
 	var failures []UniqueEvalFailure
-	for _, rule := range UniqueRuleChecks {
-		instances := whereValueEntityInstances(eval.EntitySet(rule.OwnerExpressName))
-		if len(instances) < 2 {
-			continue
-		}
-		byKey := map[string][]SIMPLE_ENTITY_INSTANCE{}
-		for _, inst := range instances {
-			step, ok := instanceStepName(inst)
-			if !ok {
-				continue
-			}
-			ec := NewEntityWhereEval(ctx, step, inst, instanceParams(inst), pop)
-			key, keyOK := instanceUniqueKey(ec, rule.AttrNames)
-			notes := ec.takeEvalUnknowns()
-			if len(notes) > 0 {
-				for _, msg := range notes {
-					failures = append(failures, UniqueEvalFailure{Instance: inst, Message: msg})
-				}
-				continue
-			}
-			if !keyOK {
-				failures = append(failures, UniqueEvalFailure{
-					Instance: inst,
-					Message:  fmt.Sprintf("Cannot evaluate UNIQUE key on %s", rule.OwnerExpressName),
-				})
-				continue
-			}
-			byKey[key] = append(byKey[key], inst)
-		}
-		for _, group := range byKey {
-			if len(group) < 2 {
-				continue
-			}
-			sort.SliceStable(group, func(i, j int) bool {
-				return compareInstanceNames(group[i].Name(), group[j].Name()) < 0
-			})
-			label := rule.Label
-			if label == "" {
-				label = strings.Join(rule.AttrNames, ", ")
-			}
-			detail := fmt.Sprintf(
-				"UNIQUE %s on %s violated for %s: duplicate among %s",
-				label,
-				rule.OwnerExpressName,
-				strings.Join(rule.AttrNames, ", "),
-				formatInstanceNames(group),
-			)
-			violations = append(violations, UniqueViolation{
-				Rule:      rule,
-				Instances: append([]SIMPLE_ENTITY_INSTANCE(nil), group...),
-				Detail:    detail,
-			})
-		}
+	for _, result := range results {
+		failures = append(failures, result.failures...)
+		violations = append(violations, result.violations...)
 	}
 	return violations, failures
+}
+
+func runUniqueRule(ctx context.Context, pop *Population, rule UniqueRuleSpec) uniqueRuleResult {
+	// Per-rule eval cache: rules run concurrently and the shared cache map is
+	// not safe for concurrent writes.
+	ruleCtx := context.WithValue(ctx, entityEvalCacheKey{}, newEntityEvalCache())
+	eval := NewGlobalRuleEval(ruleCtx, pop)
+	instances := whereValueEntityInstances(eval.EntitySet(rule.OwnerExpressName))
+	if len(instances) < 2 {
+		return uniqueRuleResult{}
+	}
+	byKey := map[string][]SIMPLE_ENTITY_INSTANCE{}
+	var failures []UniqueEvalFailure
+	for _, inst := range instances {
+		step, ok := instanceStepName(inst)
+		if !ok {
+			continue
+		}
+		ec := NewEntityWhereEval(ruleCtx, step, inst, instanceParams(inst), pop)
+		key, keyOK := instanceUniqueKey(ec, rule.AttrNames)
+		notes := ec.takeEvalUnknowns()
+		if len(notes) > 0 {
+			for _, msg := range notes {
+				failures = append(failures, UniqueEvalFailure{Instance: inst, Message: msg})
+			}
+			continue
+		}
+		if !keyOK {
+			failures = append(failures, UniqueEvalFailure{
+				Instance: inst,
+				Message:  fmt.Sprintf("Cannot evaluate UNIQUE key on %s", rule.OwnerExpressName),
+			})
+			continue
+		}
+		byKey[key] = append(byKey[key], inst)
+	}
+	var violations []UniqueViolation
+	for _, group := range byKey {
+		if len(group) < 2 {
+			continue
+		}
+		sort.SliceStable(group, func(i, j int) bool {
+			return compareInstanceNames(group[i].Name(), group[j].Name()) < 0
+		})
+		label := rule.Label
+		if label == "" {
+			label = strings.Join(rule.AttrNames, ", ")
+		}
+		detail := fmt.Sprintf(
+			"UNIQUE %s on %s violated for %s: duplicate among %s",
+			label,
+			rule.OwnerExpressName,
+			strings.Join(rule.AttrNames, ", "),
+			formatInstanceNames(group),
+		)
+		violations = append(violations, UniqueViolation{
+			Rule:      rule,
+			Instances: append([]SIMPLE_ENTITY_INSTANCE(nil), group...),
+			Detail:    detail,
+		})
+	}
+	return uniqueRuleResult{violations: violations, failures: failures}
 }
 
 func validateUniqueRules(ctx context.Context, accept core.ValidationAcceptor) {

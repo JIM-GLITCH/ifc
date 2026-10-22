@@ -3,6 +3,7 @@ package ifc
 import (
 	"context"
 	"strings"
+	"sync"
 
 	core "typefox.dev/fastbelt"
 )
@@ -18,6 +19,24 @@ type InstanceRecord struct {
 type Population struct {
 	byName       map[string]*InstanceRecord
 	inverseLinks map[string]map[string][]SIMPLE_ENTITY_INSTANCE
+
+	// globalSets caches the per-EXPRESS-name entity sets used by global RULE
+	// and UNIQUE evaluation. It is built once per population (lazily, on first
+	// use) instead of once per rule.
+	globalSetsOnce sync.Once
+	globalSets     map[string][]SIMPLE_ENTITY_INSTANCE
+}
+
+// entitySets returns the entity sets grouped by EXPRESS name, building them
+// on first use. Safe for concurrent use: rules evaluate in parallel.
+func (pop *Population) entitySets() map[string][]SIMPLE_ENTITY_INSTANCE {
+	if pop == nil {
+		return map[string][]SIMPLE_ENTITY_INSTANCE{}
+	}
+	pop.globalSetsOnce.Do(func() {
+		pop.globalSets = buildGlobalEntitySets(pop)
+	})
+	return pop.globalSets
 }
 
 func BuildPopulation(ctx context.Context, doc *core.Document) *Population {

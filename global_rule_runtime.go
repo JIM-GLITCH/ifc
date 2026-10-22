@@ -2,9 +2,11 @@ package ifc
 
 import (
 	"context"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	core "typefox.dev/fastbelt"
 )
@@ -24,25 +26,43 @@ func NewGlobalRuleEval(ctx context.Context, pop *Population) *GlobalRuleEval {
 		ctx:        ctx,
 		pop:        pop,
 		entityEval: NewEntityWhereEval(ctx, "", nil, nil, pop),
-		sets:       buildGlobalEntitySets(pop),
+		sets:       pop.entitySets(),
 	}
 }
 
-// stepNameExpressClosure returns the EXPRESS names of the given STEP entity
-// and all of its supertypes, deduplicated with the entity itself first.
-//
-// The closure is derived from the immutable generated Entities table and
-// cached per entity name; the returned slice is shared and must be treated as
-// read-only. Caching it avoids re-walking the supertype graph for every entity
-// instance when building global entity sets.
+func buildGlobalEntitySets(pop *Population) map[string][]SIMPLE_ENTITY_INSTANCE {
+	sets := map[string][]SIMPLE_ENTITY_INSTANCE{}
+	if pop == nil {
+		return sets
+	}
+	for _, rec := range pop.byName {
+		if rec == nil || rec.Instance == nil {
+			continue
+		}
+		for _, expressName := range stepNameExpressClosure(rec.StepName) {
+			sets[expressName] = append(sets[expressName], rec.Instance)
+		}
+	}
+	for name, insts := range sets {
+		sort.SliceStable(insts, func(i, j int) bool {
+			return compareInstanceNames(insts[i].Name(), insts[j].Name()) < 0
+		})
+		sets[name] = insts
+	}
+	return sets
+}
+
+// stepNameExpressClosure returns the EXPRESS names of the entity and all of
+// its supertypes, deduplicated, self first. Derived from the immutable
+// Entities table and cached per step name.
 func stepNameExpressClosure(stepName string) []string {
-	stepName = strings.ToUpper(strings.TrimSpace(stepName))
-	if cached, ok := expressClosureCache.Load(stepName); ok {
+	key := strings.ToUpper(strings.TrimSpace(stepName))
+	if cached, ok := expressClosureCache.Load(key); ok {
 		names, _ := cached.([]string)
 		return names
 	}
-	names := computeStepNameExpressClosure(stepName)
-	expressClosureCache.Store(stepName, names)
+	names := computeStepNameExpressClosure(key)
+	expressClosureCache.Store(key, names)
 	return names
 }
 
@@ -68,28 +88,6 @@ func computeStepNameExpressClosure(stepName string) []string {
 	}
 	walk(def)
 	return names
-}
-
-func buildGlobalEntitySets(pop *Population) map[string][]SIMPLE_ENTITY_INSTANCE {
-	sets := map[string][]SIMPLE_ENTITY_INSTANCE{}
-	if pop == nil {
-		return sets
-	}
-	for _, rec := range pop.byName {
-		if rec == nil || rec.Instance == nil {
-			continue
-		}
-		for _, expressName := range stepNameExpressClosure(rec.StepName) {
-			sets[expressName] = append(sets[expressName], rec.Instance)
-		}
-	}
-	for name, insts := range sets {
-		sort.SliceStable(insts, func(i, j int) bool {
-			return compareInstanceNames(insts[i].Name(), insts[j].Name()) < 0
-		})
-		sets[name] = insts
-	}
-	return sets
 }
 
 func compareInstanceNames(a, b string) int {
@@ -161,31 +159,60 @@ func (ec *GlobalRuleEval) WvAndLazy(a, b func() WhereValue) WhereValue {
 	return ec.entityEval.WvAndLazy(a, b)
 }
 
+// globalRuleOutcome is one rule's result, collected for order-preserving merge.
+type globalRuleOutcome struct {
+	pass     bool
+	detail   string
+	unknowns []string
+}
+
+// CheckGlobalRules evaluates every global RULE. Rules are independent, so they
+// run concurrently with per-rule eval caches; results are merged in rule order
+// so the reported failure and eval-unknowns match the sequential semantics
+// (stop at the first rule with eval-unknowns, keep the first failure detail).
 func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail string, evalUnknowns []string) {
 	if len(GlobalRuleChecks) == 0 {
 		return true, "", nil
 	}
-	for _, rule := range GlobalRuleChecks {
+	outcomes := make([]globalRuleOutcome, len(GlobalRuleChecks))
+	workers := runtime.GOMAXPROCS(0)
+	if workers > len(GlobalRuleChecks) {
+		workers = len(GlobalRuleChecks)
+	}
+	if workers <= 1 {
+		for i, rule := range GlobalRuleChecks {
+			outcomes[i] = runGlobalRule(ctx, pop, rule)
+		}
+	} else {
+		var wg sync.WaitGroup
+		for w := 0; w < workers; w++ {
+			wg.Add(1)
+			go func(w int) {
+				defer wg.Done()
+				for i := w; i < len(GlobalRuleChecks); i += workers {
+					outcomes[i] = runGlobalRule(ctx, pop, GlobalRuleChecks[i])
+				}
+			}(w)
+		}
+		wg.Wait()
+	}
+
+	for i, outcome := range outcomes {
+		rule := GlobalRuleChecks[i]
 		if rule.Check == nil {
 			continue
 		}
-		ec := NewGlobalRuleEval(ctx, pop)
-		ec.entityEval.whereKind = "global"
-		ec.entityEval.ruleLabel = rule.Label
-		ec.entityEval.stepName = rule.ExpressName
-		pass, msg := rule.Check(ec)
-		ruleUnknowns := ec.entityEval.takeEvalUnknowns()
-		evalUnknowns = append(evalUnknowns, ruleUnknowns...)
-		if len(ruleUnknowns) > 0 {
+		evalUnknowns = append(evalUnknowns, outcome.unknowns...)
+		if len(outcome.unknowns) > 0 {
 			break
 		}
-		if !pass && detail == "" {
-			if msg == "" {
+		if !outcome.pass && detail == "" {
+			if outcome.detail == "" {
 				detail = "RULE " + rule.ExpressName + " violated"
-			} else if rule.ExpressName != "" && !strings.Contains(msg, rule.ExpressName) {
-				detail = rule.ExpressName + ": " + msg
+			} else if rule.ExpressName != "" && !strings.Contains(outcome.detail, rule.ExpressName) {
+				detail = rule.ExpressName + ": " + outcome.detail
 			} else {
-				detail = msg
+				detail = outcome.detail
 			}
 		}
 	}
@@ -196,6 +223,22 @@ func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail str
 		return false, "", evalUnknowns
 	}
 	return true, "", nil
+}
+
+func runGlobalRule(ctx context.Context, pop *Population, rule GlobalRuleSpec) globalRuleOutcome {
+	if rule.Check == nil {
+		return globalRuleOutcome{pass: true}
+	}
+	// Per-rule eval cache: rules run concurrently and the shared cache map is
+	// not safe for concurrent writes.
+	ruleCtx := context.WithValue(ctx, entityEvalCacheKey{}, newEntityEvalCache())
+	ec := NewGlobalRuleEval(ruleCtx, pop)
+	ec.entityEval.whereKind = "global"
+	ec.entityEval.ruleLabel = rule.Label
+	ec.entityEval.stepName = rule.ExpressName
+	pass, msg := rule.Check(ec)
+	unknowns := ec.entityEval.takeEvalUnknowns()
+	return globalRuleOutcome{pass: pass, detail: msg, unknowns: unknowns}
 }
 
 func validateGlobalRules(ctx context.Context, owner core.AstNode, accept core.ValidationAcceptor) {

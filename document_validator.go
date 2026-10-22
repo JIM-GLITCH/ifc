@@ -11,14 +11,12 @@ import (
 )
 
 type IfcDocumentValidator struct {
-	inner workspace.DocumentValidator
-	sc    *service.Container
+	sc *service.Container
 }
 
 func NewIfcDocumentValidator(sc *service.Container) workspace.DocumentValidator {
 	return &IfcDocumentValidator{
-		inner: workspace.NewDefaultDocumentValidator(sc),
-		sc:    sc,
+		sc: sc,
 	}
 }
 
@@ -28,9 +26,21 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 	ctx = WithEntityEvalCache(ctx)
 	settings := ValidationSettingsFromService(v.sc)
 	ctx = WithValidationSettings(ctx, settings)
-	diags := v.inner.Validate(ctx, doc, level)
+
+	// Lexer/parser/linker diagnostics (equivalent to the fastbelt default
+	// validator's preamble), followed by the parallel AST validation walk.
+	source := validationDiagnosticSource(v.sc, doc)
+	diags := make([]*core.Diagnostic, 0, 64)
+	diags = append(diags, workspace.CreateLexerDiagnostics(doc, source)...)
+	diags = append(diags, workspace.CreateParserDiagnostics(doc, source)...)
+	diags = append(diags, workspace.CreateLinkerDiagnostics(doc, source)...)
+	diags = append(diags, parallelValidate(ctx, doc, level, source)...)
+
 	if doc != nil && doc.Root != nil && !documentHasParseErrors(doc) {
 		var accept core.ValidationAcceptor = func(d *core.Diagnostic) {
+			if d.Source == "" {
+				d.Source = source
+			}
 			diags = append(diags, d)
 		}
 		if settings.Rules {
@@ -39,6 +49,21 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 		}
 	}
 	return diags
+}
+
+// validationDiagnosticSource mirrors the fastbelt default validator's source
+// resolution: the document's language id, falling back to the workspace
+// language id.
+func validationDiagnosticSource(sc *service.Container, doc *core.Document) string {
+	if doc != nil && doc.TextDoc != nil {
+		if source := doc.TextDoc.LanguageID(); source != "" {
+			return source
+		}
+	}
+	if languageID, err := service.Get[workspace.LanguageID](sc); err == nil {
+		return string(languageID)
+	}
+	return ""
 }
 
 func documentHasParseErrors(doc *core.Document) bool {

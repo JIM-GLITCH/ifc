@@ -5,18 +5,23 @@ import (
 	"strings"
 )
 
+// evalDerivedAttr evaluates a DERIVE attribute with per-document caching.
+//
+// Only successful values are cached: a failed evaluation records an
+// eval-unknown note attributed to the reading evaluation, so caching the
+// failure would make reporting depend on who evaluated first. Recomputing a
+// failure is cheap (evaluators bail early) and keeps diagnostics independent
+// of evaluation order under parallel validation.
 func evalDerivedAttr(ec *EntityWhereEval, inst SIMPLE_ENTITY_INSTANCE, attrName string) WhereValue {
 	if ec != nil {
-		if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
-			if v, ok := cache.lookup(inst, attrName); ok {
-				return v
-			}
+		if v, ok := ec.lookupCachedAttr(inst, attrName); ok {
+			return v
 		}
 	}
 	result := evalDerivedAttrUncached(ec, inst, attrName)
-	if ec != nil {
+	if ec != nil && result.kind != wvKindUnknown && result.kind != wvKindAbsent {
 		if cache := entityEvalCacheFromContext(ec.ctx); cache != nil {
-			cache.store(inst, attrName, result)
+			cache.store(inst, attrName, entityEvalEntry{value: result})
 		}
 	}
 	return result
