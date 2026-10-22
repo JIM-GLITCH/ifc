@@ -96,7 +96,7 @@
     "package:linux-x64": "node build-server.js linux-x64 && vsce package --target linux-x64 --no-dependencies -o dist/ifc-vscode-linux-x64.vsix",
     "package:all": "npm run package:win32-x64 && npm run package:linux-x64",
     "publish-vsce": "vsce publish --no-dependencies",
-    "publish:all": "vsce publish dist/ifc-vscode-win32-x64.vsix dist/ifc-vscode-linux-x64.vsix",
+    "publish:all": "vsce publish --packagePath dist/ifc-vscode-win32-x64.vsix dist/ifc-vscode-linux-x64.vsix",
     "publish-ovsx": "ovsx publish --no-dependencies",
     "watch": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch",
