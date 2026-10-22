@@ -4,6 +4,16 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.13] - 2026-10-23
+
+### Changed
+
+- **Linking performance** — `#N` entity reference resolution now goes through a per-document name index instead of the default container-chain walk with linear symbol scans. STEP files have a flat namespace (every entity instance is a symbol in one container), so the default `O(references × symbols)` string comparisons are replaced by a `MapScope` built once per document build and cached on the document.
+  - Isolated linking phase on the bundled 150-story reference model (`t.ifc`): **1.72s → 192ms (~9x)**; allocations down ~30%.
+  - End-to-end `didOpen` → diagnostics latency: **2.47s → 0.85s (~2.9x)**; `didChange` → diagnostics: **2.40s → 0.77s (~3.1x)** (lsbench, cold start).
+  - Diagnostics content is unchanged — the full test suite produces identical results, and all 46,764 references in the reference model resolve as before.
+- **Benchmarks** — `BenchmarkLink` measures the symbol-table + reference-linking phase in isolation.
+
 ## [0.0.12] - 2026-10-23
 
 ### Added

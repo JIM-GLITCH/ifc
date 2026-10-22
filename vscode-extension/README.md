@@ -64,7 +64,8 @@ During each validation pass the language server:
 
 - **Indexes inverse relations once** when building the entity population (forward `#` references → inverse lists such as `IsTypedBy`). Entity WHERE rules query this index; they do not rescan the file.
 - **Caches attribute values** (`eval_cache`) keyed by entity `#id` and attribute name so Types-layer DERIVE checks and Rules-layer Entity WHERE do not repeat the same DERIVE or parameter conversion work.
-- **Memoizes schema-derived lookups** — supertype closures, EXPRESS↔STEP name resolution, `TYPEOF` qualified names, attribute index maps, forward-inverse merges, and SELECT type resolution are computed once per schema entry instead of per entity instance. On a 150-story reference model this makes full validation (all tiers) ~7x faster and `didOpen` → diagnostics ~2x faster.
+- **Memoizes schema-derived lookups** — supertype closures, EXPRESS↔STEP name resolution, `TYPEOF` qualified names, attribute index maps, forward-inverse merges, and SELECT type resolution are computed once per schema entry instead of per entity instance. On a 150-story reference model this makes full validation (all tiers) ~7x faster.
+- **Indexes entity references by name** — `#N` references resolve through a per-document name index (built once per build) instead of scanning every symbol per reference, making the linking phase ~9x faster on large files.
 
 Turn off **Types** or **Rules** in the status bar if you want faster feedback while editing and only need structural checks.
 
