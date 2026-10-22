@@ -137,8 +137,23 @@ func instanceRecordFrom(simple SIMPLE_ENTITY_INSTANCE) *InstanceRecord {
 	}
 }
 
+// mergedForwardInverses returns the merged forward-inverse map for the given
+// STEP entity name, including entries inherited from its supertypes.
+//
+// The result is derived from immutable generated schema data and cached per
+// entity name; the returned map must be treated as read-only.
 func mergedForwardInverses(stepName string) map[int][]ForwardInverseTarget {
 	stepName = strings.ToUpper(strings.TrimSpace(stepName))
+	if cached, ok := mergedForwardInversesCache.Load(stepName); ok {
+		forwardMap, _ := cached.(map[int][]ForwardInverseTarget)
+		return forwardMap
+	}
+	forwardMap := computeMergedForwardInverses(stepName)
+	mergedForwardInversesCache.Store(stepName, forwardMap)
+	return forwardMap
+}
+
+func computeMergedForwardInverses(stepName string) map[int][]ForwardInverseTarget {
 	seen := map[string]bool{}
 	result := make(map[int][]ForwardInverseTarget)
 	var walk func(string)
@@ -261,15 +276,35 @@ func entityRefTargetName(ctx context.Context, ref ENTITY_REFERENCE) string {
 	return strings.TrimSpace(value.Text())
 }
 
+// attrIndex returns the parameter index of the named attribute on the given
+// STEP entity, or -1 if the entity has no such attribute. Attribute names are
+// compared case-insensitively.
+//
+// The name-to-index table is derived from the immutable generated
+// entityAttrNames data and cached per entity name.
 func attrIndex(stepName, attrName string) int {
+	table, ok := attrIndexCache.Load(stepName)
+	if !ok {
+		table = computeAttrIndex(stepName)
+		attrIndexCache.Store(stepName, table)
+	}
+	index, found := table.(map[string]int)[strings.ToLower(attrName)]
+	if !found {
+		return -1
+	}
+	return index
+}
+
+func computeAttrIndex(stepName string) map[string]int {
 	names := entityAttrNames[stepName]
-	lower := strings.ToLower(attrName)
+	index := make(map[string]int, len(names))
 	for i, name := range names {
-		if strings.ToLower(name) == lower {
-			return i
+		lower := strings.ToLower(name)
+		if _, exists := index[lower]; !exists {
+			index[lower] = i
 		}
 	}
-	return -1
+	return index
 }
 
 func entityAttrNameAt(stepName string, index int) string {

@@ -41,11 +41,12 @@ func entityAttrCacheKey(inst SIMPLE_ENTITY_INSTANCE, attrName string) string {
 	if id == "" {
 		return ""
 	}
+	// instanceStepName already returns an upper-case, trimmed STEP name.
 	step, ok := instanceStepName(inst)
 	if !ok {
 		return id + "|" + strings.ToLower(strings.TrimSpace(attrName))
 	}
-	return strings.ToUpper(step) + "|" + id + "|" + strings.ToLower(strings.TrimSpace(attrName))
+	return step + "|" + id + "|" + strings.ToLower(strings.TrimSpace(attrName))
 }
 
 func (c *entityEvalCache) lookup(inst SIMPLE_ENTITY_INSTANCE, attrName string) (WhereValue, bool) {

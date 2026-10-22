@@ -4,6 +4,19 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.12] - 2026-10-23
+
+### Added
+
+- **Benchmarks** — Go benchmarks for the validation pipeline (`bench_test.go`) and an [lsbench](https://github.com/TypeFox/lsbench) harness (`bench/`) for end-to-end LSP latency measurements (`didOpen` / `didChange` → diagnostics).
+
+### Changed
+
+- **Validation performance** — the language server now memoizes schema-derived lookups that previously ran per entity instance: EXPRESS↔STEP name resolution, `TYPEOF` qualified names, supertype closures, forward-inverse merges, attribute index maps, and SELECT type resolution.
+  - On the bundled 150-story reference model (`t.ifc`), full validation with all tiers enabled is **~7x faster** (3.3s → 0.45s per pass); Global RULE checks ~6.6x, UNIQUE checks ~5.4x, and allocation volume is roughly halved.
+  - End-to-end `didOpen` → diagnostics latency drops from ~5.2s to ~2.5s (lsbench, cold start).
+  - Diagnostics content is unchanged — the full test suite produces identical results.
+
 ## [0.0.11] - 2026-10-22
 
 ### Fixed

@@ -28,6 +28,48 @@ func NewGlobalRuleEval(ctx context.Context, pop *Population) *GlobalRuleEval {
 	}
 }
 
+// stepNameExpressClosure returns the EXPRESS names of the given STEP entity
+// and all of its supertypes, deduplicated with the entity itself first.
+//
+// The closure is derived from the immutable generated Entities table and
+// cached per entity name; the returned slice is shared and must be treated as
+// read-only. Caching it avoids re-walking the supertype graph for every entity
+// instance when building global entity sets.
+func stepNameExpressClosure(stepName string) []string {
+	stepName = strings.ToUpper(strings.TrimSpace(stepName))
+	if cached, ok := expressClosureCache.Load(stepName); ok {
+		names, _ := cached.([]string)
+		return names
+	}
+	names := computeStepNameExpressClosure(stepName)
+	expressClosureCache.Store(stepName, names)
+	return names
+}
+
+func computeStepNameExpressClosure(stepName string) []string {
+	def, ok := LookupEntity(stepName)
+	if !ok {
+		return nil
+	}
+	var names []string
+	seen := map[string]bool{}
+	var walk func(EntityDef)
+	walk = func(def EntityDef) {
+		if seen[def.ExpressName] {
+			return
+		}
+		seen[def.ExpressName] = true
+		names = append(names, def.ExpressName)
+		for _, superName := range def.SuperTypes {
+			if superDef, ok := lookupEntityByExpressName(superName); ok {
+				walk(superDef)
+			}
+		}
+	}
+	walk(def)
+	return names
+}
+
 func buildGlobalEntitySets(pop *Population) map[string][]SIMPLE_ENTITY_INSTANCE {
 	sets := map[string][]SIMPLE_ENTITY_INSTANCE{}
 	if pop == nil {
@@ -37,25 +79,9 @@ func buildGlobalEntitySets(pop *Population) map[string][]SIMPLE_ENTITY_INSTANCE 
 		if rec == nil || rec.Instance == nil {
 			continue
 		}
-		def, ok := LookupEntity(rec.StepName)
-		if !ok {
-			continue
+		for _, expressName := range stepNameExpressClosure(rec.StepName) {
+			sets[expressName] = append(sets[expressName], rec.Instance)
 		}
-		visited := map[string]bool{}
-		var walk func(EntityDef)
-		walk = func(def EntityDef) {
-			if visited[def.ExpressName] {
-				return
-			}
-			visited[def.ExpressName] = true
-			sets[def.ExpressName] = append(sets[def.ExpressName], rec.Instance)
-			for _, superName := range def.SuperTypes {
-				if superDef, ok := lookupEntityByExpressName(superName); ok {
-					walk(superDef)
-				}
-			}
-		}
-		walk(def)
 	}
 	for name, insts := range sets {
 		sort.SliceStable(insts, func(i, j int) bool {

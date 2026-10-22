@@ -86,7 +86,20 @@ func builtinTypeKind(typeName string) ParamKind {
 	}
 }
 
+// resolvedTypeValueKind resolves a type name to its value kind, following
+// alias chains through the Types table. Results are derived from immutable
+// generated data and cached per type name.
 func resolvedTypeValueKind(typeName string) ParamKind {
+	if cached, ok := resolvedTypeValueKindCache.Load(typeName); ok {
+		kind, _ := cached.(ParamKind)
+		return kind
+	}
+	kind := computeResolvedTypeValueKind(typeName)
+	resolvedTypeValueKindCache.Store(typeName, kind)
+	return kind
+}
+
+func computeResolvedTypeValueKind(typeName string) ParamKind {
 	if typeName == "" {
 		return ParamUnknown
 	}
@@ -154,7 +167,21 @@ func allowedParameterKinds(attr SchemaAttr) []ParamKind {
 	}
 }
 
+// allowedSelectKinds returns the parameter kinds acceptable for values of the
+// given SELECT type. Results are derived from immutable generated data and
+// cached per type name; the returned slice is shared and must be treated as
+// read-only.
 func allowedSelectKinds(typeName string) []ParamKind {
+	if cached, ok := allowedSelectKindsCache.Load(typeName); ok {
+		kinds, _ := cached.([]ParamKind)
+		return kinds
+	}
+	kinds := computeAllowedSelectKinds(typeName)
+	allowedSelectKindsCache.Store(typeName, kinds)
+	return kinds
+}
+
+func computeAllowedSelectKinds(typeName string) []ParamKind {
 	typeDef, ok := LookupType(typeName)
 	if !ok {
 		return []ParamKind{ParamEntity, ParamAggregate, ParamString, ParamReal, ParamInteger, ParamEnum}

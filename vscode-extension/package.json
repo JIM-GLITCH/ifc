@@ -3,7 +3,7 @@
   "publisher": "lilr",
   "displayName": "Ifc",
   "description": "IFC (.ifc) language support with full EXPRESS WHERE validation — entity & type WHERE rules, Global RULE, UNIQUE, and DERIVE checks on ISO 10303-21 STEP files. Syntax highlighting, diagnostics, go-to-definition, and LSP for BIM workflows.",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "license": "MIT",
   "repository": {
     "type": "git",

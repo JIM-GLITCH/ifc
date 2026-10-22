@@ -1,0 +1,7 @@
+{
+  "validation": {
+    "structure": true,
+    "types": true,
+    "rules": true
+  }
+}
