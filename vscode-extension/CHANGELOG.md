@@ -4,6 +4,30 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.14] - 2026-10-23
+
+### Changed
+
+- **Incremental entity validation** — a `didChange` no longer re-validates every entity instance in the file. The validator keeps, per document, a fingerprint of each instance plus the diagnostics it produced, and re-runs validation only for the instances a change can be observed from.
+  - The affected set is the changed instances, everything they point at, and everything pointing at any of those. Co-referencing counts as a dependency: a WHERE rule or a DERIVE clause may read an inverse attribute of an entity it only points at, and inverse sets move when a referrer moves. Computing the set is one allocation-free pass over the document text.
+  - Cached diagnostics are stored relative to their instance's start position and re-anchored on reuse, so edits that only shift text cost nothing.
+  - Falls back to a full validation when the document is small, when more than a quarter of the instances changed, when an instance disappeared, when the schema header / settings / validation level / front-end error counts moved, or when a diagnostic does not fit inside its own instance.
+  - On the bundled reference model (`t.ifc`), full validation with all tiers enabled: **206 ms → 182 ms**; after an edit touching one instance: **182 ms → 82–101 ms** (the fixed cost is population build 46 ms, entity scan 27 ms, linker diagnostics and friends ~32 ms). Allocations drop by **~75%** (214 MB → 48–57 MB).
+  - End-to-end (lsbench, cold start, same machine, measured against 0.0.13 with the same harness): `didOpen` → diagnostics **852 ms → 560 ms (~1.5x)**; `didChange` after editing one character inside one instance **770 ms → 377 ms (~2x)**.
+  - Correctness is pinned by `TestIncrementalValidationMatchesFull`: six edit scenarios (whole-file shift, mid-file shift, single-instance edit, schema-root edit, instance added, instance deleted) each assert that the incremental result is byte-identical to a cold full validation, and that the expected path was taken.
+
+- **Type WHERE rule lookup** — `LookupTypeWhereRules` used to walk every entry of the rule map with `strings.EqualFold` on each miss. Only a minority of the schema's types carry WHERE rules, so that scan ran for most of the ~227k parameter checks per document. Rules are now indexed by upper-cased type name and the lookup key is normalised in a stack buffer, making it a single map access. Validation: **206 ms → 179 ms (-13%)**.
+
+### Changed (behaviour)
+
+- **More eval-unknown diagnostics on files with parse errors.** The per-document eval cache now carries the failure reason next to the value, so a cache hit replays the note instead of silently returning. Previously the first evaluation to read an unevaluable attribute reported it and every later reader stayed quiet, which made the published set depend on evaluation order — and, once validation became parallel, on worker scheduling. Every affected instance now reports its own diagnostic.
+  - On `t.ifc` (which has a known parser recovery error at `#118= IFCDIRECTION((6.12e-17,1.))`) this raises the published diagnostics from **10 to 21**. All 21 are distinct in position, code and message, and repeated validation runs are byte-identical (`TestValidateDeterministicUnderParallelism`).
+
+### Added
+
+- **Benchmarks** — `BenchmarkValidateIncrementalEdit` (mid-file and schema-root edit), `BenchmarkEntityScan` (the per-validation fingerprint pass). `BenchmarkValidate` now clears the entity cache between iterations so it keeps measuring a full validation instead of the unchanged-document fast path.
+- **Benchmark harness** — `bench/bench-actions.ts` gained a third metric, `edit->diagnostics`, which changes one character inside one entity instance. The previous `didChange` appended a space at end of file, which changes no instance text and therefore measured the best case only. The old metric is kept as `noop-edit->diagnostics` for comparability with earlier releases.
+
 ## [0.0.13] - 2026-10-23
 
 ### Changed

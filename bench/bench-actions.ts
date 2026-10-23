@@ -44,14 +44,45 @@ function endPosition(relativePath: string): { line: number; character: number } 
   return { line: lines.length - 1, character: lines[lines.length - 1].length };
 }
 
+// Position of the first character inside the first quoted string of the first
+// IFCAPPLICATION instance. Editing one character there changes the text of
+// exactly one entity instance, which is what the incremental validation path is
+// for. Any character is syntactically valid inside a STEP string literal, so the
+// edit cannot introduce a parse error and cannot invalidate the schema header.
+function insideInstancePosition(relativePath: string): { line: number; character: number } | null {
+  const abs = path.join(process.cwd(), relativePath);
+  const text = fs.readFileSync(abs, "utf-8");
+  const keyword = text.indexOf("IFCAPPLICATION(");
+  if (keyword < 0) {
+    return null;
+  }
+  const quote = text.indexOf("'", keyword);
+  if (quote < 0) {
+    return null;
+  }
+  const before = text.slice(0, quote + 1);
+  const lines = before.split(/\r\n|\r|\n/);
+  return { line: lines.length - 1, character: lines[lines.length - 1].length };
+}
+
 // End-to-end benchmark for the ifc language server.
 //
 // Metrics (one line pair per iteration):
-//   [bench] open->diagnostics   didOpen -> publishDiagnostics on a freshly
-//                               started server: the full cold build pipeline
-//                               (lex -> parse -> symbols -> link -> validate).
-//   [bench] edit->diagnostics   didChange -> publishDiagnostics right after:
-//                               a full rebuild on a warm server (warm caches).
+//   [bench] open->diagnostics        didOpen -> publishDiagnostics on a freshly
+//                                    started server: the full cold build
+//                                    pipeline (lex -> parse -> symbols -> link
+//                                    -> validate).
+//   [bench] noop-edit->diagnostics   didChange -> publishDiagnostics after
+//                                    appending a space at end of file. No entity
+//                                    instance text changes, so this measures the
+//                                    best case: every cached entity diagnostic is
+//                                    reused as-is. Kept for comparability with
+//                                    releases up to 0.0.13.
+//   [bench] edit->diagnostics        didChange -> publishDiagnostics after
+//                                    changing one character inside one entity
+//                                    instance. This is the representative
+//                                    interactive case: a full re-parse plus an
+//                                    incremental re-validation.
 // The per-method table additionally reports documentSymbol/definition/
 // references/hover latencies on the fully built document.
 //
@@ -87,12 +118,28 @@ export default async function (ctx: BenchContext) {
   const openMs = Number(process.hrtime.bigint() - openStart) / 1e6;
   console.log(`[bench] open->diagnostics: ${openMs.toFixed(1)}ms`);
 
-  // Force a full rebuild with a trivial edit and measure the warm path.
+  // Best case: force a full rebuild with a trivial edit that changes no entity
+  // instance text, and measure the warm path.
   const end = endPosition(rel);
-  const editStart = process.hrtime.bigint();
+  const noopStart = process.hrtime.bigint();
   await ctx.edit(rel, {
     range: { start: end, end },
     text: " ",
+  });
+  const noopDiags = await ctx.waitForDiagnostics(rel, 60_000);
+  console.log(`[bench] noop-edit wait resolved with ${noopDiags.length} diags`);
+  const noopMs = Number(process.hrtime.bigint() - noopStart) / 1e6;
+  console.log(`[bench] noop-edit->diagnostics: ${noopMs.toFixed(1)}ms`);
+
+  // Representative case: change one character inside one entity instance.
+  const inside = insideInstancePosition(rel);
+  if (!inside) {
+    throw new Error("could not locate an entity instance to edit in t.ifc");
+  }
+  const editStart = process.hrtime.bigint();
+  await ctx.edit(rel, {
+    range: { start: inside, end: { line: inside.line, character: inside.character + 1 } },
+    text: "Z",
   });
   const editDiags = await ctx.waitForDiagnostics(rel, 60_000);
   console.log(`[bench] edit wait resolved with ${editDiags.length} diags`);

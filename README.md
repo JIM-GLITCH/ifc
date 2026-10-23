@@ -2,7 +2,7 @@
 
 IFC (`.ifc`) language server and VS Code extension built on [fastbelt](https://github.com/TypeFox/fastbelt). Validates ISO 10303-21 STEP physical files against the **IFC4X3** EXPRESS schema: entity/type WHERE rules, global RULE, UNIQUE constraints, aggregate bounds, and DERIVE attribute checks.
 
-**Current extension release:** `0.0.13` — linking performance: `#N` reference resolution uses a per-document name index instead of linear symbol scans (isolated linking phase ~9x faster); combined with the validation memoization from 0.0.12, open-to-diagnostics latency on large files is ~6x faster than 0.0.11. See [`vscode-extension/CHANGELOG.md`](vscode-extension/CHANGELOG.md) and [`vscode-extension/README.md`](vscode-extension/README.md) for details, diagnostic codes, and packaging.
+**Current extension release:** `0.0.14` — incremental entity validation: a `didChange` re-validates only the entity instances a change can be observed from, instead of the whole file (validation -44% to -55%, allocations -75%; end-to-end `didChange` → diagnostics ~2x faster than 0.0.13). Combined with the linking index from 0.0.13 and the validation memoization from 0.0.12, open-to-diagnostics latency on large files is ~9x faster than 0.0.11. This is the last release built on the fastbelt framework — see the changelog for details. See [`vscode-extension/CHANGELOG.md`](vscode-extension/CHANGELOG.md) and [`vscode-extension/README.md`](vscode-extension/README.md) for details, diagnostic codes, and packaging.
 
 **Repository:** [github.com/JIM-GLITCH/ifc](https://github.com/JIM-GLITCH/ifc) · **Issues:** [github.com/JIM-GLITCH/ifc/issues](https://github.com/JIM-GLITCH/ifc/issues) · Licensed under [MIT](LICENSE).
 
