@@ -12,11 +12,16 @@ import (
 
 type IfcDocumentValidator struct {
 	sc *service.Container
+	// cache holds the entity fingerprints and diagnostics of the last few
+	// validated documents, so a didChange can skip the entities a change
+	// cannot reach. See validator_incremental.go.
+	cache *validationStateCache
 }
 
 func NewIfcDocumentValidator(sc *service.Container) workspace.DocumentValidator {
 	return &IfcDocumentValidator{
-		sc: sc,
+		sc:    sc,
+		cache: &validationStateCache{},
 	}
 }
 
@@ -28,13 +33,15 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 	ctx = WithValidationSettings(ctx, settings)
 
 	// Lexer/parser/linker diagnostics (equivalent to the fastbelt default
-	// validator's preamble), followed by the parallel AST validation walk.
+	// validator's preamble), followed by the entity validation walk. The walk
+	// re-validates only the entities a change can reach and reuses the cached
+	// diagnostics of the rest.
 	source := validationDiagnosticSource(v.sc, doc)
 	diags := make([]*core.Diagnostic, 0, 64)
 	diags = append(diags, workspace.CreateLexerDiagnostics(doc, source)...)
 	diags = append(diags, workspace.CreateParserDiagnostics(doc, source)...)
 	diags = append(diags, workspace.CreateLinkerDiagnostics(doc, source)...)
-	diags = append(diags, parallelValidate(ctx, doc, level, source)...)
+	diags = append(diags, v.validateEntities(ctx, doc, level, source, settings)...)
 
 	if doc != nil && doc.Root != nil && !documentHasParseErrors(doc) {
 		var accept core.ValidationAcceptor = func(d *core.Diagnostic) {

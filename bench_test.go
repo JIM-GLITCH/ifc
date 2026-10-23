@@ -3,6 +3,7 @@ package ifc
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 
 	core "typefox.dev/fastbelt"
@@ -21,6 +22,9 @@ var (
 	sinkInt       int
 	sinkKind      ParamKind
 	sinkKinds     []ParamKind
+	sinkUnits     []entityUnit
+	sinkContent   []byte
+	sinkScanOK    bool
 	sinkForward   map[int][]ForwardInverseTarget
 	sinkKey       string
 )
@@ -79,10 +83,129 @@ func BenchmarkValidate(b *testing.B) {
 			validator := service.MustGet[workspace.DocumentValidator](sc)
 			ctx := context.Background()
 			b.ReportAllocs()
+			// The validator caches per-document entity state; drop it so the
+			// benchmark keeps measuring a full validation instead of the
+			// unchanged-document fast path.
+			if incremental, ok := validator.(*IfcDocumentValidator); ok {
+				defer incremental.cache.reset()
+			}
 			for i := 0; i < b.N; i++ {
 				sinkDiags = validator.Validate(ctx, doc.Document, "bench")
+				if incremental, ok := validator.(*IfcDocumentValidator); ok {
+					incremental.cache.reset()
+				}
 			}
 		})
+	}
+}
+
+// BenchmarkValidateIncrementalEdit measures what a didChange costs when only a
+// single entity instance changed. Both revisions are parsed before the timer
+// starts, so the number covers validation alone: population build, fingerprint
+// pass, dependency closure and the re-validated subset.
+//
+// The two documents alternate, so every iteration after the first two
+// re-validates a revision the cache has not seen yet, which is exactly the
+// steady state of typing in a large file.
+//
+// midFile edits an instance with almost no referrers, so the dependency
+// closure is tight and the number shows what the reuse itself is worth.
+// root edits the schema root instance, which a large share of the file points
+// at; that closure is inherently large and is the worst case for reuse.
+func BenchmarkValidateIncrementalEdit(b *testing.B) {
+	for _, target := range []string{"midFile", "root"} {
+		b.Run(target, func(b *testing.B) {
+			benchmarkIncrementalEdit(b, target)
+		})
+	}
+}
+
+func benchmarkIncrementalEdit(b *testing.B, target string) {
+	raw, err := os.ReadFile("t.ifc")
+	if err != nil {
+		b.Fatal(err)
+	}
+	original := string(raw)
+	edited := original
+	editAt := -1
+	if target == "root" {
+		editAt = strings.Index(edited, "IFCPROJECT(")
+	} else {
+		// The instance roughly in the middle of the file.
+		editAt = nthEntityOffset(edited, len(edited)/2)
+	}
+	if editAt < 0 {
+		b.Fatalf("target %q not found in t.ifc", target)
+	}
+	// Skip the "#<number>=" prefix: editing the instance name would rename the
+	// instance, which is a different (and much more expensive) scenario.
+	for editAt < len(edited) && edited[editAt] != '=' {
+		editAt++
+	}
+	for i := editAt; i < len(edited); i++ {
+		if edited[i] >= '0' && edited[i] <= '9' {
+			replacement := byte('0')
+			if edited[i] == '0' {
+				replacement = '1'
+			}
+			edited = edited[:i] + string(replacement) + edited[i+1:]
+			break
+		}
+	}
+	if edited == original {
+		b.Fatal("edit did not change the document")
+	}
+
+	sc := CreateServices()
+	fixture := fbtest.New(b, sc)
+	documents := []*core.Document{
+		fixture.ParseURI(original, "inmemory://incremental-bench.ifc").Document,
+		fixture.ParseURI(edited, "inmemory://incremental-bench.ifc").Document,
+	}
+	validator := service.MustGet[workspace.DocumentValidator](sc)
+	ctx := context.Background()
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		sinkDiags = validator.Validate(ctx, documents[i%len(documents)], "bench")
+	}
+}
+
+// nthEntityOffset returns the offset of the entity instance that contains the
+// byte offset at.
+func nthEntityOffset(text string, at int) int {
+	if at <= 0 || at >= len(text) {
+		return -1
+	}
+	best := -1
+	for i := 0; i+2 < len(text); i++ {
+		if text[i] != '#' {
+			continue
+		}
+		j := i + 1
+		for j < len(text) && text[j] >= '0' && text[j] <= '9' {
+			j++
+		}
+		if j > i+1 && j < len(text) && text[j] == '=' {
+			if i > at {
+				break
+			}
+			best = i
+		}
+	}
+	return best
+}
+
+// BenchmarkEntityScan measures the per-validation bookkeeping of the
+// incremental path: collecting every entity instance plus fingerprinting its
+// source text. This is the fixed cost that every incremental validation pays
+// before it can decide what to re-validate.
+func BenchmarkEntityScan(b *testing.B) {
+	_, doc := benchTIfc(b, nil)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		sinkUnits, sinkContent, sinkScanOK = collectEntityUnits(doc.Document)
 	}
 }
 
