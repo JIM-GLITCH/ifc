@@ -33,6 +33,7 @@ func SetupIfcLanguageServer(sc *service.Container) {
 	}
 	service.Override[lsp.Server](sc, NewIfcLanguageServer(sc))
 	service.Override[server.HoverProvider](sc, NewIfcHoverProvider(sc))
+	service.Override[server.DocumentSymbolProvider](sc, NewIfcDocumentSymbolProvider(sc))
 }
 
 func (s *IfcLanguageServer) Initialize(ctx context.Context, params *lsp.ParamInitialize) (*lsp.InitializeResult, error) {

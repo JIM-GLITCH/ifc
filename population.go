@@ -20,6 +20,17 @@ type Population struct {
 	byName       map[string]*InstanceRecord
 	inverseLinks map[string]map[string][]SIMPLE_ENTITY_INSTANCE
 
+	// outlineRels caches relationship entity records (IFCREL*) seen during the
+	// population scan. Child -> parent instance-name ("#123") links used to
+	// build the document-symbol hierarchy are derived from them lazily, on the
+	// first document-symbol request, so the per-validation population build
+	// does not pay for them; see ifc_document_symbols.go.
+	outlineRels            []*InstanceRecord
+	outlineOnce            sync.Once
+	outlineAggParent       map[string]string
+	outlineContainedParent map[string]string
+	outlineHostParent      map[string]string
+
 	// globalSets caches the per-EXPRESS-name entity sets used by global RULE
 	// and UNIQUE evaluation. It is built once per population (lazily, on first
 	// use) instead of once per rule.
@@ -65,10 +76,60 @@ func BuildPopulation(ctx context.Context, doc *core.Document) *Population {
 				continue
 			}
 			pop.byName[simple.Name()] = record
+			if strings.HasPrefix(record.StepName, "IFCREL") {
+				pop.outlineRels = append(pop.outlineRels, record)
+			}
 		}
 	}
 	pop.buildInverseLinks(ctx)
 	return pop
+}
+
+// ensureOutlineParents derives spatial-outline parent links from the cached
+// relationship entities (aggregation, spatial containment, voids/fills). It
+// runs once per population, on first use by the document symbol provider.
+func (pop *Population) ensureOutlineParents(ctx context.Context) {
+	pop.outlineOnce.Do(func() {
+		for _, rec := range pop.outlineRels {
+			pop.collectOutlineParent(ctx, rec)
+		}
+	})
+}
+
+// collectOutlineParent records spatial-outline parent links from relationship
+// entities (aggregation, spatial containment, voids/fills) so the document
+// symbol provider does not need a second scan. Children are keyed by instance
+// name; first relationship in file order wins.
+func (pop *Population) collectOutlineParent(ctx context.Context, rec *InstanceRecord) {
+	if rec == nil || !strings.HasPrefix(rec.StepName, "IFCREL") {
+		return
+	}
+	var parentAttr, childAttr string
+	var dst *map[string]string
+	switch {
+	case entityIsOrSubtypes(rec.StepName, "IfcRelAggregates"):
+		parentAttr, childAttr, dst = "RelatingObject", "RelatedObjects", &pop.outlineAggParent
+	case entityIsOrSubtypes(rec.StepName, "IfcRelContainedInSpatialStructure"):
+		parentAttr, childAttr, dst = "RelatingStructure", "RelatedElements", &pop.outlineContainedParent
+	case entityIsOrSubtypes(rec.StepName, "IfcRelVoidsElement"):
+		parentAttr, childAttr, dst = "RelatingBuildingElement", "RelatedOpeningElement", &pop.outlineHostParent
+	case entityIsOrSubtypes(rec.StepName, "IfcRelFillsElement"):
+		parentAttr, childAttr, dst = "RelatingOpeningElement", "RelatedBuildingElement", &pop.outlineHostParent
+	default:
+		return
+	}
+	parents := ifcEntityAttrNames(ctx, rec, parentAttr)
+	if len(parents) != 1 {
+		return
+	}
+	if *dst == nil {
+		*dst = make(map[string]string)
+	}
+	for _, child := range ifcEntityAttrNames(ctx, rec, childAttr) {
+		if _, exists := (*dst)[child]; !exists {
+			(*dst)[child] = parents[0]
+		}
+	}
 }
 
 func findExchangeFile(root core.AstNode) EXCHANGE_FILE {
@@ -259,6 +320,17 @@ func (pop *Population) Lookup(name string) (*InstanceRecord, bool) {
 	}
 	rec, ok := pop.byName[name]
 	return rec, ok
+}
+
+func ifcEntityAttrNames(ctx context.Context, rec *InstanceRecord, attrName string) []string {
+	if rec == nil {
+		return nil
+	}
+	index := attrIndex(rec.StepName, attrName)
+	if index < 0 || index >= len(rec.Params) {
+		return nil
+	}
+	return entityRefTargetNames(ctx, rec.Params[index])
 }
 
 func entityRefTargetNames(ctx context.Context, param PARAMETER) []string {
