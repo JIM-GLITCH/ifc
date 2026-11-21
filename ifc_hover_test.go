@@ -54,6 +54,23 @@ END-ISO-10303-21;`)
 	doc.ExpectNoHoverAt("decl")
 }
 
+func TestHoverEntityNameShowsExpressDeclaration(t *testing.T) {
+	fixture := newIfcHoverFixture(t)
+	doc := fixture.Parse(`ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4X3'));
+ENDSEC;
+DATA;
+#1=<|entity:IFCWALL|>('id',$,$,$,$,$,$,$,$);
+ENDSEC;
+END-ISO-10303-21;`)
+	doc.AssertNoParseErrors()
+
+	doc.ExpectHoverAt("entity", "```express\n"+entityExpressDocs["IFCWALL"]+"\n```")
+}
+
 func TestHoverUnresolvedEntityReferenceHasNoPreview(t *testing.T) {
 	fixture := newIfcHoverFixture(t)
 	doc := fixture.Parse(`ISO-10303-21;

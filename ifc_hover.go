@@ -32,6 +32,10 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 		return nil, nil
 	}
 
+	if hover := entityHover(first, second); hover != nil {
+		return hover, nil
+	}
+
 	nameFinder := service.MustGet[server.NameFinder](p.sc)
 	foundName := nameFinder.Find(ctx, first, second)
 	if foundName.Target == nil || foundName.Source == nil || foundName.Source == foundName.Target {
@@ -58,4 +62,28 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 		},
 		Range: foundName.Source.Segment().Range.LspRange(),
 	}, nil
+}
+
+func entityHover(first, second *core.Token) *lsp.Hover {
+	for _, token := range []*core.Token{first, second} {
+		if token == nil || token.Type != Token_KEYWORD {
+			continue
+		}
+		record, ok := token.Element.(SIMPLE_RECORD)
+		if !ok {
+			continue
+		}
+		declaration, ok := entityExpressDocs[strings.ToUpper(record.Keyword())]
+		if !ok {
+			continue
+		}
+		return &lsp.Hover{
+			Contents: lsp.MarkupContent{
+				Kind:  lsp.Markdown,
+				Value: "```express\n" + declaration + "\n```",
+			},
+			Range: token.Segment().Range.LspRange(),
+		}
+	}
+	return nil
 }
