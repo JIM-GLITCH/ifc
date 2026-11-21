@@ -32,6 +32,7 @@ func SetupIfcLanguageServer(sc *service.Container) {
 		service.Put(sc, NewValidationSettingsStore())
 	}
 	service.Override[lsp.Server](sc, NewIfcLanguageServer(sc))
+	service.Override[server.HoverProvider](sc, NewIfcHoverProvider(sc))
 }
 
 func (s *IfcLanguageServer) Initialize(ctx context.Context, params *lsp.ParamInitialize) (*lsp.InitializeResult, error) {
