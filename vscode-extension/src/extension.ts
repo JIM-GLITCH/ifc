@@ -13,6 +13,34 @@ let client: LanguageClient;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     registerValidationStatusBar(context);
+    context.subscriptions.push(
+        vscode.commands.registerCommand('ifc.openEntityReference', async (target: unknown) => {
+            const payload = Array.isArray(target) ? target[0] : target;
+            if (payload == null || typeof payload !== 'object') {
+                return;
+            }
+            const { uri, range } = payload as {
+                uri?: string;
+                range?: {
+                    start?: { line: number; character: number };
+                    end?: { line: number; character: number };
+                };
+            };
+            if (!uri) {
+                return;
+            }
+            const document = await vscode.workspace.openTextDocument(vscode.Uri.parse(uri));
+            const editor = await vscode.window.showTextDocument(document);
+            if (range?.start && range?.end) {
+                const selection = new vscode.Selection(
+                    new vscode.Position(range.start.line, range.start.character),
+                    new vscode.Position(range.end.line, range.end.character)
+                );
+                editor.selection = selection;
+                editor.revealRange(selection);
+            }
+        })
+    );
     client = await startLanguageClient(context);
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration((event) => {
@@ -49,6 +77,10 @@ async function startLanguageClient(context: vscode.ExtensionContext): Promise<La
         documentSelector: [{ scheme: 'file', language: 'ifc' }],
         outputChannel: vscode.window.createOutputChannel('Ifc Language Server'),
         initializationOptions: buildInitializationOptions(),
+        markdown: {
+            isTrusted: { enabledCommands: ['ifc.openEntityReference'] },
+            supportHtml: false
+        },
         synchronize: {
             configurationSection: 'ifc'
         }

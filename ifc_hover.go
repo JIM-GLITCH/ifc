@@ -35,6 +35,12 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 	if hover := entityHover(first, second); hover != nil {
 		return hover, nil
 	}
+	if hover := derivedHover(ctx, doc, first); hover != nil {
+		return hover, nil
+	}
+	if hover := derivedHover(ctx, doc, second); hover != nil {
+		return hover, nil
+	}
 
 	nameFinder := service.MustGet[server.NameFinder](p.sc)
 	foundName := nameFinder.Find(ctx, first, second)

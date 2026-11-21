@@ -71,6 +71,64 @@ END-ISO-10303-21;`)
 	doc.ExpectHoverAt("entity", "```express\n"+entityExpressDocs["IFCWALL"]+"\n```")
 }
 
+func TestHoverOmittedSiUnitDimensions(t *testing.T) {
+	fixture := newIfcHoverFixture(t)
+	doc := fixture.Parse(`ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCSIUNIT(<|dimensions:*|>,.LENGTHUNIT.,.MILLI.,.METRE.);
+ENDSEC;
+END-ISO-10303-21;`)
+	doc.AssertNoParseErrors()
+
+	doc.ExpectHoverAt("dimensions", "**Dimensions** = `IfcDimensionalExponents(1,0,0,0,0,0,0)`")
+}
+
+func TestHoverInheritedSubContextDerivedValue(t *testing.T) {
+	fixture := newIfcHoverFixture(t)
+	doc := fixture.Parse(`ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCCARTESIANPOINT((0.,0.,0.));
+#2=IFCAXIS2PLACEMENT3D(#1,$,$);
+#3=IFCGEOMETRICREPRESENTATIONCONTEXT('Model','Model',3,1.E-5,#2,$);
+#4=IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Body','Model',<|coord:*|>,*,*,*,#3,0.5,.MODEL_VIEW.,$);
+ENDSEC;
+END-ISO-10303-21;`)
+	doc.AssertNoParseErrors()
+
+	doc.ExpectHoverAt("coord", "**CoordinateSpaceDimension** = `3`")
+}
+
+func TestHoverDerivedEntityReferenceShowsDefinitionAndLink(t *testing.T) {
+	fixture := newIfcHoverFixture(t)
+	doc := fixture.Parse(`ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#118=IFCDIRECTION((0.,1.));
+#1=IFCCARTESIANPOINT((0.,0.,0.));
+#2=IFCAXIS2PLACEMENT3D(#1,$,$);
+#3=IFCGEOMETRICREPRESENTATIONCONTEXT('Model','Model',3,1.E-5,#2,#118);
+#4=IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Body','Model',*,*,*,<|north:*|>,#3,0.5,.MODEL_VIEW.,$);
+ENDSEC;
+END-ISO-10303-21;`)
+	doc.AssertNoParseErrors()
+
+	doc.ExpectHoverAt("north", "**TrueNorth** = [#118](command:ifc.openEntityReference?%5B%7B%22uri%22%3A%22inmemory%3A%2F%2Ftest.ifc%22%2C%22range%22%3A%7B%22start%22%3A%7B%22line%22%3A7%2C%22character%22%3A0%7D%2C%22end%22%3A%7B%22line%22%3A7%2C%22character%22%3A4%7D%7D%7D%5D)\n\n```ifc\n#118=IFCDIRECTION((0.,1.));\n```")
+}
+
 func TestHoverUnresolvedEntityReferenceHasNoPreview(t *testing.T) {
 	fixture := newIfcHoverFixture(t)
 	doc := fixture.Parse(`ISO-10303-21;
