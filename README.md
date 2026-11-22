@@ -4,6 +4,8 @@ IFC (`.ifc`) language server and VS Code extension built on [fastbelt](https://g
 
 **Current extension release:** `0.0.15` — context-aware completion (entity names, `#N` references filtered by expected attribute type, header keywords) derived from the cursor line only, plus document symbols, hover signatures and signature help. See [`vscode-extension/CHANGELOG.md`](vscode-extension/CHANGELOG.md) and [`vscode-extension/README.md`](vscode-extension/README.md) for details, diagnostic codes, and packaging.
 
+**Also by the same author:** [EXPRESS Language](https://marketplace.visualstudio.com/items?itemName=lilr.express-lang) — VS Code support for EXPRESS (ISO 10303-11) schema files (`.exp`): syntax highlighting, diagnostics, completion, go-to-definition and semantic linking for entities, types, attributes and WHERE/DERIVE expressions.
+
 **Repository:** [github.com/JIM-GLITCH/ifc](https://github.com/JIM-GLITCH/ifc) · **Issues:** [github.com/JIM-GLITCH/ifc/issues](https://github.com/JIM-GLITCH/ifc/issues) · Licensed under [MIT](LICENSE).
 
 This repository includes:
