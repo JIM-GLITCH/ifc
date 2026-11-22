@@ -54,7 +54,7 @@ END-ISO-10303-21;`)
 	doc.ExpectNoHoverAt("decl")
 }
 
-func TestHoverEntityNameShowsExpressDeclaration(t *testing.T) {
+func TestHoverEntityNameShowsSignatureAndParameterTypes(t *testing.T) {
 	fixture := newIfcHoverFixture(t)
 	doc := fixture.Parse(`ISO-10303-21;
 HEADER;
@@ -63,12 +63,13 @@ FILE_NAME('','2022-01-01',(),(),'','','');
 FILE_SCHEMA(('IFC4X3'));
 ENDSEC;
 DATA;
-#1=<|entity:IFCWALL|>('id',$,$,$,$,$,$,$,$);
+#2=IFCCARTESIANPOINT((0.,0.,0.));
+#1=<|entity:IFCPRESENTATIONLAYERASSIGNMENT|>('layer',$,(#2),$);
 ENDSEC;
 END-ISO-10303-21;`)
 	doc.AssertNoParseErrors()
 
-	doc.ExpectHoverAt("entity", "```express\n"+entityExpressDocs["IFCWALL"]+"\n```")
+	doc.ExpectHoverAt("entity", "`IFCPRESENTATIONLAYERASSIGNMENT(Name, Description, AssignedItems, Identifier)`\n\n- `Name`: `IfcLabel`\n- `Description`: `OPTIONAL IfcText`\n- `AssignedItems`: `SET [1:?] OF IfcLayeredItem`\n- `Identifier`: `OPTIONAL IfcIdentifier`")
 }
 
 func TestHoverOmittedSiUnitDimensions(t *testing.T) {
@@ -127,6 +128,41 @@ END-ISO-10303-21;`)
 	doc.AssertNoParseErrors()
 
 	doc.ExpectHoverAt("north", "**TrueNorth** = [#118](command:ifc.openEntityReference?%5B%7B%22uri%22%3A%22inmemory%3A%2F%2Ftest.ifc%22%2C%22range%22%3A%7B%22start%22%3A%7B%22line%22%3A7%2C%22character%22%3A0%7D%2C%22end%22%3A%7B%22line%22%3A7%2C%22character%22%3A4%7D%7D%7D%5D)\n\n```ifc\n#118=IFCDIRECTION((0.,1.));\n```")
+}
+
+func TestHoverEnumerationShowsTypeDeclaration(t *testing.T) {
+	fixture := newIfcHoverFixture(t)
+	doc := fixture.Parse(`ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCSIUNIT(*,<|unit:.LENGTHUNIT.|>,.MILLI.,.METRE.);
+ENDSEC;
+END-ISO-10303-21;`)
+	doc.AssertNoParseErrors()
+
+	doc.ExpectHoverAt("unit", "**UnitType** : `IfcUnitEnum`\n\n```express\n"+enumTypeExpressDocs["IFCUNITENUM"]+"\n```")
+}
+
+func TestHoverEnumerationOnLaterAttribute(t *testing.T) {
+	fixture := newIfcHoverFixture(t)
+	doc := fixture.Parse(`ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION((),'2;1');
+FILE_NAME('','2022-01-01',(),(),'','','');
+FILE_SCHEMA(('IFC4X3'));
+ENDSEC;
+DATA;
+#1=IFCGEOMETRICREPRESENTATIONCONTEXT('Model','Model',3,1.E-5,$,$);
+#2=IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Axis','Model',*,*,*,*,#1,0.5,<|view:.MODEL_VIEW.|>,$);
+ENDSEC;
+END-ISO-10303-21;`)
+	doc.AssertNoParseErrors()
+
+	doc.ExpectHoverAt("view", "**TargetView** : `IfcGeometricProjectionEnum`\n\n```express\n"+enumTypeExpressDocs["IFCGEOMETRICPROJECTIONENUM"]+"\n```")
 }
 
 func TestHoverUnresolvedEntityReferenceHasNoPreview(t *testing.T) {

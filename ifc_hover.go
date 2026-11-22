@@ -35,6 +35,9 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 	if hover := entityHover(first, second); hover != nil {
 		return hover, nil
 	}
+	if hover := enumHover(first, second); hover != nil {
+		return hover, nil
+	}
 	if hover := derivedHover(ctx, doc, first); hover != nil {
 		return hover, nil
 	}
@@ -79,14 +82,31 @@ func entityHover(first, second *core.Token) *lsp.Hover {
 		if !ok {
 			continue
 		}
-		declaration, ok := entityExpressDocs[strings.ToUpper(record.Keyword())]
+		stepName := strings.ToUpper(record.Keyword())
+		params, ok := entitySignatureParameters(stepName)
 		if !ok {
-			continue
+			declaration, ok := entityExpressDocs[stepName]
+			if !ok {
+				continue
+			}
+			return &lsp.Hover{
+				Contents: lsp.MarkupContent{
+					Kind:  lsp.Markdown,
+					Value: "```express\n" + declaration + "\n```",
+				},
+				Range: token.Segment().Range.LspRange(),
+			}
+		}
+
+		var b strings.Builder
+		b.WriteString("`" + entitySignatureLabel(stepName, params, false) + "`")
+		if types := entityParameterTypeMarkdown(params); types != "" {
+			b.WriteString("\n\n" + types)
 		}
 		return &lsp.Hover{
 			Contents: lsp.MarkupContent{
 				Kind:  lsp.Markdown,
-				Value: "```express\n" + declaration + "\n```",
+				Value: b.String(),
 			},
 			Range: token.Segment().Range.LspRange(),
 		}

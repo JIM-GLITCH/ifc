@@ -4,14 +4,20 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.0.15] - 2026-11-22
 
 ### Added
 
+- **Completion** — `textDocument/completion` now offers context-aware candidates derived from the text on the cursor's line (no full-prefix reparse, so it stays fast on large files):
+  - Record keyword positions (`#N=`, `#N=(`, after `,` inside a complex instance) complete all non-abstract EXPRESS entity names, filterable by the typed prefix, with the entity signature as detail.
+  - Header entity positions complete `FILE_DESCRIPTION` / `FILE_NAME` / `FILE_SCHEMA`.
+  - Parameter positions complete `#N` entity references **filtered by the expected attribute type** (entity/select/aggregate-aware via the EXPRESS schema), plus the `$` (default) and `*` (omitted) markers.
+  - Entity documentation is attached lazily through `completionItem/resolve`, keeping completion responses small.
 - **Document symbols (Outline view)** — `textDocument/documentSymbol` returns the spatial hierarchy of the model: `IFCPROJECT` → site / building / storey / space → contained elements, with openings and fills nested under their host elements. Parent links are read from `IFCRELAGGREGATES`, `IFCRELCONTAINEDINSPATIALSTRUCTURE`, `IFCRELVOIDSELEMENT` and `IFCRELFILLSELEMENT`; entities without a spatial parent are listed as roots in file order. Non-spatial entities (types, property sets, relationships, …) are omitted.
   - The relationship scan is piggybacked on the population build as a cheap record list and the parent maps are derived lazily on the first symbol request, so validation and hover pay nothing for it (`BenchmarkBuildPopulation` unchanged).
 - **Hover: STEP `#id` references** — hovering an entity reference shows the referenced instance's source text in a code block.
-- **Hover: entity documentation** — hovering an IFC entity keyword shows its EXPRESS declaration, generated for every IFC4X3 entity (`entity_docs_gen.go`, regenerated via `npm run generate:entity-docs`).
+- **Hover: entity signature** — hovering an IFC entity keyword shows its STEP signature (`ENTITY(...)`) plus per-argument types with `OPTIONAL`/`DERIVED` markers.
+- **Signature help** — `textDocument/signatureHelp` inside an entity argument list shows typed parameters (`Name: Type`) and a parameter-type documentation list.
 - **Hover: derived attributes** — hovering a `*` DERIVE placeholder shows the attribute name and evaluated value; entity references inside the value render as clickable links that jump to the referenced instance (new `ifc.openEntityReference` command).
 - **Benchmark harness** — `bench/compare.mjs` runs an identical LSP conversation against any server and reports open/edit → diagnostics latency; `bench/features.mjs` times documentSymbol / definition / references / hover / completion in isolation; `bench/samples/Building-Architecture-IFC4.ifc` adds a typical-size (226 KB) model alongside `t.ifc`.
 
