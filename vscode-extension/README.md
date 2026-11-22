@@ -6,6 +6,8 @@ VS Code extension for editing **IFC physical files** (`.ifc`) — the text-based
 
 Open any `.ifc` file and the extension activates automatically. No extra configuration is required.
 
+**Also by the same author:** [EXPRESS Language](https://marketplace.visualstudio.com/items?itemName=lilr.express-lang) — VS Code support for EXPRESS (ISO 10303-11) schema files (`.exp`): syntax highlighting, diagnostics, completion, go-to-definition and semantic linking for entities, types, attributes and WHERE/DERIVE expressions.
+
 **Repository:** [github.com/JIM-GLITCH/ifc](https://github.com/JIM-GLITCH/ifc) · **Issues:** [github.com/JIM-GLITCH/ifc/issues](https://github.com/JIM-GLITCH/ifc/issues) · Licensed under [MIT](LICENSE).
 
 ## Features
