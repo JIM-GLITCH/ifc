@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	core "typefox.dev/fastbelt"
+	"typefox.dev/fastbelt/parser"
 	fbtest "typefox.dev/fastbelt/test"
 	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
@@ -80,7 +81,7 @@ func BenchmarkValidate(b *testing.B) {
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
 			sc, doc := benchTIfc(b, tc.preset)
-			validator := service.MustGet[workspace.DocumentValidator](sc)
+			validator := sc.MustGet[workspace.DocumentValidator]()
 			ctx := context.Background()
 			b.ReportAllocs()
 			// The validator caches per-document entity state; drop it so the
@@ -90,7 +91,7 @@ func BenchmarkValidate(b *testing.B) {
 				defer incremental.cache.reset()
 			}
 			for i := 0; i < b.N; i++ {
-				sinkDiags = validator.Validate(ctx, doc.Document, "bench")
+				sinkDiags = validator.Validate(ctx, doc.Document)
 				if incremental, ok := validator.(*IfcDocumentValidator); ok {
 					incremental.cache.reset()
 				}
@@ -162,12 +163,12 @@ func benchmarkIncrementalEdit(b *testing.B, target string) {
 		fixture.ParseURI(original, "inmemory://incremental-bench.ifc").Document,
 		fixture.ParseURI(edited, "inmemory://incremental-bench.ifc").Document,
 	}
-	validator := service.MustGet[workspace.DocumentValidator](sc)
+	validator := sc.MustGet[workspace.DocumentValidator]()
 	ctx := context.Background()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		sinkDiags = validator.Validate(ctx, documents[i%len(documents)], "bench")
+		sinkDiags = validator.Validate(ctx, documents[i%len(documents)])
 	}
 }
 
@@ -217,15 +218,13 @@ func BenchmarkParse(b *testing.B) {
 		b.Fatal(err)
 	}
 	sc := CreateServices()
-	parser := service.MustGet[workspace.DocumentParser](sc)
+	p := sc.MustGet[parser.Parser]()
+	ctx := context.Background()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		doc, err := core.NewDocumentFromString("inmemory://test.ifc", "ifc", string(raw))
-		if err != nil {
-			b.Fatal(err)
-		}
-		parser.Parse(doc)
+		doc := core.NewDocumentFromString("inmemory://test.ifc", "ifc", string(raw))
+		p.Parse(ctx, doc)
 		if doc.Root == nil {
 			b.Fatal("parse produced no AST")
 		}
@@ -279,7 +278,7 @@ func BenchmarkCheckUniqueRules(b *testing.B) {
 // overrides whatever the incoming context carries.
 func BenchmarkLink(b *testing.B) {
 	sc := CreateServices()
-	store := service.MustGet[*ValidationSettingsStore](sc)
+	store := sc.MustGet[*ValidationSettingsStore]()
 	store.Set(ValidationSettings{})
 	fixture := fbtest.New(b, sc)
 	raw, err := os.ReadFile("t.ifc")
@@ -287,14 +286,14 @@ func BenchmarkLink(b *testing.B) {
 		b.Fatal(err)
 	}
 	doc := fixture.Parse(string(raw))
-	lock := service.MustGet[workspace.Lock](sc)
-	builder := service.MustGet[workspace.Builder](sc)
+	lock := sc.MustGet[workspace.Lock]()
+	builder := sc.MustGet[workspace.Builder]()
 	ctx := context.Background()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		lock.Write(ctx, func(ctx context.Context, downgrade func()) {
-			builder.Reset(doc.Document, core.DocStateParsed)
-			if err := builder.Build(ctx, []*core.Document{doc.Document}, downgrade); err != nil {
+		lock.Write(ctx, func(ctx context.Context) {
+			builder.Reset(doc.Document, core.DocStateLexed|core.DocStateParsed)
+			if err := builder.Build(ctx, []*core.Document{doc.Document}); err != nil {
 				b.Fatal(err)
 			}
 		})

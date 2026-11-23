@@ -5,6 +5,7 @@ package ifc
 import (
 	"context"
 	"iter"
+	"unique"
 
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/parser"
@@ -39,9 +40,9 @@ var IfcCompletionDispatch = map[string]IfcCompletionDispatchFunc{
 		if !ok {
 			return func(yield func(*core.SymbolDescription) bool) {}
 		}
-		refs := service.MustGet[IfcReferencesConstructor](sc)
-		scopes := service.MustGet[IfcScopeProvider](sc)
-		filter := service.MustGet[IfcCompletionFilter](sc)
+		refs := sc.MustGet[IfcReferencesConstructor]()
+		scopes := sc.MustGet[IfcScopeProvider]()
+		filter := sc.MustGet[IfcCompletionFilter]()
 		ref := refs.ENTITY_REFERENCEValue(typedOwner, nil)
 		candidates := scopes.ScopeENTITY_REFERENCEValue(ctx, ref).AllElements()
 		return filter.FilterENTITY_REFERENCEValue(ctx, ref, candidates)
@@ -56,16 +57,16 @@ func NewIfcCompletionAdapter(sc *service.Container) *IfcCompletionAdapter {
 	return &IfcCompletionAdapter{sc: sc}
 }
 
-func (a *IfcCompletionAdapter) Parse(tokens []core.Token) *parser.CompletionParseResult {
-	return NewCompletionParser(a.sc).Parse(tokens)
+func (a *IfcCompletionAdapter) Parse(ctx context.Context, document *core.Document, tokens []core.Token) *parser.CompletionParseResult {
+	return NewCompletionParser(a.sc).Parse(ctx, document, tokens)
 }
 
 func (a *IfcCompletionAdapter) ATN() *parser.RuntimeATN {
-	return BuildATN()
+	return ATN()
 }
 
-func (a *IfcCompletionAdapter) SyntheticOwnerFor(ruleKey string) (core.AstNode, bool) {
-	factory, ok := IfcSyntheticFactories[ruleKey]
+func (a *IfcCompletionAdapter) SyntheticOwnerFor(nodeType string) (core.AstNode, bool) {
+	factory, ok := IfcSyntheticFactories[nodeType]
 	if !ok {
 		return nil, false
 	}
@@ -96,4 +97,8 @@ func (a *IfcCompletionAdapter) ApplyAction(actionType, property string, value co
 	_ = property
 	_ = value
 	return nil
+}
+
+func (a *IfcCompletionAdapter) AssignsCurrent(container core.AstNode, field unique.Handle[string], index int) bool {
+	return false
 }

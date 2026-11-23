@@ -7,6 +7,7 @@ import (
 
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/server"
+	"typefox.dev/fastbelt/textdoc"
 	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 	"typefox.dev/lsp"
@@ -20,10 +21,16 @@ func NewIfcDocumentSymbolProvider(sc *service.Container) server.DocumentSymbolPr
 	return &IfcDocumentSymbolProvider{sc: sc}
 }
 
+// RequiredState: document symbols are built from the AST population, so a
+// parsed document is enough.
+func (p *IfcDocumentSymbolProvider) RequiredState() (core.DocumentState, bool) {
+	return core.DocStateParsed, false
+}
+
 func (p *IfcDocumentSymbolProvider) HandleDocumentSymbolRequest(ctx context.Context, params *lsp.DocumentSymbolParams) ([]lsp.DocumentSymbol, error) {
-	documentManager := service.MustGet[workspace.DocumentManager](p.sc)
+	documentManager := p.sc.MustGet[workspace.DocumentManager]()
 	doc := documentManager.Get(core.ParseURI(string(params.TextDocument.URI)))
-	if doc == nil || doc.Root == nil {
+	if doc == nil || doc.Root == nil || doc.TextDoc == nil {
 		return nil, nil
 	}
 
@@ -31,7 +38,7 @@ func (p *IfcDocumentSymbolProvider) HandleDocumentSymbolRequest(ctx context.Cont
 	if pop == nil {
 		return nil, nil
 	}
-	return buildIfcDocumentSymbols(ctx, pop), nil
+	return buildIfcDocumentSymbols(ctx, pop, doc.TextDoc), nil
 }
 
 type ifcSymbolNode struct {
@@ -40,7 +47,7 @@ type ifcSymbolNode struct {
 	children []*ifcSymbolNode
 }
 
-func buildIfcDocumentSymbols(ctx context.Context, pop *Population) []lsp.DocumentSymbol {
+func buildIfcDocumentSymbols(ctx context.Context, pop *Population, handle textdoc.Handle) []lsp.DocumentSymbol {
 	if pop == nil {
 		return nil
 	}
@@ -104,34 +111,36 @@ func buildIfcDocumentSymbols(ctx context.Context, pop *Population) []lsp.Documen
 	seen := map[*ifcSymbolNode]bool{}
 	var symbols []lsp.DocumentSymbol
 	for _, node := range roots {
-		symbols = append(symbols, finalizeIfcSymbolNode(node, seen)...)
+		symbols = append(symbols, finalizeIfcSymbolNode(node, seen, handle)...)
 	}
 	for _, node := range outline {
 		if !seen[node] {
-			symbols = append(symbols, finalizeIfcSymbolNode(node, seen)...)
+			symbols = append(symbols, finalizeIfcSymbolNode(node, seen, handle)...)
 		}
 	}
 	return symbols
 }
 
-func finalizeIfcSymbolNode(node *ifcSymbolNode, seen map[*ifcSymbolNode]bool) []lsp.DocumentSymbol {
+func finalizeIfcSymbolNode(node *ifcSymbolNode, seen map[*ifcSymbolNode]bool, handle textdoc.Handle) []lsp.DocumentSymbol {
 	if node == nil || seen[node] {
 		return nil
 	}
 	seen[node] = true
-	node.symbol = ifcDocumentSymbolFor(node.rec)
+	node.symbol = ifcDocumentSymbolFor(node.rec, handle)
 	for _, child := range node.children {
-		node.symbol.Children = append(node.symbol.Children, finalizeIfcSymbolNode(child, seen)...)
+		node.symbol.Children = append(node.symbol.Children, finalizeIfcSymbolNode(child, seen, handle)...)
 	}
 	return []lsp.DocumentSymbol{node.symbol}
 }
 
-func ifcDocumentSymbolFor(rec *InstanceRecord) lsp.DocumentSymbol {
+func ifcDocumentSymbolFor(rec *InstanceRecord, handle textdoc.Handle) lsp.DocumentSymbol {
 	inst := rec.Instance
-	r := ifcInstanceRange(inst)
+	r := ifcInstanceRange(inst, handle)
 	selection := r
-	if token := inst.NameToken(); token != nil && token.Segment() != nil {
-		selection = token.Segment().Range.LspRange()
+	if token := inst.NameToken(); token != nil {
+		if rng := token.TextRange(); rng.End > rng.Start {
+			selection = rng.LspRange(handle)
+		}
 	}
 	return lsp.DocumentSymbol{
 		Name:           strings.TrimSpace(rec.StepName + " " + inst.Name()),
@@ -210,32 +219,36 @@ func isSpatialElementStep(stepName string) bool {
 	return entityIsOrSubtypes(stepName, "IfcElement") || entityIsOrSubtypes(stepName, "IfcSpatialElement")
 }
 
-func ifcInstanceSegment(inst SIMPLE_ENTITY_INSTANCE) *core.TextSegment {
+func ifcInstanceTextRange(inst SIMPLE_ENTITY_INSTANCE) (core.TextRange, bool) {
 	if inst == nil {
-		return nil
+		return core.TextRange{}, false
 	}
-	if segment := inst.Segment(); segment != nil {
-		return segment
+	if rng := inst.TextRange(); rng.End > rng.Start {
+		return rng, true
 	}
 	if token := inst.NameToken(); token != nil {
-		return token.Segment()
+		if rng := token.TextRange(); rng.End > rng.Start {
+			return rng, true
+		}
 	}
 	if record := inst.Record(); record != nil {
-		return record.Segment()
+		if rng := record.TextRange(); rng.End > rng.Start {
+			return rng, true
+		}
 	}
-	return nil
+	return core.TextRange{}, false
 }
 
-func ifcInstanceRange(inst SIMPLE_ENTITY_INSTANCE) lsp.Range {
-	if segment := ifcInstanceSegment(inst); segment != nil {
-		return segment.Range.LspRange()
+func ifcInstanceRange(inst SIMPLE_ENTITY_INSTANCE, handle textdoc.Handle) lsp.Range {
+	if rng, ok := ifcInstanceTextRange(inst); ok {
+		return rng.LspRange(handle)
 	}
 	return lsp.Range{}
 }
 
 func ifcInstanceStart(inst SIMPLE_ENTITY_INSTANCE) int32 {
-	if segment := ifcInstanceSegment(inst); segment != nil {
-		return int32(segment.Indices.Start)
+	if rng, ok := ifcInstanceTextRange(inst); ok {
+		return rng.Start
 	}
 	return int32(^uint32(0) >> 1)
 }

@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 )
 
@@ -20,17 +19,19 @@ func TestDumpTIfcEvalUnknownRanges(t *testing.T) {
 	}
 	doc := fixture.Parse(string(raw))
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diags := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diags := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diags {
 		if d.Code != evalUnknownCode {
 			continue
 		}
-		span := int(d.Range.End.Line) - int(d.Range.Start.Line)
+		start := doc.Document.TextDoc.PositionAt(int(d.Range.Start))
+		end := doc.Document.TextDoc.PositionAt(int(d.Range.End))
+		span := int(end.Line) - int(start.Line)
 		if span > 10 || strings.Contains(d.Message, "WorldCoordinateSystem") || strings.Contains(d.Message, "parameter value") {
 			t.Logf("eval-unknown L%d:%d-L%d:%d span=%d msg=%q",
-				d.Range.Start.Line, d.Range.Start.Column,
-				d.Range.End.Line, d.Range.End.Column,
+				start.Line, start.Character,
+				end.Line, end.Character,
 				span, d.Message)
 		}
 	}

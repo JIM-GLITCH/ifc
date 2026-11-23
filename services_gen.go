@@ -12,42 +12,42 @@ import (
 // SetupGeneratedServices sets up the generated services for this grammar.
 // If any service is already set, it's not overwritten.
 func SetupGeneratedServices(sc *service.Container) {
-	if !service.Has[IfcScopeProvider](sc) {
-		service.Put(sc, NewDefaultIfcScopeProvider(sc))
+	if !sc.Has[IfcScopeProvider]() {
+		sc.Put(NewDefaultIfcScopeProvider(sc))
 	}
-	if !service.Has[IfcReferenceLinker](sc) {
-		service.Put(sc, NewDefaultIfcReferenceLinker(sc))
+	if !sc.Has[IfcReferenceLinker]() {
+		sc.Put(NewDefaultIfcReferenceLinker(sc))
 	}
-	if !service.Has[IfcReferencesConstructor](sc) {
-		service.Put(sc, NewDefaultIfcReferencesConstructor(sc))
+	if !sc.Has[IfcReferencesConstructor]() {
+		sc.Put(NewDefaultIfcReferencesConstructor(sc))
 	}
-	if !service.Has[IfcParserLookahead](sc) {
-		service.Put(sc, NewDefaultIfcParserLookahead())
+	if !sc.Has[IfcParserLookahead]() {
+		sc.Put(NewDefaultIfcParserLookahead())
 	}
-	if !service.Has[lexer.Lexer](sc) {
-		service.Put(sc, NewLexer())
+	if !sc.Has[lexer.Lexer]() {
+		sc.Put(NewLexer(sc))
 	}
-	if !service.Has[parser.Parser](sc) {
-		service.Put[parser.Parser](sc, NewParser(sc))
+	if !sc.Has[parser.Parser]() {
+		sc.Put[parser.Parser](NewParser(sc))
 	}
-	if !service.Has[parser.ErrorRecoveryStrategy](sc) {
-		service.Put[parser.ErrorRecoveryStrategy](sc, parser.NewDefaultErrorRecovery())
+	if !sc.Has[parser.ErrorRecoveryStrategy]() {
+		sc.Put[parser.ErrorRecoveryStrategy](parser.NewDefaultErrorRecovery())
 	}
-	if !service.Has[parser.ErrorMessageProvider](sc) {
-		service.Put[parser.ErrorMessageProvider](sc, parser.NewDefaultErrorMessageProvider())
+	if !sc.Has[parser.ErrorMessageProvider]() {
+		sc.Put[parser.ErrorMessageProvider](parser.NewDefaultErrorMessageProvider())
 	}
-	if !service.Has[core.SymbolContainers](sc) {
-		service.Put[core.SymbolContainers](sc, NewSymbolContainers())
+	if !sc.Has[core.SymbolContainers]() {
+		sc.Put[core.SymbolContainers](NewSymbolContainers())
 	}
 }
 
 // SetupGeneratedServerServices sets up the generated language server services for this grammar.
 // If any service is already set, it's not overwritten.
 func SetupGeneratedServerServices(sc *service.Container) {
-	if !service.Has[IfcCompletionFilter](sc) {
-		service.Put(sc, NewDefaultIfcCompletionFilter())
+	if !sc.Has[IfcCompletionFilter]() {
+		sc.Put(NewDefaultIfcCompletionFilter())
 	}
-	if !service.Has[parser.LanguageCompletionAdapter](sc) {
-		service.Put[parser.LanguageCompletionAdapter](sc, NewIfcCompletionAdapter(sc))
+	if !sc.Has[parser.LanguageCompletionAdapter]() {
+		sc.Put[parser.LanguageCompletionAdapter](NewIfcCompletionAdapter(sc))
 	}
 }

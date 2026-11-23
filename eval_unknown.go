@@ -64,11 +64,17 @@ func diagnosticLineSpan(node core.AstNode) int {
 	if node == nil {
 		return 0
 	}
-	seg := node.Segment()
-	if seg == nil {
+	rng := node.TextRange()
+	if rng.End <= rng.Start {
 		return 0
 	}
-	return int(seg.Range.End.Line) - int(seg.Range.Start.Line)
+	doc := node.Document()
+	if doc == nil || doc.TextDoc == nil {
+		return 0
+	}
+	start := doc.TextDoc.PositionAt(int(rng.Start))
+	end := doc.TextDoc.PositionAt(int(rng.End))
+	return int(end.Line) - int(start.Line)
 }
 
 func acceptEvalUnknowns(

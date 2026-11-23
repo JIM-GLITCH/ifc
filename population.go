@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"sync"
+	"unique"
 
 	core "typefox.dev/fastbelt"
 )
@@ -67,6 +68,9 @@ func BuildPopulation(ctx context.Context, doc *core.Document) *Population {
 			continue
 		}
 		for _, inst := range section.EntityInstances() {
+			if ctx.Err() != nil {
+				return pop
+			}
 			simple := asSimpleInstance(inst)
 			if simple == nil {
 				continue
@@ -193,12 +197,12 @@ func (s *simpleFromComplex) Record() SIMPLE_RECORD     { return s.record }
 func (s *simpleFromComplex) SetRecord(value SIMPLE_RECORD) {
 	s.record = value
 }
-func (s *simpleFromComplex) ForEachNode(fn func(core.AstNode)) {
+func (s *simpleFromComplex) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if s.record != nil {
-		fn(s.record)
+		fn(s.record, unique.Make("record"), -1)
 	}
 }
-func (s *simpleFromComplex) ForEachReference(fn func(core.UntypedReference)) {}
+func (s *simpleFromComplex) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {}
 
 func instanceRecordFrom(simple SIMPLE_ENTITY_INSTANCE) *InstanceRecord {
 	record := simple.Record()
@@ -267,6 +271,9 @@ func computeMergedForwardInverses(stepName string) map[int][]ForwardInverseTarge
 
 func (pop *Population) buildInverseLinks(ctx context.Context) {
 	for _, rec := range pop.byName {
+		if ctx.Err() != nil {
+			return
+		}
 		forwardMap := mergedForwardInverses(rec.StepName)
 		if forwardMap == nil {
 			continue

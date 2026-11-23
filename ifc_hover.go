@@ -6,6 +6,7 @@ import (
 
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/server"
+	"typefox.dev/fastbelt/textdoc"
 	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 	"typefox.dev/lsp"
@@ -19,10 +20,17 @@ func NewIfcHoverProvider(sc *service.Container) server.HoverProvider {
 	return &IfcHoverProvider{sc: sc}
 }
 
+// RequiredState matches the default hover provider: entity hover resolves
+// references, so it needs the document linked. Scoping to the single document
+// keeps hover from waiting on the whole workspace build.
+func (p *IfcHoverProvider) RequiredState() (core.DocumentState, bool) {
+	return core.DocStateLinked, false
+}
+
 func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.HoverParams) (*lsp.Hover, error) {
-	documentManager := service.MustGet[workspace.DocumentManager](p.sc)
+	documentManager := p.sc.MustGet[workspace.DocumentManager]()
 	doc := documentManager.Get(core.ParseURI(string(params.TextDocument.URI)))
-	if doc == nil {
+	if doc == nil || doc.TextDoc == nil {
 		return nil, nil
 	}
 
@@ -32,10 +40,10 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 		return nil, nil
 	}
 
-	if hover := entityHover(first, second); hover != nil {
+	if hover := entityHover(first, second, doc.TextDoc); hover != nil {
 		return hover, nil
 	}
-	if hover := enumHover(first, second); hover != nil {
+	if hover := enumHover(first, second, doc.TextDoc); hover != nil {
 		return hover, nil
 	}
 	if hover := derivedHover(ctx, doc, first); hover != nil {
@@ -45,7 +53,7 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 		return hover, nil
 	}
 
-	nameFinder := service.MustGet[server.NameFinder](p.sc)
+	nameFinder := p.sc.MustGet[server.NameFinder]()
 	foundName := nameFinder.Find(ctx, first, second)
 	if foundName.Target == nil || foundName.Source == nil || foundName.Source == foundName.Target {
 		return nil, nil
@@ -69,11 +77,11 @@ func (p *IfcHoverProvider) HandleHoverRequest(ctx context.Context, params *lsp.H
 			Kind:  lsp.Markdown,
 			Value: "```ifc\n" + preview + "\n```",
 		},
-		Range: foundName.Source.Segment().Range.LspRange(),
+		Range: foundName.Source.TextRange().LspRange(doc.TextDoc),
 	}, nil
 }
 
-func entityHover(first, second *core.Token) *lsp.Hover {
+func entityHover(first, second *core.Token, handle textdoc.Handle) *lsp.Hover {
 	for _, token := range []*core.Token{first, second} {
 		if token == nil || token.Type != Token_KEYWORD {
 			continue
@@ -94,7 +102,7 @@ func entityHover(first, second *core.Token) *lsp.Hover {
 					Kind:  lsp.Markdown,
 					Value: "```express\n" + declaration + "\n```",
 				},
-				Range: token.Segment().Range.LspRange(),
+				Range: token.TextRange().LspRange(handle),
 			}
 		}
 
@@ -108,7 +116,7 @@ func entityHover(first, second *core.Token) *lsp.Hover {
 				Kind:  lsp.Markdown,
 				Value: b.String(),
 			},
-			Range: token.Segment().Range.LspRange(),
+			Range: token.TextRange().LspRange(handle),
 		}
 	}
 	return nil

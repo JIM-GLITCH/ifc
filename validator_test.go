@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 )
 
@@ -46,8 +45,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-param-count" || d.Code == "ifc-unknown-entity" {
@@ -74,8 +73,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -106,8 +105,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -141,8 +140,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -173,8 +172,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -207,8 +206,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-typed-keyword" {
@@ -235,8 +234,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -318,8 +317,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
@@ -354,8 +353,8 @@ END-ISO-10303-21;`
 		t.Fatal("expected first IFCSIUNIT attribute to be marked derived")
 	}
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-param-required" || d.Code == "ifc-param-derived" || d.Code == "ifc-entity-where" {
@@ -392,8 +391,8 @@ END-ISO-10303-21;`
 		t.Fatalf("expected RefLatitude to be ParamAggregate, got %v", def.Attrs[9].Kind)
 	}
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-param-type" {
@@ -423,8 +422,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-param-type" || d.Code == "ifc-param-count" || d.Code == "ifc-unknown-entity" {
@@ -451,8 +450,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -491,8 +490,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	for _, d := range diagnostics {
 		if d.Code == "ifc-type-where" {
@@ -522,8 +521,8 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {

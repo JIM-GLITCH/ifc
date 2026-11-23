@@ -22,7 +22,7 @@ func newIfcSymbolFixture(t *testing.T) (*fbtest.Fixture, *service.Container) {
 
 func documentSymbols(t *testing.T, sc *service.Container, doc *fbtest.Doc) []lsp.DocumentSymbol {
 	t.Helper()
-	provider, err := service.Get[server.DocumentSymbolProvider](sc)
+	provider, err := sc.Get[server.DocumentSymbolProvider]()
 	if err != nil {
 		t.Fatalf("document symbol provider: %v", err)
 	}

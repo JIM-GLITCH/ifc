@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 )
 
@@ -51,8 +50,8 @@ func TestTIfcPropertySetGlobalIdCaseDistinct(t *testing.T) {
 	doc := fixture.Parse(string(raw))
 	doc.AssertNoParseErrors()
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-unique" && strings.Contains(d.Message, "#64609") && strings.Contains(d.Message, "#65761") {
 			t.Fatalf("false duplicate GlobalId between #64609 and #65761: %s", d.Message)

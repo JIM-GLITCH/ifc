@@ -7,7 +7,6 @@ import (
 
 	core "typefox.dev/fastbelt"
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 )
 
@@ -32,15 +31,17 @@ func TestTIfcParseErrorsDoNotPaintFullFileEvalUnknown(t *testing.T) {
 	}
 	doc := fixture.Parse(string(raw))
 
-	validator := service.MustGet[workspace.DocumentValidator](sc)
-	diags := validator.Validate(context.Background(), doc.Document, "test")
+	validator := sc.MustGet[workspace.DocumentValidator]()
+	diags := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diags {
 		if d.Code != evalUnknownCode {
 			continue
 		}
-		span := int(d.Range.End.Line) - int(d.Range.Start.Line)
+		start := doc.Document.TextDoc.PositionAt(int(d.Range.Start))
+		end := doc.Document.TextDoc.PositionAt(int(d.Range.End))
+		span := int(end.Line) - int(start.Line)
 		if span > 50 {
-			t.Fatalf("eval-unknown spans entire file: L%d-%d msg=%q", d.Range.Start.Line, d.Range.End.Line, d.Message)
+			t.Fatalf("eval-unknown spans entire file: L%d-%d msg=%q", start.Line, end.Line, d.Message)
 		}
 	}
 }

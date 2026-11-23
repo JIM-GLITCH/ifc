@@ -81,10 +81,16 @@ func NewIfcCompletionProvider(sc *service.Container) server.CompletionProvider {
 	return &IfcCompletionProvider{sc: sc}
 }
 
+// RequiredState: parameter completion lists local entity symbols, which are
+// available once local symbols are computed.
+func (p *IfcCompletionProvider) RequiredState() (core.DocumentState, bool) {
+	return core.DocStateLocalSymbols, false
+}
+
 func (p *IfcCompletionProvider) HandleCompletionRequest(ctx context.Context, params *lsp.CompletionParams) (*lsp.CompletionList, error) {
 	empty := &lsp.CompletionList{IsIncomplete: false, Items: []lsp.CompletionItem{}}
 
-	documentManager, err := service.Get[workspace.DocumentManager](p.sc)
+	documentManager, err := p.sc.Get[workspace.DocumentManager]()
 	if err != nil {
 		return empty, nil
 	}
@@ -432,7 +438,7 @@ func paramItems(doc *core.Document, typed string, attr *SchemaAttr, replace *lsp
 		if desc == nil {
 			continue
 		}
-		name := desc.Name.String()
+		name := desc.Name
 		if upper != "" && !strings.Contains(strings.ToUpper(name), upper) {
 			continue
 		}
@@ -455,8 +461,8 @@ func paramItems(doc *core.Document, typed string, attr *SchemaAttr, replace *lsp
 // cursor).
 func applyCompletionText(item *lsp.CompletionItem, replace *lsp.Range, newText string) {
 	if replace != nil {
-		item.TextEdit = &lsp.Or_CompletionItem_textEdit{
-			Value: lsp.TextEdit{Range: *replace, NewText: newText},
+		item.TextEdit = &lsp.CompletionItemTextEdit{
+			TextEdit: &lsp.TextEdit{Range: *replace, NewText: newText},
 		}
 		return
 	}

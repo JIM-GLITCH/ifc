@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 
 	core "typefox.dev/fastbelt"
+	"typefox.dev/fastbelt/util/service"
 )
 
 // parallelValidateThreshold is the number of validator nodes below which
@@ -46,7 +47,7 @@ const parallelValidateThreshold = 64
 //
 // Diagnostics from all workers are merged in a deterministic order (by source
 // position, then code, then message) so output does not depend on scheduling.
-func parallelValidate(ctx context.Context, doc *core.Document, level, source string) []*core.Diagnostic {
+func parallelValidate(ctx context.Context, sc *service.Container, doc *core.Document, source string) []*core.Diagnostic {
 	diagnostics := []*core.Diagnostic{}
 	if doc == nil || doc.Root == nil {
 		return diagnostics
@@ -81,7 +82,7 @@ func parallelValidate(ctx context.Context, doc *core.Document, level, source str
 				break
 			}
 			accept := newAccept(&diagnostics)
-			node.Validate(ctx, level, accept)
+			node.Validate(ctx, sc, accept)
 		}
 		sortDiagnostics(diagnostics)
 		return diagnostics
@@ -109,7 +110,7 @@ func parallelValidate(ctx context.Context, doc *core.Document, level, source str
 				if ctx.Err() != nil {
 					break
 				}
-				nodes[i].Validate(workerCtx, level, accept)
+				nodes[i].Validate(workerCtx, sc, accept)
 			}
 			perWorker[w] = out
 		}(w)
@@ -128,17 +129,11 @@ func parallelValidate(ctx context.Context, doc *core.Document, level, source str
 func sortDiagnostics(diags []*core.Diagnostic) {
 	sort.SliceStable(diags, func(i, j int) bool {
 		a, b := diags[i], diags[j]
-		if a.Range.Start.Line != b.Range.Start.Line {
-			return a.Range.Start.Line < b.Range.Start.Line
+		if a.Range.Start != b.Range.Start {
+			return a.Range.Start < b.Range.Start
 		}
-		if a.Range.Start.Column != b.Range.Start.Column {
-			return a.Range.Start.Column < b.Range.Start.Column
-		}
-		if a.Range.End.Line != b.Range.End.Line {
-			return a.Range.End.Line < b.Range.End.Line
-		}
-		if a.Range.End.Column != b.Range.End.Column {
-			return a.Range.End.Column < b.Range.End.Column
+		if a.Range.End != b.Range.End {
+			return a.Range.End < b.Range.End
 		}
 		if a.Code != b.Code {
 			return a.Code < b.Code

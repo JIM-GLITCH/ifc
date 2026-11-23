@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/lsp"
 )
 
@@ -23,7 +22,7 @@ func signatureHelpAt(t *testing.T, fixture *fbtest.Fixture, doc *fbtest.Doc, lab
 		t.Fatalf("fbtest: no index marker with label %q", label)
 	}
 	position := doc.Document.TextDoc.PositionAt(offset)
-	server, err := service.Get[lsp.Server](fixture.Services())
+	server, err := fixture.Services().Get[lsp.Server]()
 	if err != nil {
 		t.Fatalf("fbtest: no language server available: %v", err)
 	}
@@ -131,9 +130,9 @@ func TestSignatureHelpDerivedAttributeDocumentsStar(t *testing.T) {
 	if sig.Documentation == nil {
 		t.Fatal("fbtest: expected signature documentation with parameter types")
 	}
-	markup, ok := sig.Documentation.Value.(lsp.MarkupContent)
-	if !ok {
-		t.Fatalf("fbtest: expected markup signature documentation, got %T", sig.Documentation.Value)
+	markup := sig.Documentation.MarkupContent
+	if markup == nil {
+		t.Fatalf("fbtest: expected markup signature documentation, got %+v", sig.Documentation)
 	}
 	if !strings.Contains(markup.Value, "- `Dimensions`: `DERIVED IfcDimensionalExponents`") {
 		t.Errorf("fbtest: expected derived parameter type in signature documentation, got %q", markup.Value)
@@ -177,7 +176,7 @@ func TestSignatureHelpCapabilityAdvertised(t *testing.T) {
 	fixture := newIfcHoverFixture(t)
 	doc := parseSignatureFixture(t, fixture, `#1=IFCDIRECTION((0.,0.,1.));`)
 
-	server, err := service.Get[lsp.Server](fixture.Services())
+	server, err := fixture.Services().Get[lsp.Server]()
 	if err != nil {
 		t.Fatalf("fbtest: no language server available: %v", err)
 	}

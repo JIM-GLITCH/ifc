@@ -18,9 +18,8 @@ const incrementalTestURI = "inmemory://incremental.ifc"
 func renderDiagnostics(diags []*core.Diagnostic) []string {
 	out := make([]string, 0, len(diags))
 	for _, d := range diags {
-		out = append(out, fmt.Sprintf("%d:%d-%d:%d|%d|%s|%s|%s",
-			d.Range.Start.Line, d.Range.Start.Column,
-			d.Range.End.Line, d.Range.End.Column,
+		out = append(out, fmt.Sprintf("%d-%d|%d|%s|%s|%s",
+			d.Range.Start, d.Range.End,
 			d.Severity, d.Code, d.Source, d.Message))
 	}
 	return out

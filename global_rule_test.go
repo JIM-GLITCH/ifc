@@ -30,7 +30,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustGlobalRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	var found bool
 	for _, d := range diagnostics {
 		if d.Code == "ifc-global-rule" && strings.Contains(d.Message, "SIZEOF(IfcProject)") {
@@ -62,7 +62,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustGlobalRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-global-rule" {
 			t.Fatalf("unexpected global RULE diagnostic: %s", d.Message)
@@ -93,7 +93,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustGlobalRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-global-rule" {
 			t.Fatalf("unexpected global RULE diagnostic: %s", d.Message)
@@ -126,7 +126,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustGlobalRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	var found bool
 	for _, d := range diagnostics {
 		if d.Code == "ifc-global-rule" && strings.Contains(d.Message, "IsDifferent = FALSE") {
@@ -140,5 +140,5 @@ END-ISO-10303-21;`
 }
 
 func serviceMustGlobalRuleValidator(sc *service.Container) workspace.DocumentValidator {
-	return service.MustGet[workspace.DocumentValidator](sc)
+	return sc.MustGet[workspace.DocumentValidator]()
 }

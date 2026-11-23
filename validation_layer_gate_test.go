@@ -5,12 +5,11 @@ import (
 	"testing"
 
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 )
 
 func TestValidationLayerDisablesEntityWhere(t *testing.T) {
 	sc := CreateServices()
-	store, err := service.Get[*ValidationSettingsStore](sc)
+	store, err := sc.Get[*ValidationSettingsStore]()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +31,7 @@ END-ISO-10303-21;`
 
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
 			t.Fatalf("entity WHERE should be disabled, got %q", d.Message)

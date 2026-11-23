@@ -127,7 +127,7 @@ ENDSEC;
 END-ISO-10303-21;`)
 	doc.AssertNoParseErrors()
 
-	doc.ExpectHoverAt("north", "**TrueNorth** = [#118](command:ifc.openEntityReference?%5B%7B%22uri%22%3A%22inmemory%3A%2F%2Ftest.ifc%22%2C%22range%22%3A%7B%22start%22%3A%7B%22line%22%3A7%2C%22character%22%3A0%7D%2C%22end%22%3A%7B%22line%22%3A7%2C%22character%22%3A4%7D%7D%7D%5D)\n\n```ifc\n#118=IFCDIRECTION((0.,1.));\n```")
+	doc.ExpectHoverAt("north", "**TrueNorth** = [#118](command:ifc.openEntityReference?%5B%7B%22uri%22%3A%22inmemory%3A%2Ftest%22%2C%22range%22%3A%7B%22start%22%3A%7B%22line%22%3A7%2C%22character%22%3A0%7D%2C%22end%22%3A%7B%22line%22%3A7%2C%22character%22%3A4%7D%7D%7D%5D)\n\n```ifc\n#118=IFCDIRECTION((0.,1.));\n```")
 }
 
 func TestHoverEnumerationShowsTypeDeclaration(t *testing.T) {

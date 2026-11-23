@@ -25,8 +25,9 @@ ENDSEC;
 END-ISO-10303-21;`
 
 	doc := fixture.Parse(source)
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
-		t.Logf("L%d [%s] %s", d.Range.Start.Line, d.Code, d.Message)
+		pos := doc.Document.TextDoc.PositionAt(int(d.Range.Start))
+		t.Logf("L%d [%s] %s", pos.Line, d.Code, d.Message)
 	}
 }

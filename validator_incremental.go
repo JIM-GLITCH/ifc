@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 
 	core "typefox.dev/fastbelt"
+	"typefox.dev/fastbelt/util/service"
 )
 
 // Incremental entity validation.
@@ -62,26 +63,20 @@ type entityUnit struct {
 	node    core.Validator
 	ordinal int
 	hash    uint64
-	segment core.TextSegment
+	rng     core.TextRange
 }
 
 // text returns the source bytes covered by the unit.
 func (u *entityUnit) text(content []byte) []byte {
-	return segmentBytes(content, &u.segment)
+	return rangeBytes(content, u.rng)
 }
 
-// cachedDiagnostic stores a diagnostic in coordinates relative to the start of
-// the entity instance it was reported on, so it can be re-anchored after the
-// surrounding text moved.
-//
-// Columns on the entity's own first line are relative to the entity start
-// column; columns on any later line are absolute, because those lines belong
-// to the entity's own, unchanged, text.
+// cachedDiagnostic stores a diagnostic as byte offsets relative to the start
+// of the entity instance it was reported on, so it can be re-anchored after
+// the surrounding text moved.
 type cachedDiagnostic struct {
-	startLine int32
-	startCol  int32
-	endLine   int32
-	endCol    int32
+	startOff  int32
+	endOff    int32
 	severity  core.DiagnosticSeverity
 	message   string
 	source    string
@@ -92,25 +87,11 @@ type cachedDiagnostic struct {
 }
 
 // diagnostic re-anchors the cached diagnostic at the entity's current start.
-func (c cachedDiagnostic) diagnostic(start core.TextLocation) *core.Diagnostic {
-	startCol := core.TextColumn(c.startCol)
-	endCol := core.TextColumn(c.endCol)
-	if c.startLine == 0 {
-		startCol += start.Column
-	}
-	if c.endLine == 0 {
-		endCol += start.Column
-	}
+func (c cachedDiagnostic) diagnostic(entityStart int32) *core.Diagnostic {
 	return &core.Diagnostic{
 		Range: core.TextRange{
-			Start: core.TextLocation{
-				Line:   core.TextLine(int32(start.Line) + c.startLine),
-				Column: startCol,
-			},
-			End: core.TextLocation{
-				Line:   core.TextLine(int32(start.Line) + c.endLine),
-				Column: endCol,
-			},
+			Start: entityStart + c.startOff,
+			End:   entityStart + c.endOff,
 		},
 		Severity:       c.severity,
 		Message:        c.message,
@@ -132,18 +113,16 @@ type cachedEntity struct {
 type documentValidationState struct {
 	header      uint64
 	settings    ValidationSettings
-	level       string
 	lexErrors   int
 	parseErrors int
 	entities    map[int]cachedEntity
 }
 
 // compatible reports whether the state may be reused for a document that now
-// has the given header fingerprint, settings, level and front-end error counts.
+// has the given header fingerprint, settings and front-end error counts.
 func (s *documentValidationState) compatible(
 	header uint64,
 	settings ValidationSettings,
-	level string,
 	lexErrors, parseErrors int,
 ) bool {
 	if s == nil {
@@ -151,7 +130,6 @@ func (s *documentValidationState) compatible(
 	}
 	return s.header == header &&
 		s.settings == settings &&
-		s.level == level &&
 		s.lexErrors == lexErrors &&
 		s.parseErrors == parseErrors
 }
@@ -230,23 +208,23 @@ func collectEntityUnits(doc *core.Document) (units []entityUnit, content []byte,
 		if ordinal <= 0 {
 			return nil, nil, false
 		}
-		segment := node.Segment()
-		if segment == nil {
+		rng := node.TextRange()
+		if rng.End <= rng.Start {
 			return nil, nil, false
 		}
 		units = append(units, entityUnit{
 			node:    validator,
 			ordinal: ordinal,
-			hash:    hashBytes(segmentBytes(content, segment)),
-			segment: *segment,
+			hash:    hashBytes(rangeBytes(content, rng)),
+			rng:     rng,
 		})
 	}
 	return units, content, true
 }
 
-func segmentBytes(content []byte, segment *core.TextSegment) []byte {
-	start := int(segment.Indices.Start)
-	end := int(segment.Indices.End)
+func rangeBytes(content []byte, rng core.TextRange) []byte {
+	start := int(rng.Start)
+	end := int(rng.End)
 	if start < 0 {
 		start = 0
 	}
@@ -392,9 +370,10 @@ func computeAffected(units []entityUnit, content []byte, state *documentValidati
 // interrupted, in which case the result must not be published.
 func validateEntityUnits(
 	ctx context.Context,
+	sc *service.Container,
 	units []entityUnit,
 	indices []int,
-	level, source string,
+	source string,
 ) (out [][]*core.Diagnostic, ok bool) {
 	out = make([][]*core.Diagnostic, len(units))
 	if len(indices) == 0 {
@@ -413,7 +392,7 @@ func validateEntityUnits(
 				return nil, false
 			}
 			sink = &out[i]
-			units[i].node.Validate(ctx, level, accept)
+			units[i].node.Validate(ctx, sc, accept)
 		}
 		return out, ctx.Err() == nil
 	}
@@ -446,7 +425,7 @@ func validateEntityUnits(
 				}
 				i := indices[k]
 				sink = &out[i]
-				units[i].node.Validate(workerCtx, level, accept)
+				units[i].node.Validate(workerCtx, sc, accept)
 			}
 		}()
 	}
@@ -460,7 +439,6 @@ func validateEntityUnits(
 func buildDocumentState(
 	header uint64,
 	settings ValidationSettings,
-	level string,
 	lexErrors, parseErrors int,
 	units []entityUnit,
 	diags [][]*core.Diagnostic,
@@ -468,7 +446,6 @@ func buildDocumentState(
 	state := &documentValidationState{
 		header:      header,
 		settings:    settings,
-		level:       level,
 		lexErrors:   lexErrors,
 		parseErrors: parseErrors,
 		entities:    make(map[int]cachedEntity, len(units)),
@@ -480,7 +457,7 @@ func buildDocumentState(
 		if len(diags[i]) > 0 {
 			entry.diags = make([]cachedDiagnostic, 0, len(diags[i]))
 			for _, d := range diags[i] {
-				relative, fits := relativeDiagnostic(d, u.segment.Range)
+				relative, fits := relativeDiagnostic(d, u.rng)
 				if !fits {
 					return nil, false
 				}
@@ -496,38 +473,17 @@ func buildDocumentState(
 }
 
 // relativeDiagnostic re-bases a diagnostic onto the start of its entity.
+// It only fits diagnostics fully contained in the entity's byte range.
 func relativeDiagnostic(d *core.Diagnostic, entity core.TextRange) (cachedDiagnostic, bool) {
 	if d == nil {
 		return cachedDiagnostic{}, false
 	}
-	startLine := int32(d.Range.Start.Line) - int32(entity.Start.Line)
-	endLine := int32(d.Range.End.Line) - int32(entity.Start.Line)
-	if startLine < 0 || endLine < 0 {
+	if d.Range.Start < entity.Start || d.Range.End > entity.End || d.Range.Start > d.Range.End {
 		return cachedDiagnostic{}, false
-	}
-	maxLine := int32(entity.End.Line) - int32(entity.Start.Line)
-	if endLine > maxLine || (endLine == maxLine && int32(d.Range.End.Column) > int32(entity.End.Column)) {
-		return cachedDiagnostic{}, false
-	}
-	startCol := int32(d.Range.Start.Column)
-	endCol := int32(d.Range.End.Column)
-	if startLine == 0 {
-		if startCol < int32(entity.Start.Column) {
-			return cachedDiagnostic{}, false
-		}
-		startCol -= int32(entity.Start.Column)
-	}
-	if endLine == 0 {
-		if endCol < int32(entity.Start.Column) {
-			return cachedDiagnostic{}, false
-		}
-		endCol -= int32(entity.Start.Column)
 	}
 	return cachedDiagnostic{
-		startLine: startLine,
-		startCol:  startCol,
-		endLine:   endLine,
-		endCol:    endCol,
+		startOff: d.Range.Start - entity.Start,
+		endOff:   d.Range.End - entity.Start,
 		severity:  d.Severity,
 		message:   d.Message,
 		source:    d.Source,
@@ -560,11 +516,11 @@ func hashHeaderSection(doc *core.Document, content []byte) uint64 {
 	if header == nil {
 		return 0
 	}
-	segment := header.Segment()
-	if segment == nil {
+	rng := header.TextRange()
+	if rng.End <= rng.Start {
 		return 0
 	}
-	return hashBytes(segmentBytes(content, segment))
+	return hashBytes(rangeBytes(content, rng))
 }
 
 // incrementalReuseRuns and incrementalFullRuns count how often validation
@@ -581,13 +537,13 @@ var (
 func (v *IfcDocumentValidator) validateEntities(
 	ctx context.Context,
 	doc *core.Document,
-	level, source string,
+	source string,
 	settings ValidationSettings,
 ) []*core.Diagnostic {
 	units, content, scannable := collectEntityUnits(doc)
 	if !scannable || len(units) < incrementalEntityThreshold {
 		incrementalFullRuns.Add(1)
-		return parallelValidate(ctx, doc, level, source)
+		return parallelValidate(ctx, v.sc, doc, source)
 	}
 	uri := doc.URI.StringUnencoded()
 	header := hashHeaderSection(doc, content)
@@ -595,7 +551,7 @@ func (v *IfcDocumentValidator) validateEntities(
 
 	var recompute []bool
 	reusable := false
-	if state.compatible(header, settings, level, len(doc.LexerErrors), len(doc.ParserErrors)) {
+	if state.compatible(header, settings, len(doc.LexerErrors), len(doc.ParserErrors)) {
 		if marks, count, ok := computeAffected(units, content, state); ok {
 			if count == 0 {
 				// Nothing the cache tracks moved at all.
@@ -625,7 +581,7 @@ func (v *IfcDocumentValidator) validateEntities(
 	} else {
 		incrementalFullRuns.Add(1)
 	}
-	diags, ok := validateEntityUnits(ctx, units, indices, level, source)
+	diags, ok := validateEntityUnits(ctx, v.sc, units, indices, source)
 	if !ok {
 		// Interrupted by a newer edit: publish nothing, the builder discards
 		// the result anyway once it sees the cancelled context.
@@ -633,8 +589,21 @@ func (v *IfcDocumentValidator) validateEntities(
 	}
 
 	if ctx.Err() == nil {
+		if reusable {
+			// diags only covers the recomputed units; backfill the unchanged
+			// ones from the previous state so the fresh cache keeps their
+			// diagnostics for the next edit.
+			for i, u := range units {
+				if recompute[i] {
+					continue
+				}
+				for _, cached := range state.entities[u.ordinal].diags {
+					diags[i] = append(diags[i], cached.diagnostic(u.rng.Start))
+				}
+			}
+		}
 		if fresh, buildable := buildDocumentState(
-			header, settings, level,
+			header, settings,
 			len(doc.LexerErrors), len(doc.ParserErrors),
 			units, diags,
 		); buildable {
@@ -651,7 +620,7 @@ func (v *IfcDocumentValidator) validateEntities(
 			}
 			entry := state.entities[u.ordinal]
 			for _, cached := range entry.diags {
-				diagnostics = append(diagnostics, cached.diagnostic(u.segment.Range.Start))
+				diagnostics = append(diagnostics, cached.diagnostic(u.rng.Start))
 			}
 		}
 	} else {
@@ -670,7 +639,7 @@ func cachedDiagnostics(units []entityUnit, state *documentValidationState, sourc
 	for _, u := range units {
 		entry := state.entities[u.ordinal]
 		for _, cached := range entry.diags {
-			diagnostics = append(diagnostics, cached.diagnostic(u.segment.Range.Start))
+			diagnostics = append(diagnostics, cached.diagnostic(u.rng.Start))
 		}
 	}
 	sortDiagnostics(diagnostics)

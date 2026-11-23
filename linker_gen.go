@@ -43,7 +43,7 @@ func NewDefaultIfcReferenceLinker(sc *service.Container) IfcReferenceLinker {
 	return &DefaultIfcReferenceLinker{
 		sc: sc,
 		scopeProvider: sync.OnceValue(func() IfcScopeProvider {
-			return service.MustGet[IfcScopeProvider](sc)
+			return sc.MustGet[IfcScopeProvider]()
 		}),
 	}
 }
@@ -58,22 +58,22 @@ type IfcReferencesConstructor interface {
 }
 
 type DefaultIfcReferencesConstructor struct {
-	sc              *service.Container
-	referenceLinker func() IfcReferenceLinker
+	linkENTITY_REFERENCEValue func() core.ReferenceGetter[SIMPLE_ENTITY_INSTANCE]
 }
 
 func NewDefaultIfcReferencesConstructor(sc *service.Container) IfcReferencesConstructor {
+	referenceLinker := sync.OnceValue(func() IfcReferenceLinker {
+		return sc.MustGet[IfcReferenceLinker]()
+	})
 	return &DefaultIfcReferencesConstructor{
-		sc: sc,
-		referenceLinker: sync.OnceValue(func() IfcReferenceLinker {
-			return service.MustGet[IfcReferenceLinker](sc)
+		linkENTITY_REFERENCEValue: sync.OnceValue(func() core.ReferenceGetter[SIMPLE_ENTITY_INSTANCE] {
+			return referenceLinker().LinkENTITY_REFERENCEValue
 		}),
 	}
 }
 
 func (s *DefaultIfcReferencesConstructor) ENTITY_REFERENCEValue(owner core.AstNode, unit core.StringUnit) *core.Reference[SIMPLE_ENTITY_INSTANCE] {
-	fn := s.referenceLinker().LinkENTITY_REFERENCEValue
-	return core.NewReference(owner, unit, fn)
+	return core.NewReference(owner, unit, s.linkENTITY_REFERENCEValue())
 }
 
 type IfcSymbolContainers struct{}
@@ -112,5 +112,13 @@ func (sc *IfcSymbolContainer) ForType(t reflect.Type) core.SymbolSeq {
 	case TypeFor_SIMPLE_ENTITY_INSTANCE:
 		return slices.Values(sc.SIMPLE_ENTITY_INSTANCEs)
 	}
-	return core.EmptySymbolDescriptions
+	return core.EmptySymbolSeq
+}
+
+func (sc *IfcSymbolContainer) ForTypeSlice(t reflect.Type) ([]*core.SymbolDescription, bool) {
+	switch t {
+	case TypeFor_SIMPLE_ENTITY_INSTANCE:
+		return sc.SIMPLE_ENTITY_INSTANCEs, true
+	}
+	return nil, true
 }

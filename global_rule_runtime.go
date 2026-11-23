@@ -181,6 +181,9 @@ func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail str
 	}
 	if workers <= 1 {
 		for i, rule := range GlobalRuleChecks {
+			if ctx.Err() != nil {
+				return true, "", nil
+			}
 			outcomes[i] = runGlobalRule(ctx, pop, rule)
 		}
 	} else {
@@ -190,11 +193,19 @@ func CheckGlobalRules(ctx context.Context, pop *Population) (ok bool, detail str
 			go func(w int) {
 				defer wg.Done()
 				for i := w; i < len(GlobalRuleChecks); i += workers {
+					if ctx.Err() != nil {
+						return
+					}
 					outcomes[i] = runGlobalRule(ctx, pop, GlobalRuleChecks[i])
 				}
 			}(w)
 		}
 		wg.Wait()
+	}
+	if ctx.Err() != nil {
+		// Unfilled outcomes are zero values, which the merge would report as
+		// rule violations. The cancelled build discards diagnostics anyway.
+		return true, "", nil
 	}
 
 	for i, outcome := range outcomes {

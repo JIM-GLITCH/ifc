@@ -5,6 +5,7 @@
 package ifc
 
 import (
+	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/linking"
 	"typefox.dev/fastbelt/textdoc"
 	"typefox.dev/fastbelt/util/service"
@@ -13,16 +14,20 @@ import (
 
 // SetupServices sets up the base services for the Ifc language.
 func SetupServices(sc *service.Container) {
-	service.Put[workspace.LanguageID](sc, "ifc")
-	service.Put[workspace.FileExtensions](sc, []string{".ifc"})
+	sc.Put[core.LanguageSelector](
+		workspace.NewDefaultLanguageSelector(
+			sc,
+			workspace.NewDocumentMatcherWithPatterns("ifc", "**/*.ifc"),
+		),
+	)
 	textdoc.SetupDefaultServices(sc)
 	linking.SetupDefaultServices(sc)
 	workspace.SetupDefaultServices(sc)
-	service.Put(sc, NewValidationSettingsStore())
-	service.Override[workspace.DocumentValidator](sc, NewIfcDocumentValidator(sc))
+	sc.Put(NewValidationSettingsStore())
+	sc.Override[workspace.DocumentValidator](NewIfcDocumentValidator(sc))
 	// Registered before SetupGeneratedServices so the generated default
 	// (linear-scan SeqScope) is skipped; see ifc_scope.go.
-	service.Put[IfcScopeProvider](sc, ifcScopeProvider{})
+	sc.Put[IfcScopeProvider](ifcScopeProvider{})
 	SetupGeneratedServices(sc)
 }
 

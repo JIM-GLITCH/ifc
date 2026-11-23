@@ -32,13 +32,14 @@ func NewIfcLanguageServer(sc *service.Container) lsp.Server {
 }
 
 func SetupIfcLanguageServer(sc *service.Container) {
-	if !service.Has[*ValidationSettingsStore](sc) {
-		service.Put(sc, NewValidationSettingsStore())
+	if !sc.Has[*ValidationSettingsStore]() {
+		sc.Put(NewValidationSettingsStore())
 	}
-	service.Override[lsp.Server](sc, NewIfcLanguageServer(sc))
-	service.Override[server.HoverProvider](sc, NewIfcHoverProvider(sc))
-	service.Override[server.DocumentSymbolProvider](sc, NewIfcDocumentSymbolProvider(sc))
-	service.Override[server.CompletionProvider](sc, NewIfcCompletionProvider(sc))
+	sc.Override[server.FoldingRangeProvider](&noopFoldingProvider{})
+	sc.Override[lsp.Server](NewIfcLanguageServer(sc))
+	sc.Override[server.HoverProvider](NewIfcHoverProvider(sc))
+	sc.Override[server.DocumentSymbolProvider](NewIfcDocumentSymbolProvider(sc))
+	sc.Override[server.CompletionProvider](NewIfcCompletionProvider(sc))
 }
 
 func (s *IfcLanguageServer) Initialize(ctx context.Context, params *lsp.ParamInitialize) (*lsp.InitializeResult, error) {
@@ -70,21 +71,23 @@ func (s *IfcLanguageServer) ResolveCompletionItem(ctx context.Context, params *l
 		return nil, nil
 	}
 	if doc := ifcEntityCompletionDoc(params.Label); doc != "" {
-		params.Documentation = &lsp.Or_CompletionItem_documentation{
-			Value: lsp.MarkupContent{Kind: lsp.Markdown, Value: doc},
+		params.Documentation = &lsp.CompletionItemDocumentation{
+			MarkupContent: &lsp.MarkupContent{Kind: lsp.Markdown, Value: doc},
 		}
 	}
 	return params, nil
 }
 
 func (s *IfcLanguageServer) SignatureHelp(ctx context.Context, params *lsp.SignatureHelpParams) (*lsp.SignatureHelp, error) {
-	lock, err := service.Get[workspace.Lock](s.sc)
+	lock, err := s.sc.Get[workspace.Lock]()
 	if err != nil {
 		return nil, err
 	}
 	var result *lsp.SignatureHelp
 	var providerErr error
-	if err := lock.Read(ctx, func(ctx context.Context) {
+	// Signature help only reads the token stream: wait for the lexed state of
+	// this document instead of the whole workspace build.
+	if err := lock.ReadAt(ctx, core.DocStateLexed, []core.URI{core.ParseURI(string(params.TextDocument.URI))}, func(ctx context.Context) {
 		result, providerErr = s.signatureHelp.HandleSignatureHelpRequest(ctx, params)
 	}); err != nil {
 		return nil, err
@@ -93,13 +96,13 @@ func (s *IfcLanguageServer) SignatureHelp(ctx context.Context, params *lsp.Signa
 }
 
 func (s *IfcLanguageServer) InlayHint(ctx context.Context, params *lsp.InlayHintParams) ([]lsp.InlayHint, error) {
-	lock, err := service.Get[workspace.Lock](s.sc)
+	lock, err := s.sc.Get[workspace.Lock]()
 	if err != nil {
 		return nil, err
 	}
 	var result []lsp.InlayHint
 	var providerErr error
-	if err := lock.Read(ctx, func(ctx context.Context) {
+	if err := lock.ReadAt(ctx, core.DocStateLexed, []core.URI{core.ParseURI(string(params.TextDocument.URI))}, func(ctx context.Context) {
 		result, providerErr = s.inlayHint.HandleInlayHintRequest(ctx, params)
 	}); err != nil {
 		return nil, err
@@ -118,12 +121,14 @@ func (s *IfcLanguageServer) DidChangeConfiguration(ctx context.Context, params *
 // RebuildAllValidatedDocuments re-runs validation for every open document after settings change.
 func RebuildAllValidatedDocuments(sc *service.Container) {
 	go func() {
-		lock := service.MustGet[workspace.Lock](sc)
-		builder := service.MustGet[workspace.Builder](sc)
-		docManager := service.MustGet[workspace.DocumentManager](sc)
-		lock.Write(context.Background(), func(ctx context.Context, downgrade func()) {
-			keepState := core.DocStateParsed | core.DocStateExportedSymbols | core.DocStateImportedSymbols |
-				core.DocStateLocalSymbols | core.DocStateLinked | core.DocStateReferences
+		lock := sc.MustGet[workspace.Lock]()
+		builder := sc.MustGet[workspace.Builder]()
+		docManager := sc.MustGet[workspace.DocumentManager]()
+		lock.Write(context.Background(), func(ctx context.Context) {
+			// Keep every build state up to References so only validation re-runs.
+			// Reset cascades: the kept mask must be a prefix of the state order,
+			// otherwise fields are cleared while their state bits survive.
+			keepState := core.DocStateComplete.Without(core.DocStateValidated)
 			docs := make([]*core.Document, 0, 8)
 			for doc := range docManager.All() {
 				builder.Reset(doc, keepState)
@@ -132,7 +137,7 @@ func RebuildAllValidatedDocuments(sc *service.Container) {
 			if len(docs) == 0 {
 				return
 			}
-			_ = builder.Build(ctx, docs, downgrade)
+			_ = builder.Build(ctx, docs)
 		})
 	}()
 }

@@ -133,6 +133,9 @@ func CheckUniqueRules(ctx context.Context, pop *Population) ([]UniqueViolation, 
 	}
 	if workers <= 1 {
 		for i, rule := range UniqueRuleChecks {
+			if ctx.Err() != nil {
+				return nil, nil
+			}
 			results[i] = runUniqueRule(ctx, pop, rule)
 		}
 	} else {
@@ -142,11 +145,17 @@ func CheckUniqueRules(ctx context.Context, pop *Population) ([]UniqueViolation, 
 			go func(w int) {
 				defer wg.Done()
 				for i := w; i < len(UniqueRuleChecks); i += workers {
+					if ctx.Err() != nil {
+						return
+					}
 					results[i] = runUniqueRule(ctx, pop, UniqueRuleChecks[i])
 				}
 			}(w)
 		}
 		wg.Wait()
+	}
+	if ctx.Err() != nil {
+		return nil, nil
 	}
 
 	var violations []UniqueViolation
@@ -170,6 +179,9 @@ func runUniqueRule(ctx context.Context, pop *Population, rule UniqueRuleSpec) un
 	byKey := map[string][]SIMPLE_ENTITY_INSTANCE{}
 	var failures []UniqueEvalFailure
 	for _, inst := range instances {
+		if ctx.Err() != nil {
+			return uniqueRuleResult{}
+		}
 		step, ok := instanceStepName(inst)
 		if !ok {
 			continue

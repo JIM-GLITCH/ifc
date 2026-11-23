@@ -24,7 +24,7 @@ func NewIfcSignatureHelpProvider(sc *service.Container) *IfcSignatureHelpProvide
 }
 
 func (p *IfcSignatureHelpProvider) HandleSignatureHelpRequest(ctx context.Context, params *lsp.SignatureHelpParams) (*lsp.SignatureHelp, error) {
-	documentManager := service.MustGet[workspace.DocumentManager](p.sc)
+	documentManager := p.sc.MustGet[workspace.DocumentManager]()
 	doc := documentManager.Get(core.ParseURI(string(params.TextDocument.URI)))
 	if doc == nil {
 		return nil, nil
@@ -64,8 +64,8 @@ func (p *IfcSignatureHelpProvider) HandleSignatureHelpRequest(ctx context.Contex
 		Parameters: parameters,
 	}
 	if typeDoc := entityParameterTypeMarkdown(sigParams); typeDoc != "" {
-		signature.Documentation = &lsp.Or_SignatureInformation_documentation{
-			Value: lsp.MarkupContent{
+		signature.Documentation = &lsp.SignatureInformationDocumentation{
+			MarkupContent: &lsp.MarkupContent{
 				Kind:  lsp.Markdown,
 				Value: typeDoc,
 			},
@@ -100,7 +100,7 @@ func enclosingEntityCall(tokens core.TokenSlice, offset int) (entityCallSite, bo
 	lo, hi := 0, len(tokens)
 	for lo < hi {
 		mid := (lo + hi) / 2
-		if int(tokens[mid].TextSegment.Indices.Start) < offset {
+		if int(tokens[mid].TextRange().Start) < offset {
 			lo = mid + 1
 		} else {
 			hi = mid
@@ -146,7 +146,7 @@ found:
 	depth = 0
 	for j := paren + 1; j < len(tokens); j++ {
 		t := &tokens[j]
-		if int(t.TextSegment.Indices.Start) >= offset {
+		if int(t.TextRange().Start) >= offset {
 			break
 		}
 		switch t.Image {

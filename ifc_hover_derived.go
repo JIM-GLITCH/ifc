@@ -106,7 +106,7 @@ func derivedHover(ctx context.Context, doc *core.Document, token *core.Token) *l
 				Kind:  lsp.Markdown,
 				Value: b.String(),
 			},
-			Range: token.Segment().Range.LspRange(),
+			Range: token.TextRange().LspRange(doc.TextDoc),
 		}
 	}
 
@@ -120,7 +120,7 @@ func derivedHover(ctx context.Context, doc *core.Document, token *core.Token) *l
 			Kind:  lsp.Markdown,
 			Value: fmt.Sprintf("**%s** = `%s`", attrName, formatted),
 		},
-		Range: token.Segment().Range.LspRange(),
+		Range: token.TextRange().LspRange(doc.TextDoc),
 	}
 }
 
@@ -217,15 +217,21 @@ func ifcEntityHoverCommandLink(inst SIMPLE_ENTITY_INSTANCE, fallbackDoc *core.Do
 	if targetDoc == nil || targetDoc.URI == nil {
 		return ""
 	}
-	var r lsp.Range
-	if token := inst.NameToken(); token != nil && token.Segment() != nil {
-		r = token.Segment().Range.LspRange()
-	} else if segment := inst.Segment(); segment != nil {
-		r = segment.Range.LspRange()
-	} else {
+	var r core.TextRange
+	if token := inst.NameToken(); token != nil {
+		if rng := token.TextRange(); rng.End > rng.Start {
+			r = rng
+		}
+	}
+	if r.End <= r.Start {
+		if rng := inst.TextRange(); rng.End > rng.Start {
+			r = rng
+		}
+	}
+	if r.End <= r.Start || targetDoc.TextDoc == nil {
 		return ""
 	}
-	args, err := json.Marshal([]ifcHoverRefTarget{{URI: string(targetDoc.URI.DocumentURI()), Range: r}})
+	args, err := json.Marshal([]ifcHoverRefTarget{{URI: string(targetDoc.URI.DocumentURI()), Range: r.LspRange(targetDoc.TextDoc)}})
 	if err != nil {
 		return ""
 	}

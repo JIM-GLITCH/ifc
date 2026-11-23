@@ -3,6 +3,9 @@
 package ifc
 
 import (
+	"fmt"
+	"unique"
+
 	core "typefox.dev/fastbelt"
 )
 
@@ -17,10 +20,7 @@ type EXCHANGE_FILE interface {
 }
 
 func NewEXCHANGE_FILE() EXCHANGE_FILE {
-	return &EXCHANGE_FILEImpl{
-		AstNodeBase:       core.NewAstNode(),
-		EXCHANGE_FILEData: NewEXCHANGE_FILEData(),
-	}
+	return &EXCHANGE_FILEImpl{}
 }
 
 type EXCHANGE_FILEData struct {
@@ -28,24 +28,18 @@ type EXCHANGE_FILEData struct {
 	dataSections  []DATA_SECTION
 }
 
-func NewEXCHANGE_FILEData() EXCHANGE_FILEData {
-	return EXCHANGE_FILEData{
-		dataSections: []DATA_SECTION{},
-	}
-}
-
 func (i *EXCHANGE_FILEData) IsEXCHANGE_FILE() {}
 
-func (i *EXCHANGE_FILEData) ForEachNode(fn func(core.AstNode)) {
+func (i *EXCHANGE_FILEData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.headerSection != nil {
-		fn(i.headerSection)
+		fn(i.headerSection, fieldNameHeaderSection, -1)
 	}
-	for _, item := range i.dataSections {
-		fn(item)
+	for j, item := range i.dataSections {
+		fn(item, fieldNameDataSections, j)
 	}
 }
 
-func (i *EXCHANGE_FILEData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *EXCHANGE_FILEData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *EXCHANGE_FILEData) HeaderSection() HEADER_SECTION {
@@ -73,12 +67,42 @@ type EXCHANGE_FILEImpl struct {
 	EXCHANGE_FILEData
 }
 
-func (i *EXCHANGE_FILEImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *EXCHANGE_FILEImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.EXCHANGE_FILEData.ForEachNode(fn)
 }
 
-func (i *EXCHANGE_FILEImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *EXCHANGE_FILEImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.EXCHANGE_FILEData.ForEachReference(fn)
+}
+
+func (i *EXCHANGE_FILEImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, index := path.Head()
+	switch field {
+	case fieldNameDataSections:
+		if index >= len(i.DataSections()) {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("EXCHANGE_FILEImpl.Resolve: index %d exceeds length of slice in 'dataSections' (length=%d) in node '%s'", index, len(i.DataSections()), nodePath)
+		}
+		child := i.DataSections()[index]
+		if child == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("EXCHANGE_FILEImpl.Resolve: item %d of slice in field 'dataSections' is nil in node '%s'", index, nodePath)
+		}
+		return child.Resolve(path.Tail())
+	case fieldNameHeaderSection:
+		if i.HeaderSection() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("EXCHANGE_FILEImpl.Resolve: field 'headerSection' is nil in node '%s'", nodePath)
+		}
+		child := i.HeaderSection()
+		return child.Resolve(path.Tail())
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("EXCHANGE_FILEImpl.Resolve: field '%s' does not exist in node '%s' of type 'EXCHANGE_FILE'", field.Value(), nodePath)
+	}
 }
 
 type HEADER_SECTION interface {
@@ -90,31 +114,22 @@ type HEADER_SECTION interface {
 }
 
 func NewHEADER_SECTION() HEADER_SECTION {
-	return &HEADER_SECTIONImpl{
-		AstNodeBase:        core.NewAstNode(),
-		HEADER_SECTIONData: NewHEADER_SECTIONData(),
-	}
+	return &HEADER_SECTIONImpl{}
 }
 
 type HEADER_SECTIONData struct {
 	headerEntityList []HEADER_ENTITY
 }
 
-func NewHEADER_SECTIONData() HEADER_SECTIONData {
-	return HEADER_SECTIONData{
-		headerEntityList: []HEADER_ENTITY{},
-	}
-}
-
 func (i *HEADER_SECTIONData) IsHEADER_SECTION() {}
 
-func (i *HEADER_SECTIONData) ForEachNode(fn func(core.AstNode)) {
-	for _, item := range i.headerEntityList {
-		fn(item)
+func (i *HEADER_SECTIONData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
+	for j, item := range i.headerEntityList {
+		fn(item, fieldNameHeaderEntityList, j)
 	}
 }
 
-func (i *HEADER_SECTIONData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *HEADER_SECTIONData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *HEADER_SECTIONData) HeaderEntityList() []HEADER_ENTITY {
@@ -130,12 +145,35 @@ type HEADER_SECTIONImpl struct {
 	HEADER_SECTIONData
 }
 
-func (i *HEADER_SECTIONImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *HEADER_SECTIONImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.HEADER_SECTIONData.ForEachNode(fn)
 }
 
-func (i *HEADER_SECTIONImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *HEADER_SECTIONImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.HEADER_SECTIONData.ForEachReference(fn)
+}
+
+func (i *HEADER_SECTIONImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, index := path.Head()
+	switch field {
+	case fieldNameHeaderEntityList:
+		if index >= len(i.HeaderEntityList()) {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("HEADER_SECTIONImpl.Resolve: index %d exceeds length of slice in 'headerEntityList' (length=%d) in node '%s'", index, len(i.HeaderEntityList()), nodePath)
+		}
+		child := i.HeaderEntityList()[index]
+		if child == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("HEADER_SECTIONImpl.Resolve: item %d of slice in field 'headerEntityList' is nil in node '%s'", index, nodePath)
+		}
+		return child.Resolve(path.Tail())
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("HEADER_SECTIONImpl.Resolve: field '%s' does not exist in node '%s' of type 'HEADER_SECTION'", field.Value(), nodePath)
+	}
 }
 
 type HEADER_ENTITY interface {
@@ -150,10 +188,7 @@ type HEADER_ENTITY interface {
 }
 
 func NewHEADER_ENTITY() HEADER_ENTITY {
-	return &HEADER_ENTITYImpl{
-		AstNodeBase:       core.NewAstNode(),
-		HEADER_ENTITYData: NewHEADER_ENTITYData(),
-	}
+	return &HEADER_ENTITYImpl{}
 }
 
 type HEADER_ENTITYData struct {
@@ -161,19 +196,15 @@ type HEADER_ENTITYData struct {
 	parameterList PARAMETER_LIST
 }
 
-func NewHEADER_ENTITYData() HEADER_ENTITYData {
-	return HEADER_ENTITYData{}
-}
-
 func (i *HEADER_ENTITYData) IsHEADER_ENTITY() {}
 
-func (i *HEADER_ENTITYData) ForEachNode(fn func(core.AstNode)) {
+func (i *HEADER_ENTITYData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.parameterList != nil {
-		fn(i.parameterList)
+		fn(i.parameterList, fieldNameParameterList, -1)
 	}
 }
 
-func (i *HEADER_ENTITYData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *HEADER_ENTITYData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *HEADER_ENTITYData) Keyword() string {
@@ -209,12 +240,33 @@ type HEADER_ENTITYImpl struct {
 	HEADER_ENTITYData
 }
 
-func (i *HEADER_ENTITYImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *HEADER_ENTITYImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.HEADER_ENTITYData.ForEachNode(fn)
 }
 
-func (i *HEADER_ENTITYImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *HEADER_ENTITYImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.HEADER_ENTITYData.ForEachReference(fn)
+}
+
+func (i *HEADER_ENTITYImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameParameterList:
+		if i.ParameterList() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("HEADER_ENTITYImpl.Resolve: field 'parameterList' is nil in node '%s'", nodePath)
+		}
+		child := i.ParameterList()
+		return child.Resolve(path.Tail())
+	case fieldNameKeyword:
+		return nil, fmt.Errorf("HEADER_ENTITYImpl.Resolve: field 'keyword' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("HEADER_ENTITYImpl.Resolve: field '%s' does not exist in node '%s' of type 'HEADER_ENTITY'", field.Value(), nodePath)
+	}
 }
 
 type PARAMETER_LIST interface {
@@ -226,31 +278,22 @@ type PARAMETER_LIST interface {
 }
 
 func NewPARAMETER_LIST() PARAMETER_LIST {
-	return &PARAMETER_LISTImpl{
-		AstNodeBase:        core.NewAstNode(),
-		PARAMETER_LISTData: NewPARAMETER_LISTData(),
-	}
+	return &PARAMETER_LISTImpl{}
 }
 
 type PARAMETER_LISTData struct {
 	parameters []PARAMETER
 }
 
-func NewPARAMETER_LISTData() PARAMETER_LISTData {
-	return PARAMETER_LISTData{
-		parameters: []PARAMETER{},
-	}
-}
-
 func (i *PARAMETER_LISTData) IsPARAMETER_LIST() {}
 
-func (i *PARAMETER_LISTData) ForEachNode(fn func(core.AstNode)) {
-	for _, item := range i.parameters {
-		fn(item)
+func (i *PARAMETER_LISTData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
+	for j, item := range i.parameters {
+		fn(item, fieldNameParameters, j)
 	}
 }
 
-func (i *PARAMETER_LISTData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *PARAMETER_LISTData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *PARAMETER_LISTData) Parameters() []PARAMETER {
@@ -266,12 +309,35 @@ type PARAMETER_LISTImpl struct {
 	PARAMETER_LISTData
 }
 
-func (i *PARAMETER_LISTImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *PARAMETER_LISTImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.PARAMETER_LISTData.ForEachNode(fn)
 }
 
-func (i *PARAMETER_LISTImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *PARAMETER_LISTImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.PARAMETER_LISTData.ForEachReference(fn)
+}
+
+func (i *PARAMETER_LISTImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, index := path.Head()
+	switch field {
+	case fieldNameParameters:
+		if index >= len(i.Parameters()) {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("PARAMETER_LISTImpl.Resolve: index %d exceeds length of slice in 'parameters' (length=%d) in node '%s'", index, len(i.Parameters()), nodePath)
+		}
+		child := i.Parameters()[index]
+		if child == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("PARAMETER_LISTImpl.Resolve: item %d of slice in field 'parameters' is nil in node '%s'", index, nodePath)
+		}
+		return child.Resolve(path.Tail())
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("PARAMETER_LISTImpl.Resolve: field '%s' does not exist in node '%s' of type 'PARAMETER_LIST'", field.Value(), nodePath)
+	}
 }
 
 type PARAMETER interface {
@@ -281,25 +347,18 @@ type PARAMETER interface {
 }
 
 func NewPARAMETER() PARAMETER {
-	return &PARAMETERImpl{
-		AstNodeBase:   core.NewAstNode(),
-		PARAMETERData: NewPARAMETERData(),
-	}
+	return &PARAMETERImpl{}
 }
 
 type PARAMETERData struct {
 }
 
-func NewPARAMETERData() PARAMETERData {
-	return PARAMETERData{}
-}
-
 func (i *PARAMETERData) IsPARAMETER() {}
 
-func (i *PARAMETERData) ForEachNode(fn func(core.AstNode)) {
+func (i *PARAMETERData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *PARAMETERData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *PARAMETERData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 type PARAMETERImpl struct {
@@ -307,12 +366,21 @@ type PARAMETERImpl struct {
 	PARAMETERData
 }
 
-func (i *PARAMETERImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *PARAMETERImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachNode(fn)
 }
 
-func (i *PARAMETERImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *PARAMETERImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachReference(fn)
+}
+
+func (i *PARAMETERImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	nodePath, _ := core.PathOf(i)
+	return nil, fmt.Errorf("PARAMETERImpl.Resolve: field '%s' does not exist in node '%s' of type 'PARAMETER'", field.Value(), nodePath)
 }
 
 type TYPED_PARAMETER interface {
@@ -328,11 +396,7 @@ type TYPED_PARAMETER interface {
 }
 
 func NewTYPED_PARAMETER() TYPED_PARAMETER {
-	return &TYPED_PARAMETERImpl{
-		AstNodeBase:         core.NewAstNode(),
-		PARAMETERData:       NewPARAMETERData(),
-		TYPED_PARAMETERData: NewTYPED_PARAMETERData(),
-	}
+	return &TYPED_PARAMETERImpl{}
 }
 
 type TYPED_PARAMETERData struct {
@@ -340,19 +404,15 @@ type TYPED_PARAMETERData struct {
 	parameter PARAMETER
 }
 
-func NewTYPED_PARAMETERData() TYPED_PARAMETERData {
-	return TYPED_PARAMETERData{}
-}
-
 func (i *TYPED_PARAMETERData) IsTYPED_PARAMETER() {}
 
-func (i *TYPED_PARAMETERData) ForEachNode(fn func(core.AstNode)) {
+func (i *TYPED_PARAMETERData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.parameter != nil {
-		fn(i.parameter)
+		fn(i.parameter, fieldNameParameter, -1)
 	}
 }
 
-func (i *TYPED_PARAMETERData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *TYPED_PARAMETERData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *TYPED_PARAMETERData) Keyword() string {
@@ -389,14 +449,35 @@ type TYPED_PARAMETERImpl struct {
 	TYPED_PARAMETERData
 }
 
-func (i *TYPED_PARAMETERImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *TYPED_PARAMETERImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachNode(fn)
 	i.TYPED_PARAMETERData.ForEachNode(fn)
 }
 
-func (i *TYPED_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *TYPED_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachReference(fn)
 	i.TYPED_PARAMETERData.ForEachReference(fn)
+}
+
+func (i *TYPED_PARAMETERImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameParameter:
+		if i.Parameter() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("TYPED_PARAMETERImpl.Resolve: field 'parameter' is nil in node '%s'", nodePath)
+		}
+		child := i.Parameter()
+		return child.Resolve(path.Tail())
+	case fieldNameKeyword:
+		return nil, fmt.Errorf("TYPED_PARAMETERImpl.Resolve: field 'keyword' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("TYPED_PARAMETERImpl.Resolve: field '%s' does not exist in node '%s' of type 'TYPED_PARAMETER'", field.Value(), nodePath)
+	}
 }
 
 type UNTYPED_PARAMETER interface {
@@ -407,26 +488,18 @@ type UNTYPED_PARAMETER interface {
 }
 
 func NewUNTYPED_PARAMETER() UNTYPED_PARAMETER {
-	return &UNTYPED_PARAMETERImpl{
-		AstNodeBase:           core.NewAstNode(),
-		PARAMETERData:         NewPARAMETERData(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-	}
+	return &UNTYPED_PARAMETERImpl{}
 }
 
 type UNTYPED_PARAMETERData struct {
 }
 
-func NewUNTYPED_PARAMETERData() UNTYPED_PARAMETERData {
-	return UNTYPED_PARAMETERData{}
-}
-
 func (i *UNTYPED_PARAMETERData) IsUNTYPED_PARAMETER() {}
 
-func (i *UNTYPED_PARAMETERData) ForEachNode(fn func(core.AstNode)) {
+func (i *UNTYPED_PARAMETERData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *UNTYPED_PARAMETERData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *UNTYPED_PARAMETERData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 type UNTYPED_PARAMETERImpl struct {
@@ -435,14 +508,23 @@ type UNTYPED_PARAMETERImpl struct {
 	UNTYPED_PARAMETERData
 }
 
-func (i *UNTYPED_PARAMETERImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *UNTYPED_PARAMETERImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachNode(fn)
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 }
 
-func (i *UNTYPED_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *UNTYPED_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachReference(fn)
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
+}
+
+func (i *UNTYPED_PARAMETERImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	nodePath, _ := core.PathOf(i)
+	return nil, fmt.Errorf("UNTYPED_PARAMETERImpl.Resolve: field '%s' does not exist in node '%s' of type 'UNTYPED_PARAMETER'", field.Value(), nodePath)
 }
 
 type DEFAULT_PARAMETER interface {
@@ -456,28 +538,19 @@ type DEFAULT_PARAMETER interface {
 }
 
 func NewDEFAULT_PARAMETER() DEFAULT_PARAMETER {
-	return &DEFAULT_PARAMETERImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		DEFAULT_PARAMETERData: NewDEFAULT_PARAMETERData(),
-	}
+	return &DEFAULT_PARAMETERImpl{}
 }
 
 type DEFAULT_PARAMETERData struct {
 	value *core.Token
 }
 
-func NewDEFAULT_PARAMETERData() DEFAULT_PARAMETERData {
-	return DEFAULT_PARAMETERData{}
-}
-
 func (i *DEFAULT_PARAMETERData) IsDEFAULT_PARAMETER() {}
 
-func (i *DEFAULT_PARAMETERData) ForEachNode(fn func(core.AstNode)) {
+func (i *DEFAULT_PARAMETERData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *DEFAULT_PARAMETERData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *DEFAULT_PARAMETERData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *DEFAULT_PARAMETERData) Value() string {
@@ -503,16 +576,30 @@ type DEFAULT_PARAMETERImpl struct {
 	DEFAULT_PARAMETERData
 }
 
-func (i *DEFAULT_PARAMETERImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *DEFAULT_PARAMETERImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.DEFAULT_PARAMETERData.ForEachNode(fn)
 }
 
-func (i *DEFAULT_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *DEFAULT_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.DEFAULT_PARAMETERData.ForEachReference(fn)
+}
+
+func (i *DEFAULT_PARAMETERImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("DEFAULT_PARAMETERImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("DEFAULT_PARAMETERImpl.Resolve: field '%s' does not exist in node '%s' of type 'DEFAULT_PARAMETER'", field.Value(), nodePath)
+	}
 }
 
 type INTEGER_LITERAL interface {
@@ -526,28 +613,19 @@ type INTEGER_LITERAL interface {
 }
 
 func NewINTEGER_LITERAL() INTEGER_LITERAL {
-	return &INTEGER_LITERALImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		INTEGER_LITERALData:   NewINTEGER_LITERALData(),
-	}
+	return &INTEGER_LITERALImpl{}
 }
 
 type INTEGER_LITERALData struct {
 	value *core.Token
 }
 
-func NewINTEGER_LITERALData() INTEGER_LITERALData {
-	return INTEGER_LITERALData{}
-}
-
 func (i *INTEGER_LITERALData) IsINTEGER_LITERAL() {}
 
-func (i *INTEGER_LITERALData) ForEachNode(fn func(core.AstNode)) {
+func (i *INTEGER_LITERALData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *INTEGER_LITERALData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *INTEGER_LITERALData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *INTEGER_LITERALData) Value() string {
@@ -573,16 +651,30 @@ type INTEGER_LITERALImpl struct {
 	INTEGER_LITERALData
 }
 
-func (i *INTEGER_LITERALImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *INTEGER_LITERALImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.INTEGER_LITERALData.ForEachNode(fn)
 }
 
-func (i *INTEGER_LITERALImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *INTEGER_LITERALImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.INTEGER_LITERALData.ForEachReference(fn)
+}
+
+func (i *INTEGER_LITERALImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("INTEGER_LITERALImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("INTEGER_LITERALImpl.Resolve: field '%s' does not exist in node '%s' of type 'INTEGER_LITERAL'", field.Value(), nodePath)
+	}
 }
 
 type REAL_LITERAL interface {
@@ -596,28 +688,19 @@ type REAL_LITERAL interface {
 }
 
 func NewREAL_LITERAL() REAL_LITERAL {
-	return &REAL_LITERALImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		REAL_LITERALData:      NewREAL_LITERALData(),
-	}
+	return &REAL_LITERALImpl{}
 }
 
 type REAL_LITERALData struct {
 	value *core.Token
 }
 
-func NewREAL_LITERALData() REAL_LITERALData {
-	return REAL_LITERALData{}
-}
-
 func (i *REAL_LITERALData) IsREAL_LITERAL() {}
 
-func (i *REAL_LITERALData) ForEachNode(fn func(core.AstNode)) {
+func (i *REAL_LITERALData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *REAL_LITERALData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *REAL_LITERALData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *REAL_LITERALData) Value() string {
@@ -643,16 +726,30 @@ type REAL_LITERALImpl struct {
 	REAL_LITERALData
 }
 
-func (i *REAL_LITERALImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *REAL_LITERALImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.REAL_LITERALData.ForEachNode(fn)
 }
 
-func (i *REAL_LITERALImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *REAL_LITERALImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.REAL_LITERALData.ForEachReference(fn)
+}
+
+func (i *REAL_LITERALImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("REAL_LITERALImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("REAL_LITERALImpl.Resolve: field '%s' does not exist in node '%s' of type 'REAL_LITERAL'", field.Value(), nodePath)
+	}
 }
 
 type STRING_LITERAL interface {
@@ -666,28 +763,19 @@ type STRING_LITERAL interface {
 }
 
 func NewSTRING_LITERAL() STRING_LITERAL {
-	return &STRING_LITERALImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		STRING_LITERALData:    NewSTRING_LITERALData(),
-	}
+	return &STRING_LITERALImpl{}
 }
 
 type STRING_LITERALData struct {
 	value *core.Token
 }
 
-func NewSTRING_LITERALData() STRING_LITERALData {
-	return STRING_LITERALData{}
-}
-
 func (i *STRING_LITERALData) IsSTRING_LITERAL() {}
 
-func (i *STRING_LITERALData) ForEachNode(fn func(core.AstNode)) {
+func (i *STRING_LITERALData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *STRING_LITERALData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *STRING_LITERALData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *STRING_LITERALData) Value() string {
@@ -713,16 +801,30 @@ type STRING_LITERALImpl struct {
 	STRING_LITERALData
 }
 
-func (i *STRING_LITERALImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *STRING_LITERALImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.STRING_LITERALData.ForEachNode(fn)
 }
 
-func (i *STRING_LITERALImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *STRING_LITERALImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.STRING_LITERALData.ForEachReference(fn)
+}
+
+func (i *STRING_LITERALImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("STRING_LITERALImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("STRING_LITERALImpl.Resolve: field '%s' does not exist in node '%s' of type 'STRING_LITERAL'", field.Value(), nodePath)
+	}
 }
 
 type ENUMERATION_LITERAL interface {
@@ -736,28 +838,19 @@ type ENUMERATION_LITERAL interface {
 }
 
 func NewENUMERATION_LITERAL() ENUMERATION_LITERAL {
-	return &ENUMERATION_LITERALImpl{
-		AstNodeBase:             core.NewAstNode(),
-		UNTYPED_PARAMETERData:   NewUNTYPED_PARAMETERData(),
-		PARAMETERData:           NewPARAMETERData(),
-		ENUMERATION_LITERALData: NewENUMERATION_LITERALData(),
-	}
+	return &ENUMERATION_LITERALImpl{}
 }
 
 type ENUMERATION_LITERALData struct {
 	value *core.Token
 }
 
-func NewENUMERATION_LITERALData() ENUMERATION_LITERALData {
-	return ENUMERATION_LITERALData{}
-}
-
 func (i *ENUMERATION_LITERALData) IsENUMERATION_LITERAL() {}
 
-func (i *ENUMERATION_LITERALData) ForEachNode(fn func(core.AstNode)) {
+func (i *ENUMERATION_LITERALData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *ENUMERATION_LITERALData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *ENUMERATION_LITERALData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *ENUMERATION_LITERALData) Value() string {
@@ -783,16 +876,30 @@ type ENUMERATION_LITERALImpl struct {
 	ENUMERATION_LITERALData
 }
 
-func (i *ENUMERATION_LITERALImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *ENUMERATION_LITERALImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.ENUMERATION_LITERALData.ForEachNode(fn)
 }
 
-func (i *ENUMERATION_LITERALImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *ENUMERATION_LITERALImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.ENUMERATION_LITERALData.ForEachReference(fn)
+}
+
+func (i *ENUMERATION_LITERALImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("ENUMERATION_LITERALImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("ENUMERATION_LITERALImpl.Resolve: field '%s' does not exist in node '%s' of type 'ENUMERATION_LITERAL'", field.Value(), nodePath)
+	}
 }
 
 type BINARY_LITERAL interface {
@@ -806,28 +913,19 @@ type BINARY_LITERAL interface {
 }
 
 func NewBINARY_LITERAL() BINARY_LITERAL {
-	return &BINARY_LITERALImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		BINARY_LITERALData:    NewBINARY_LITERALData(),
-	}
+	return &BINARY_LITERALImpl{}
 }
 
 type BINARY_LITERALData struct {
 	value *core.Token
 }
 
-func NewBINARY_LITERALData() BINARY_LITERALData {
-	return BINARY_LITERALData{}
-}
-
 func (i *BINARY_LITERALData) IsBINARY_LITERAL() {}
 
-func (i *BINARY_LITERALData) ForEachNode(fn func(core.AstNode)) {
+func (i *BINARY_LITERALData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *BINARY_LITERALData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *BINARY_LITERALData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *BINARY_LITERALData) Value() string {
@@ -853,16 +951,30 @@ type BINARY_LITERALImpl struct {
 	BINARY_LITERALData
 }
 
-func (i *BINARY_LITERALImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *BINARY_LITERALImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.BINARY_LITERALData.ForEachNode(fn)
 }
 
-func (i *BINARY_LITERALImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *BINARY_LITERALImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.BINARY_LITERALData.ForEachReference(fn)
+}
+
+func (i *BINARY_LITERALImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("BINARY_LITERALImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("BINARY_LITERALImpl.Resolve: field '%s' does not exist in node '%s' of type 'BINARY_LITERAL'", field.Value(), nodePath)
+	}
 }
 
 type ENTITY_REFERENCE interface {
@@ -875,30 +987,21 @@ type ENTITY_REFERENCE interface {
 }
 
 func NewENTITY_REFERENCE() ENTITY_REFERENCE {
-	return &ENTITY_REFERENCEImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		ENTITY_REFERENCEData:  NewENTITY_REFERENCEData(),
-	}
+	return &ENTITY_REFERENCEImpl{}
 }
 
 type ENTITY_REFERENCEData struct {
 	value *core.Reference[SIMPLE_ENTITY_INSTANCE]
 }
 
-func NewENTITY_REFERENCEData() ENTITY_REFERENCEData {
-	return ENTITY_REFERENCEData{}
-}
-
 func (i *ENTITY_REFERENCEData) IsENTITY_REFERENCE() {}
 
-func (i *ENTITY_REFERENCEData) ForEachNode(fn func(core.AstNode)) {
+func (i *ENTITY_REFERENCEData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *ENTITY_REFERENCEData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *ENTITY_REFERENCEData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	if i.value != nil {
-		fn(i.value)
+		fn(i.value, fieldNameValue, -1)
 	}
 }
 
@@ -921,16 +1024,30 @@ type ENTITY_REFERENCEImpl struct {
 	ENTITY_REFERENCEData
 }
 
-func (i *ENTITY_REFERENCEImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *ENTITY_REFERENCEImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.ENTITY_REFERENCEData.ForEachNode(fn)
 }
 
-func (i *ENTITY_REFERENCEImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *ENTITY_REFERENCEImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.ENTITY_REFERENCEData.ForEachReference(fn)
+}
+
+func (i *ENTITY_REFERENCEImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("ENTITY_REFERENCEImpl.Resolve: field 'value' is a cross-reference instead of a container field")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("ENTITY_REFERENCEImpl.Resolve: field '%s' does not exist in node '%s' of type 'ENTITY_REFERENCE'", field.Value(), nodePath)
+	}
 }
 
 type OMITTED_PARAMETER interface {
@@ -944,27 +1061,19 @@ type OMITTED_PARAMETER interface {
 }
 
 func NewOMITTED_PARAMETER() OMITTED_PARAMETER {
-	return &OMITTED_PARAMETERImpl{
-		AstNodeBase:           core.NewAstNode(),
-		PARAMETERData:         NewPARAMETERData(),
-		OMITTED_PARAMETERData: NewOMITTED_PARAMETERData(),
-	}
+	return &OMITTED_PARAMETERImpl{}
 }
 
 type OMITTED_PARAMETERData struct {
 	value *core.Token
 }
 
-func NewOMITTED_PARAMETERData() OMITTED_PARAMETERData {
-	return OMITTED_PARAMETERData{}
-}
-
 func (i *OMITTED_PARAMETERData) IsOMITTED_PARAMETER() {}
 
-func (i *OMITTED_PARAMETERData) ForEachNode(fn func(core.AstNode)) {
+func (i *OMITTED_PARAMETERData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *OMITTED_PARAMETERData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *OMITTED_PARAMETERData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *OMITTED_PARAMETERData) Value() string {
@@ -989,14 +1098,28 @@ type OMITTED_PARAMETERImpl struct {
 	OMITTED_PARAMETERData
 }
 
-func (i *OMITTED_PARAMETERImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *OMITTED_PARAMETERImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachNode(fn)
 	i.OMITTED_PARAMETERData.ForEachNode(fn)
 }
 
-func (i *OMITTED_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *OMITTED_PARAMETERImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.PARAMETERData.ForEachReference(fn)
 	i.OMITTED_PARAMETERData.ForEachReference(fn)
+}
+
+func (i *OMITTED_PARAMETERImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameValue:
+		return nil, fmt.Errorf("OMITTED_PARAMETERImpl.Resolve: field 'value' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("OMITTED_PARAMETERImpl.Resolve: field '%s' does not exist in node '%s' of type 'OMITTED_PARAMETER'", field.Value(), nodePath)
+	}
 }
 
 type LIST interface {
@@ -1009,33 +1132,22 @@ type LIST interface {
 }
 
 func NewLIST() LIST {
-	return &LISTImpl{
-		AstNodeBase:           core.NewAstNode(),
-		UNTYPED_PARAMETERData: NewUNTYPED_PARAMETERData(),
-		PARAMETERData:         NewPARAMETERData(),
-		LISTData:              NewLISTData(),
-	}
+	return &LISTImpl{}
 }
 
 type LISTData struct {
 	parameters []PARAMETER
 }
 
-func NewLISTData() LISTData {
-	return LISTData{
-		parameters: []PARAMETER{},
-	}
-}
-
 func (i *LISTData) IsLIST() {}
 
-func (i *LISTData) ForEachNode(fn func(core.AstNode)) {
-	for _, item := range i.parameters {
-		fn(item)
+func (i *LISTData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
+	for j, item := range i.parameters {
+		fn(item, fieldNameParameters, j)
 	}
 }
 
-func (i *LISTData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *LISTData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *LISTData) Parameters() []PARAMETER {
@@ -1053,16 +1165,39 @@ type LISTImpl struct {
 	LISTData
 }
 
-func (i *LISTImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *LISTImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachNode(fn)
 	i.PARAMETERData.ForEachNode(fn)
 	i.LISTData.ForEachNode(fn)
 }
 
-func (i *LISTImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *LISTImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.UNTYPED_PARAMETERData.ForEachReference(fn)
 	i.PARAMETERData.ForEachReference(fn)
 	i.LISTData.ForEachReference(fn)
+}
+
+func (i *LISTImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, index := path.Head()
+	switch field {
+	case fieldNameParameters:
+		if index >= len(i.Parameters()) {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("LISTImpl.Resolve: index %d exceeds length of slice in 'parameters' (length=%d) in node '%s'", index, len(i.Parameters()), nodePath)
+		}
+		child := i.Parameters()[index]
+		if child == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("LISTImpl.Resolve: item %d of slice in field 'parameters' is nil in node '%s'", index, nodePath)
+		}
+		return child.Resolve(path.Tail())
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("LISTImpl.Resolve: field '%s' does not exist in node '%s' of type 'LIST'", field.Value(), nodePath)
+	}
 }
 
 type DATA_SECTION interface {
@@ -1076,10 +1211,7 @@ type DATA_SECTION interface {
 }
 
 func NewDATA_SECTION() DATA_SECTION {
-	return &DATA_SECTIONImpl{
-		AstNodeBase:      core.NewAstNode(),
-		DATA_SECTIONData: NewDATA_SECTIONData(),
-	}
+	return &DATA_SECTIONImpl{}
 }
 
 type DATA_SECTIONData struct {
@@ -1087,24 +1219,18 @@ type DATA_SECTIONData struct {
 	entityInstances []ENTITY_INSTANCE
 }
 
-func NewDATA_SECTIONData() DATA_SECTIONData {
-	return DATA_SECTIONData{
-		entityInstances: []ENTITY_INSTANCE{},
-	}
-}
-
 func (i *DATA_SECTIONData) IsDATA_SECTION() {}
 
-func (i *DATA_SECTIONData) ForEachNode(fn func(core.AstNode)) {
+func (i *DATA_SECTIONData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.dataParameters != nil {
-		fn(i.dataParameters)
+		fn(i.dataParameters, fieldNameDataParameters, -1)
 	}
-	for _, item := range i.entityInstances {
-		fn(item)
+	for j, item := range i.entityInstances {
+		fn(item, fieldNameEntityInstances, j)
 	}
 }
 
-func (i *DATA_SECTIONData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *DATA_SECTIONData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *DATA_SECTIONData) DataParameters() PARAMETER_LIST {
@@ -1132,12 +1258,42 @@ type DATA_SECTIONImpl struct {
 	DATA_SECTIONData
 }
 
-func (i *DATA_SECTIONImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *DATA_SECTIONImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.DATA_SECTIONData.ForEachNode(fn)
 }
 
-func (i *DATA_SECTIONImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *DATA_SECTIONImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.DATA_SECTIONData.ForEachReference(fn)
+}
+
+func (i *DATA_SECTIONImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, index := path.Head()
+	switch field {
+	case fieldNameDataParameters:
+		if i.DataParameters() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("DATA_SECTIONImpl.Resolve: field 'dataParameters' is nil in node '%s'", nodePath)
+		}
+		child := i.DataParameters()
+		return child.Resolve(path.Tail())
+	case fieldNameEntityInstances:
+		if index >= len(i.EntityInstances()) {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("DATA_SECTIONImpl.Resolve: index %d exceeds length of slice in 'entityInstances' (length=%d) in node '%s'", index, len(i.EntityInstances()), nodePath)
+		}
+		child := i.EntityInstances()[index]
+		if child == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("DATA_SECTIONImpl.Resolve: item %d of slice in field 'entityInstances' is nil in node '%s'", index, nodePath)
+		}
+		return child.Resolve(path.Tail())
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("DATA_SECTIONImpl.Resolve: field '%s' does not exist in node '%s' of type 'DATA_SECTION'", field.Value(), nodePath)
+	}
 }
 
 type ENTITY_INSTANCE interface {
@@ -1147,25 +1303,18 @@ type ENTITY_INSTANCE interface {
 }
 
 func NewENTITY_INSTANCE() ENTITY_INSTANCE {
-	return &ENTITY_INSTANCEImpl{
-		AstNodeBase:         core.NewAstNode(),
-		ENTITY_INSTANCEData: NewENTITY_INSTANCEData(),
-	}
+	return &ENTITY_INSTANCEImpl{}
 }
 
 type ENTITY_INSTANCEData struct {
 }
 
-func NewENTITY_INSTANCEData() ENTITY_INSTANCEData {
-	return ENTITY_INSTANCEData{}
-}
-
 func (i *ENTITY_INSTANCEData) IsENTITY_INSTANCE() {}
 
-func (i *ENTITY_INSTANCEData) ForEachNode(fn func(core.AstNode)) {
+func (i *ENTITY_INSTANCEData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 }
 
-func (i *ENTITY_INSTANCEData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *ENTITY_INSTANCEData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 type ENTITY_INSTANCEImpl struct {
@@ -1173,12 +1322,21 @@ type ENTITY_INSTANCEImpl struct {
 	ENTITY_INSTANCEData
 }
 
-func (i *ENTITY_INSTANCEImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *ENTITY_INSTANCEImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.ENTITY_INSTANCEData.ForEachNode(fn)
 }
 
-func (i *ENTITY_INSTANCEImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *ENTITY_INSTANCEImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.ENTITY_INSTANCEData.ForEachReference(fn)
+}
+
+func (i *ENTITY_INSTANCEImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	nodePath, _ := core.PathOf(i)
+	return nil, fmt.Errorf("ENTITY_INSTANCEImpl.Resolve: field '%s' does not exist in node '%s' of type 'ENTITY_INSTANCE'", field.Value(), nodePath)
 }
 
 type SIMPLE_ENTITY_INSTANCE interface {
@@ -1194,11 +1352,7 @@ type SIMPLE_ENTITY_INSTANCE interface {
 }
 
 func NewSIMPLE_ENTITY_INSTANCE() SIMPLE_ENTITY_INSTANCE {
-	return &SIMPLE_ENTITY_INSTANCEImpl{
-		AstNodeBase:                core.NewAstNode(),
-		ENTITY_INSTANCEData:        NewENTITY_INSTANCEData(),
-		SIMPLE_ENTITY_INSTANCEData: NewSIMPLE_ENTITY_INSTANCEData(),
-	}
+	return &SIMPLE_ENTITY_INSTANCEImpl{}
 }
 
 type SIMPLE_ENTITY_INSTANCEData struct {
@@ -1206,19 +1360,15 @@ type SIMPLE_ENTITY_INSTANCEData struct {
 	record SIMPLE_RECORD
 }
 
-func NewSIMPLE_ENTITY_INSTANCEData() SIMPLE_ENTITY_INSTANCEData {
-	return SIMPLE_ENTITY_INSTANCEData{}
-}
-
 func (i *SIMPLE_ENTITY_INSTANCEData) IsSIMPLE_ENTITY_INSTANCE() {}
 
-func (i *SIMPLE_ENTITY_INSTANCEData) ForEachNode(fn func(core.AstNode)) {
+func (i *SIMPLE_ENTITY_INSTANCEData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.record != nil {
-		fn(i.record)
+		fn(i.record, fieldNameRecord, -1)
 	}
 }
 
-func (i *SIMPLE_ENTITY_INSTANCEData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *SIMPLE_ENTITY_INSTANCEData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *SIMPLE_ENTITY_INSTANCEData) Name() string {
@@ -1255,14 +1405,35 @@ type SIMPLE_ENTITY_INSTANCEImpl struct {
 	SIMPLE_ENTITY_INSTANCEData
 }
 
-func (i *SIMPLE_ENTITY_INSTANCEImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *SIMPLE_ENTITY_INSTANCEImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.ENTITY_INSTANCEData.ForEachNode(fn)
 	i.SIMPLE_ENTITY_INSTANCEData.ForEachNode(fn)
 }
 
-func (i *SIMPLE_ENTITY_INSTANCEImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *SIMPLE_ENTITY_INSTANCEImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.ENTITY_INSTANCEData.ForEachReference(fn)
 	i.SIMPLE_ENTITY_INSTANCEData.ForEachReference(fn)
+}
+
+func (i *SIMPLE_ENTITY_INSTANCEImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameRecord:
+		if i.Record() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("SIMPLE_ENTITY_INSTANCEImpl.Resolve: field 'record' is nil in node '%s'", nodePath)
+		}
+		child := i.Record()
+		return child.Resolve(path.Tail())
+	case fieldNameName:
+		return nil, fmt.Errorf("SIMPLE_ENTITY_INSTANCEImpl.Resolve: field 'name' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("SIMPLE_ENTITY_INSTANCEImpl.Resolve: field '%s' does not exist in node '%s' of type 'SIMPLE_ENTITY_INSTANCE'", field.Value(), nodePath)
+	}
 }
 
 type COMPLEX_ENTITY_INSTANCE interface {
@@ -1278,11 +1449,7 @@ type COMPLEX_ENTITY_INSTANCE interface {
 }
 
 func NewCOMPLEX_ENTITY_INSTANCE() COMPLEX_ENTITY_INSTANCE {
-	return &COMPLEX_ENTITY_INSTANCEImpl{
-		AstNodeBase:                 core.NewAstNode(),
-		ENTITY_INSTANCEData:         NewENTITY_INSTANCEData(),
-		COMPLEX_ENTITY_INSTANCEData: NewCOMPLEX_ENTITY_INSTANCEData(),
-	}
+	return &COMPLEX_ENTITY_INSTANCEImpl{}
 }
 
 type COMPLEX_ENTITY_INSTANCEData struct {
@@ -1290,19 +1457,15 @@ type COMPLEX_ENTITY_INSTANCEData struct {
 	record SUBSUPER_RECORD
 }
 
-func NewCOMPLEX_ENTITY_INSTANCEData() COMPLEX_ENTITY_INSTANCEData {
-	return COMPLEX_ENTITY_INSTANCEData{}
-}
-
 func (i *COMPLEX_ENTITY_INSTANCEData) IsCOMPLEX_ENTITY_INSTANCE() {}
 
-func (i *COMPLEX_ENTITY_INSTANCEData) ForEachNode(fn func(core.AstNode)) {
+func (i *COMPLEX_ENTITY_INSTANCEData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.record != nil {
-		fn(i.record)
+		fn(i.record, fieldNameRecord, -1)
 	}
 }
 
-func (i *COMPLEX_ENTITY_INSTANCEData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *COMPLEX_ENTITY_INSTANCEData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *COMPLEX_ENTITY_INSTANCEData) Name() string {
@@ -1339,14 +1502,35 @@ type COMPLEX_ENTITY_INSTANCEImpl struct {
 	COMPLEX_ENTITY_INSTANCEData
 }
 
-func (i *COMPLEX_ENTITY_INSTANCEImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *COMPLEX_ENTITY_INSTANCEImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.ENTITY_INSTANCEData.ForEachNode(fn)
 	i.COMPLEX_ENTITY_INSTANCEData.ForEachNode(fn)
 }
 
-func (i *COMPLEX_ENTITY_INSTANCEImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *COMPLEX_ENTITY_INSTANCEImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.ENTITY_INSTANCEData.ForEachReference(fn)
 	i.COMPLEX_ENTITY_INSTANCEData.ForEachReference(fn)
+}
+
+func (i *COMPLEX_ENTITY_INSTANCEImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameRecord:
+		if i.Record() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("COMPLEX_ENTITY_INSTANCEImpl.Resolve: field 'record' is nil in node '%s'", nodePath)
+		}
+		child := i.Record()
+		return child.Resolve(path.Tail())
+	case fieldNameName:
+		return nil, fmt.Errorf("COMPLEX_ENTITY_INSTANCEImpl.Resolve: field 'name' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("COMPLEX_ENTITY_INSTANCEImpl.Resolve: field '%s' does not exist in node '%s' of type 'COMPLEX_ENTITY_INSTANCE'", field.Value(), nodePath)
+	}
 }
 
 type SIMPLE_RECORD interface {
@@ -1361,10 +1545,7 @@ type SIMPLE_RECORD interface {
 }
 
 func NewSIMPLE_RECORD() SIMPLE_RECORD {
-	return &SIMPLE_RECORDImpl{
-		AstNodeBase:       core.NewAstNode(),
-		SIMPLE_RECORDData: NewSIMPLE_RECORDData(),
-	}
+	return &SIMPLE_RECORDImpl{}
 }
 
 type SIMPLE_RECORDData struct {
@@ -1372,19 +1553,15 @@ type SIMPLE_RECORDData struct {
 	parameters PARAMETER_LIST
 }
 
-func NewSIMPLE_RECORDData() SIMPLE_RECORDData {
-	return SIMPLE_RECORDData{}
-}
-
 func (i *SIMPLE_RECORDData) IsSIMPLE_RECORD() {}
 
-func (i *SIMPLE_RECORDData) ForEachNode(fn func(core.AstNode)) {
+func (i *SIMPLE_RECORDData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	if i.parameters != nil {
-		fn(i.parameters)
+		fn(i.parameters, fieldNameParameters, -1)
 	}
 }
 
-func (i *SIMPLE_RECORDData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *SIMPLE_RECORDData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *SIMPLE_RECORDData) Keyword() string {
@@ -1420,12 +1597,33 @@ type SIMPLE_RECORDImpl struct {
 	SIMPLE_RECORDData
 }
 
-func (i *SIMPLE_RECORDImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *SIMPLE_RECORDImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.SIMPLE_RECORDData.ForEachNode(fn)
 }
 
-func (i *SIMPLE_RECORDImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *SIMPLE_RECORDImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.SIMPLE_RECORDData.ForEachReference(fn)
+}
+
+func (i *SIMPLE_RECORDImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, _ := path.Head()
+	switch field {
+	case fieldNameParameters:
+		if i.Parameters() == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("SIMPLE_RECORDImpl.Resolve: field 'parameters' is nil in node '%s'", nodePath)
+		}
+		child := i.Parameters()
+		return child.Resolve(path.Tail())
+	case fieldNameKeyword:
+		return nil, fmt.Errorf("SIMPLE_RECORDImpl.Resolve: field 'keyword' holds a primitive value instead of an ast node")
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("SIMPLE_RECORDImpl.Resolve: field '%s' does not exist in node '%s' of type 'SIMPLE_RECORD'", field.Value(), nodePath)
+	}
 }
 
 type SUBSUPER_RECORD interface {
@@ -1437,31 +1635,22 @@ type SUBSUPER_RECORD interface {
 }
 
 func NewSUBSUPER_RECORD() SUBSUPER_RECORD {
-	return &SUBSUPER_RECORDImpl{
-		AstNodeBase:         core.NewAstNode(),
-		SUBSUPER_RECORDData: NewSUBSUPER_RECORDData(),
-	}
+	return &SUBSUPER_RECORDImpl{}
 }
 
 type SUBSUPER_RECORDData struct {
 	records []SIMPLE_RECORD
 }
 
-func NewSUBSUPER_RECORDData() SUBSUPER_RECORDData {
-	return SUBSUPER_RECORDData{
-		records: []SIMPLE_RECORD{},
-	}
-}
-
 func (i *SUBSUPER_RECORDData) IsSUBSUPER_RECORD() {}
 
-func (i *SUBSUPER_RECORDData) ForEachNode(fn func(core.AstNode)) {
-	for _, item := range i.records {
-		fn(item)
+func (i *SUBSUPER_RECORDData) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
+	for j, item := range i.records {
+		fn(item, fieldNameRecords, j)
 	}
 }
 
-func (i *SUBSUPER_RECORDData) ForEachReference(fn func(core.UntypedReference)) {
+func (i *SUBSUPER_RECORDData) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 }
 
 func (i *SUBSUPER_RECORDData) Records() []SIMPLE_RECORD {
@@ -1477,13 +1666,52 @@ type SUBSUPER_RECORDImpl struct {
 	SUBSUPER_RECORDData
 }
 
-func (i *SUBSUPER_RECORDImpl) ForEachNode(fn func(core.AstNode)) {
+func (i *SUBSUPER_RECORDImpl) ForEachNode(fn func(core.AstNode, unique.Handle[string], int)) {
 	i.SUBSUPER_RECORDData.ForEachNode(fn)
 }
 
-func (i *SUBSUPER_RECORDImpl) ForEachReference(fn func(core.UntypedReference)) {
+func (i *SUBSUPER_RECORDImpl) ForEachReference(fn func(core.UntypedReference, unique.Handle[string], int)) {
 	i.SUBSUPER_RECORDData.ForEachReference(fn)
 }
+
+func (i *SUBSUPER_RECORDImpl) Resolve(path core.FragmentPath) (core.AstNode, error) {
+	if path.Empty() {
+		return i, nil
+	}
+	field, index := path.Head()
+	switch field {
+	case fieldNameRecords:
+		if index >= len(i.Records()) {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("SUBSUPER_RECORDImpl.Resolve: index %d exceeds length of slice in 'records' (length=%d) in node '%s'", index, len(i.Records()), nodePath)
+		}
+		child := i.Records()[index]
+		if child == nil {
+			nodePath, _ := core.PathOf(i)
+			return nil, fmt.Errorf("SUBSUPER_RECORDImpl.Resolve: item %d of slice in field 'records' is nil in node '%s'", index, nodePath)
+		}
+		return child.Resolve(path.Tail())
+	default:
+		nodePath, _ := core.PathOf(i)
+		return nil, fmt.Errorf("SUBSUPER_RECORDImpl.Resolve: field '%s' does not exist in node '%s' of type 'SUBSUPER_RECORD'", field.Value(), nodePath)
+	}
+}
+
+var (
+	fieldNameDataParameters   = unique.Make("dataParameters")
+	fieldNameDataSections     = unique.Make("dataSections")
+	fieldNameEntityInstances  = unique.Make("entityInstances")
+	fieldNameHeaderEntityList = unique.Make("headerEntityList")
+	fieldNameHeaderSection    = unique.Make("headerSection")
+	fieldNameKeyword          = unique.Make("keyword")
+	fieldNameName             = unique.Make("name")
+	fieldNameParameter        = unique.Make("parameter")
+	fieldNameParameterList    = unique.Make("parameterList")
+	fieldNameParameters       = unique.Make("parameters")
+	fieldNameRecord           = unique.Make("record")
+	fieldNameRecords          = unique.Make("records")
+	fieldNameValue            = unique.Make("value")
+)
 
 var IfcSyntheticFactories = map[string]func() core.AstNode{
 	"BINARY_LITERAL":          func() core.AstNode { return NewBINARY_LITERAL() },

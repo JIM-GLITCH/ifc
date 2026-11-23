@@ -4,13 +4,12 @@ import (
 	"testing"
 
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/lsp"
 )
 
 func inlayHintsForDoc(t *testing.T, fixture *fbtest.Fixture, doc *fbtest.Doc) []lsp.InlayHint {
 	t.Helper()
-	server, err := service.Get[lsp.Server](fixture.Services())
+	server, err := fixture.Services().Get[lsp.Server]()
 	if err != nil {
 		t.Fatalf("fbtest: no language server available: %v", err)
 	}
@@ -114,7 +113,7 @@ func TestInlayHintCapabilityAdvertised(t *testing.T) {
 	fixture := newIfcHoverFixture(t)
 	doc := parseSignatureFixture(t, fixture, `#1=IFCDIRECTION((0.,0.,1.));`)
 
-	server, err := service.Get[lsp.Server](fixture.Services())
+	server, err := fixture.Services().Get[lsp.Server]()
 	if err != nil {
 		t.Fatalf("fbtest: no language server available: %v", err)
 	}

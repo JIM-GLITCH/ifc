@@ -3,6 +3,8 @@
 package ifc
 
 import (
+	"context"
+
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/parser"
 	"typefox.dev/fastbelt/util/service"
@@ -15,16 +17,28 @@ type Parser struct {
 	lookahead             IfcParserLookahead
 }
 
-func (p *Parser) Parse(document *core.Document) *parser.ParseResult {
-	recovery := service.MustGet[parser.ErrorRecoveryStrategy](p.sc)
-	messages := service.MustGet[parser.ErrorMessageProvider](p.sc)
-	referencesConstructor := service.MustGet[IfcReferencesConstructor](p.sc)
-	lookahead := service.MustGet[IfcParserLookahead](p.sc)
-	cp := &Parser{sc: p.sc, referencesConstructor: referencesConstructor, lookahead: lookahead, state: parser.NewParserState(document.Tokens, ATN(), recovery, messages)}
+func (p *Parser) Parse(ctx context.Context, document *core.Document) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	recovery := p.sc.MustGet[parser.ErrorRecoveryStrategy]()
+	messages := p.sc.MustGet[parser.ErrorMessageProvider]()
+	referencesConstructor := p.sc.MustGet[IfcReferencesConstructor]()
+	lookahead := p.sc.MustGet[IfcParserLookahead]()
+	cp := &Parser{
+		sc:                    p.sc,
+		referencesConstructor: referencesConstructor,
+		lookahead:             lookahead,
+		state:                 parser.NewParserState(ctx, document.Tokens, ATN(), recovery, messages),
+	}
 	result := cp.ParseEXCHANGE_FILE()
+	if ctx.Err() != nil {
+		return
+	}
 	cp.state.ExpectEndOfInput()
-	core.AssignContainers(document, result)
-	return &parser.ParseResult{Node: result, Errors: cp.state.Errors()}
+	document.ParserErrors = cp.state.Errors()
+	document.Root = result
+	core.AssignContainers(document)
 }
 
 func NewParser(sc *service.Container) *Parser {
@@ -35,7 +49,7 @@ func NewParser(sc *service.Container) *Parser {
 
 func (p *Parser) ParseEXCHANGE_FILE() EXCHANGE_FILE {
 	current := NewEXCHANGE_FILE()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_ISODash10303Dash21Semicolon)
@@ -66,13 +80,13 @@ func (p *Parser) ParseEXCHANGE_FILE() EXCHANGE_FILE {
 			core.AssignToken(current, token, EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseHEADER_SECTION() HEADER_SECTION {
 	current := NewHEADER_SECTION()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_HEADERSemicolon)
@@ -119,13 +133,13 @@ func (p *Parser) ParseHEADER_SECTION() HEADER_SECTION {
 			core.AssignToken(current, token, HEADER_SECTION_ENDSECSemicolon)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseHEADER_ENTITY() HEADER_ENTITY {
 	current := NewHEADER_ENTITY()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_KEYWORD)
@@ -158,13 +172,13 @@ func (p *Parser) ParseHEADER_ENTITY() HEADER_ENTITY {
 			core.AssignToken(current, token, HEADER_ENTITY_Semicolon)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParsePARAMETER_LIST() PARAMETER_LIST {
 	current := NewPARAMETER_LIST()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			p.state.EnterRule(PARAMETER_LIST__LoopEntry)
@@ -191,13 +205,13 @@ func (p *Parser) ParsePARAMETER_LIST() PARAMETER_LIST {
 			p.state.Sync(PARAMETER_LIST__LoopEntry)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParsePARAMETER() PARAMETER {
-	current := NewPARAMETER()
-	current.SetSegmentStartToken(p.state.LA(1))
+	startPos := p.state.LA(1).Range.Start
+	var current PARAMETER
 	{
 		switch prediction, failure := p.lookahead.PARAMETERAlternatives(p.state); prediction {
 		case 0:
@@ -205,7 +219,6 @@ func (p *Parser) ParsePARAMETER() PARAMETER {
 				p.state.EnterRule(PARAMETER__Basic_1)
 				result := p.ParseTYPED_PARAMETER()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 1:
@@ -213,7 +226,6 @@ func (p *Parser) ParsePARAMETER() PARAMETER {
 				p.state.EnterRule(PARAMETER__Basic_3)
 				result := p.ParseUNTYPED_PARAMETER()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 2:
@@ -221,20 +233,23 @@ func (p *Parser) ParsePARAMETER() PARAMETER {
 				p.state.EnterRule(PARAMETER__Basic_5)
 				result := p.ParseOMITTED_PARAMETER()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		default:
 			p.state.AppendError(p.state.Messages().NoViableAlternative(failure), failure.Token)
 		}
+		if current == nil {
+			current = NewPARAMETER()
+			current.SetTextRangeStart(startPos)
+		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseTYPED_PARAMETER() TYPED_PARAMETER {
 	current := NewTYPED_PARAMETER()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_KEYWORD)
@@ -260,13 +275,13 @@ func (p *Parser) ParseTYPED_PARAMETER() TYPED_PARAMETER {
 			core.AssignToken(current, token, TYPED_PARAMETER_RightParen)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
-	current := NewUNTYPED_PARAMETER()
-	current.SetSegmentStartToken(p.state.LA(1))
+	startPos := p.state.LA(1).Range.Start
+	var current UNTYPED_PARAMETER
 	{
 		switch prediction, failure := p.lookahead.UNTYPED_PARAMETERAlternatives(p.state); prediction {
 		case 0:
@@ -274,7 +289,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_1)
 				result := p.ParseDEFAULT_PARAMETER()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 1:
@@ -282,7 +296,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_3)
 				result := p.ParseINTEGER_LITERAL()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 2:
@@ -290,7 +303,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_5)
 				result := p.ParseREAL_LITERAL()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 3:
@@ -298,7 +310,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_7)
 				result := p.ParseSTRING_LITERAL()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 4:
@@ -306,7 +317,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_9)
 				result := p.ParseENUMERATION_LITERAL()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 5:
@@ -314,7 +324,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_11)
 				result := p.ParseBINARY_LITERAL()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 6:
@@ -322,7 +331,6 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_13)
 				result := p.ParseLIST()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 7:
@@ -330,20 +338,23 @@ func (p *Parser) ParseUNTYPED_PARAMETER() UNTYPED_PARAMETER {
 				p.state.EnterRule(UNTYPED_PARAMETER__Basic_15)
 				result := p.ParseENTITY_REFERENCE()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		default:
 			p.state.AppendError(p.state.Messages().NoViableAlternative(failure), failure.Token)
 		}
+		if current == nil {
+			current = NewUNTYPED_PARAMETER()
+			current.SetTextRangeStart(startPos)
+		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseDEFAULT_PARAMETER() DEFAULT_PARAMETER {
 	current := NewDEFAULT_PARAMETER()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_Dollar)
@@ -353,13 +364,13 @@ func (p *Parser) ParseDEFAULT_PARAMETER() DEFAULT_PARAMETER {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseINTEGER_LITERAL() INTEGER_LITERAL {
 	current := NewINTEGER_LITERAL()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_INTEGER)
@@ -369,13 +380,13 @@ func (p *Parser) ParseINTEGER_LITERAL() INTEGER_LITERAL {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseREAL_LITERAL() REAL_LITERAL {
 	current := NewREAL_LITERAL()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_REAL)
@@ -385,13 +396,13 @@ func (p *Parser) ParseREAL_LITERAL() REAL_LITERAL {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseSTRING_LITERAL() STRING_LITERAL {
 	current := NewSTRING_LITERAL()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_STRING)
@@ -401,13 +412,13 @@ func (p *Parser) ParseSTRING_LITERAL() STRING_LITERAL {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseENUMERATION_LITERAL() ENUMERATION_LITERAL {
 	current := NewENUMERATION_LITERAL()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_ENUMERATION)
@@ -417,13 +428,13 @@ func (p *Parser) ParseENUMERATION_LITERAL() ENUMERATION_LITERAL {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseBINARY_LITERAL() BINARY_LITERAL {
 	current := NewBINARY_LITERAL()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_BINARY)
@@ -433,13 +444,13 @@ func (p *Parser) ParseBINARY_LITERAL() BINARY_LITERAL {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseENTITY_REFERENCE() ENTITY_REFERENCE {
 	current := NewENTITY_REFERENCE()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_ENTITY_INSTANCE_NAME)
@@ -449,13 +460,13 @@ func (p *Parser) ParseENTITY_REFERENCE() ENTITY_REFERENCE {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseOMITTED_PARAMETER() OMITTED_PARAMETER {
 	current := NewOMITTED_PARAMETER()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_Asterisk)
@@ -465,13 +476,13 @@ func (p *Parser) ParseOMITTED_PARAMETER() OMITTED_PARAMETER {
 			}
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseLIST() LIST {
 	current := NewLIST()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_LeftParen)
@@ -509,13 +520,13 @@ func (p *Parser) ParseLIST() LIST {
 			core.AssignToken(current, token, LIST_RightParen)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseDATA_SECTION() DATA_SECTION {
 	current := NewDATA_SECTION()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_DATA)
@@ -561,13 +572,13 @@ func (p *Parser) ParseDATA_SECTION() DATA_SECTION {
 			core.AssignToken(current, token, DATA_SECTION_ENDSECSemicolon)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseENTITY_INSTANCE() ENTITY_INSTANCE {
-	current := NewENTITY_INSTANCE()
-	current.SetSegmentStartToken(p.state.LA(1))
+	startPos := p.state.LA(1).Range.Start
+	var current ENTITY_INSTANCE
 	{
 		switch prediction, failure := p.lookahead.ENTITY_INSTANCEAlternatives(p.state); prediction {
 		case 0:
@@ -575,7 +586,6 @@ func (p *Parser) ParseENTITY_INSTANCE() ENTITY_INSTANCE {
 				p.state.EnterRule(ENTITY_INSTANCE__Basic_1)
 				result := p.ParseSIMPLE_ENTITY_INSTANCE()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		case 1:
@@ -583,20 +593,23 @@ func (p *Parser) ParseENTITY_INSTANCE() ENTITY_INSTANCE {
 				p.state.EnterRule(ENTITY_INSTANCE__Basic_3)
 				result := p.ParseCOMPLEX_ENTITY_INSTANCE()
 				p.state.ExitRule()
-				core.MergeTokens(result, current.Tokens())
 				current = result
 			}
 		default:
 			p.state.AppendError(p.state.Messages().NoViableAlternative(failure), failure.Token)
 		}
+		if current == nil {
+			current = NewENTITY_INSTANCE()
+			current.SetTextRangeStart(startPos)
+		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseSIMPLE_ENTITY_INSTANCE() SIMPLE_ENTITY_INSTANCE {
 	current := NewSIMPLE_ENTITY_INSTANCE()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_ENTITY_INSTANCE_NAME)
@@ -622,13 +635,13 @@ func (p *Parser) ParseSIMPLE_ENTITY_INSTANCE() SIMPLE_ENTITY_INSTANCE {
 			core.AssignToken(current, token, SIMPLE_ENTITY_INSTANCE_Semicolon)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseCOMPLEX_ENTITY_INSTANCE() COMPLEX_ENTITY_INSTANCE {
 	current := NewCOMPLEX_ENTITY_INSTANCE()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_ENTITY_INSTANCE_NAME)
@@ -654,13 +667,13 @@ func (p *Parser) ParseCOMPLEX_ENTITY_INSTANCE() COMPLEX_ENTITY_INSTANCE {
 			core.AssignToken(current, token, COMPLEX_ENTITY_INSTANCE_Semicolon)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseSIMPLE_RECORD() SIMPLE_RECORD {
 	current := NewSIMPLE_RECORD()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Token_KEYWORD)
@@ -689,13 +702,13 @@ func (p *Parser) ParseSIMPLE_RECORD() SIMPLE_RECORD {
 			core.AssignToken(current, token, SIMPLE_RECORD_RightParen)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }
 
 func (p *Parser) ParseSUBSUPER_RECORD() SUBSUPER_RECORD {
 	current := NewSUBSUPER_RECORD()
-	current.SetSegmentStartToken(p.state.LA(1))
+	current.SetTextRangeStart(p.state.LA(1).Range.Start)
 	{
 		{
 			token := p.state.Consume(Keyword_LeftParen)
@@ -717,6 +730,6 @@ func (p *Parser) ParseSUBSUPER_RECORD() SUBSUPER_RECORD {
 			core.AssignToken(current, token, SUBSUPER_RECORD_RightParen)
 		}
 	}
-	current.SetSegmentEndToken(p.state.LA(0))
+	current.SetTextRangeEnd(p.state.LA(0).Range.End)
 	return current
 }

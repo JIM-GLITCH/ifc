@@ -8,7 +8,6 @@ import (
 
 	core "typefox.dev/fastbelt"
 	fbtest "typefox.dev/fastbelt/test"
-	"typefox.dev/fastbelt/util/service"
 	"typefox.dev/fastbelt/workspace"
 )
 
@@ -25,25 +24,24 @@ func TestValidateDeterministicUnderParallelism(t *testing.T) {
 		t.Fatal(err)
 	}
 	doc := fixture.Parse(string(raw))
-	validator := service.MustGet[workspace.DocumentValidator](sc)
+	validator := sc.MustGet[workspace.DocumentValidator]()
 
 	// t.ifc has a known parse error; diagnostics still include the parallel
 	// entity-validation results, which is what this test compares.
 	render := func(diags []*core.Diagnostic) string {
 		parts := make([]string, 0, len(diags))
 		for _, d := range diags {
-			parts = append(parts, fmt.Sprintf("%d:%d-%d:%d|%s|%s|%s",
-				d.Range.Start.Line, d.Range.Start.Column,
-				d.Range.End.Line, d.Range.End.Column,
+			parts = append(parts, fmt.Sprintf("%d-%d|%s|%s|%s",
+				d.Range.Start, d.Range.End,
 				d.Code, d.Severity, d.Message))
 		}
 		return fmt.Sprintf("%d diagnostics:\n%s", len(diags), joinStrings(parts, "\n"))
 	}
 
-	first := render(validator.Validate(context.Background(), doc.Document, "test"))
+	first := render(validator.Validate(context.Background(), doc.Document))
 	t.Logf("baseline: %d diagnostics", countLines(first))
 	for i := 0; i < 7; i++ {
-		got := render(validator.Validate(context.Background(), doc.Document, "test"))
+		got := render(validator.Validate(context.Background(), doc.Document))
 		if got != first {
 			t.Fatalf("validation output changed between runs (iteration %d)", i+2)
 		}

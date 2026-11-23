@@ -48,7 +48,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	foundLinker := false
 	for _, d := range diagnostics {
 		if d.Code == evalUnknownCode && strings.Contains(d.Message, "#999") {

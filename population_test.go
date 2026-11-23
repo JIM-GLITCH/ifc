@@ -214,7 +214,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
 			t.Fatalf("unexpected entity WHERE diagnostic: %s", d.Message)
@@ -247,7 +247,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" || d.Code == "ifc-type-where" {
 			t.Fatalf("unexpected diagnostic (%s): %s", d.Code, d.Message)
@@ -278,7 +278,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
 			t.Fatalf("unexpected entity WHERE diagnostic: %s", d.Message)
@@ -306,7 +306,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
 			t.Fatalf("unexpected entity WHERE diagnostic: %s", d.Message)
@@ -333,7 +333,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
 			t.Fatalf("unexpected entity WHERE diagnostic: %s", d.Message)
@@ -360,7 +360,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-entity-where" {
 			t.Fatalf("unexpected entity WHERE diagnostic: %s", d.Message)
@@ -392,7 +392,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustDocumentValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 
 	found := false
 	for _, d := range diagnostics {
@@ -407,5 +407,5 @@ END-ISO-10303-21;`
 }
 
 func serviceMustDocumentValidator(sc *service.Container) workspace.DocumentValidator {
-	return service.MustGet[workspace.DocumentValidator](sc)
+	return sc.MustGet[workspace.DocumentValidator]()
 }

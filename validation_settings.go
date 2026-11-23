@@ -96,7 +96,7 @@ func ValidationSettingsFromService(sc *service.Container) ValidationSettings {
 	if sc == nil {
 		return DefaultValidationSettings()
 	}
-	store, err := service.Get[*ValidationSettingsStore](sc)
+	store, err := sc.Get[*ValidationSettingsStore]()
 	if err != nil || store == nil {
 		return DefaultValidationSettings()
 	}

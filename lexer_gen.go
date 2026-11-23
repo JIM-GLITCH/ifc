@@ -6,228 +6,17 @@ import (
 	"strings"
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/lexer"
+	"typefox.dev/fastbelt/util/service"
 	"unicode/utf8"
 )
 
-const Keyword_Dollar_Idx = 1
-
-var Keyword_Dollar = core.NewTokenType(
-	Keyword_Dollar_Idx,
-	"$",
-	"$",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "$") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{'$'},
-)
-
-const Keyword_LeftParen_Idx = 2
-
-var Keyword_LeftParen = core.NewTokenType(
-	Keyword_LeftParen_Idx,
-	"(",
-	"(",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "(") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{'('},
-)
-
-const Keyword_RightParen_Idx = 3
-
-var Keyword_RightParen = core.NewTokenType(
-	Keyword_RightParen_Idx,
-	")",
-	")",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], ")") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{')'},
-)
-
-const Keyword_Asterisk_Idx = 4
-
-var Keyword_Asterisk = core.NewTokenType(
-	Keyword_Asterisk_Idx,
-	"*",
-	"*",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "*") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{'*'},
-)
-
-const Keyword_Comma_Idx = 5
-
-var Keyword_Comma = core.NewTokenType(
-	Keyword_Comma_Idx,
-	",",
-	",",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], ",") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{','},
-)
-
-const Keyword_Semicolon_Idx = 6
-
-var Keyword_Semicolon = core.NewTokenType(
-	Keyword_Semicolon_Idx,
-	";",
-	";",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], ";") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{';'},
-)
-
-const Keyword_Equals_Idx = 7
-
-var Keyword_Equals = core.NewTokenType(
-	Keyword_Equals_Idx,
-	"=",
-	"=",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "=") {
-			return 1
-		}
-		return 0
-	},
-	[]rune{'='},
-)
-
-const Keyword_DATA_Idx = 8
-
-var Keyword_DATA = core.NewTokenType(
-	Keyword_DATA_Idx,
-	"DATA",
-	"DATA",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "DATA") {
-			return 4
-		}
-		return 0
-	},
-	[]rune{'D'},
-)
-
-const Keyword_ENDDashISODash10303Dash21Semicolon_Idx = 9
-
-var Keyword_ENDDashISODash10303Dash21Semicolon = core.NewTokenType(
-	Keyword_ENDDashISODash10303Dash21Semicolon_Idx,
-	"END-ISO-10303-21;",
-	"END-ISO-10303-21;",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "END-ISO-10303-21;") {
-			return 17
-		}
-		return 0
-	},
-	[]rune{'E'},
-)
-
-const Keyword_ENDSECSemicolon_Idx = 10
-
-var Keyword_ENDSECSemicolon = core.NewTokenType(
-	Keyword_ENDSECSemicolon_Idx,
-	"ENDSEC;",
-	"ENDSEC;",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "ENDSEC;") {
-			return 7
-		}
-		return 0
-	},
-	[]rune{'E'},
-)
-
-const Keyword_HEADERSemicolon_Idx = 11
-
-var Keyword_HEADERSemicolon = core.NewTokenType(
-	Keyword_HEADERSemicolon_Idx,
-	"HEADER;",
-	"HEADER;",
-	0,
-	core.TokenKindKeyword,
-	0,
-	false,
-	func(text string, offset int) int {
-		if strings.HasPrefix(text[offset:], "HEADER;") {
-			return 7
-		}
-		return 0
-	},
-	[]rune{'H'},
-)
-
-const Keyword_ISODash10303Dash21Semicolon_Idx = 12
+const Keyword_ISODash10303Dash21Semicolon_Idx = 1
 
 var Keyword_ISODash10303Dash21Semicolon = core.NewTokenType(
 	Keyword_ISODash10303Dash21Semicolon_Idx,
 	"ISO-10303-21;",
 	"ISO-10303-21;",
-	0,
 	core.TokenKindKeyword,
-	0,
-	false,
 	func(text string, offset int) int {
 		if strings.HasPrefix(text[offset:], "ISO-10303-21;") {
 			return 13
@@ -237,16 +26,189 @@ var Keyword_ISODash10303Dash21Semicolon = core.NewTokenType(
 	[]rune{'I'},
 )
 
+const Keyword_ENDDashISODash10303Dash21Semicolon_Idx = 2
+
+var Keyword_ENDDashISODash10303Dash21Semicolon = core.NewTokenType(
+	Keyword_ENDDashISODash10303Dash21Semicolon_Idx,
+	"END-ISO-10303-21;",
+	"END-ISO-10303-21;",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "END-ISO-10303-21;") {
+			return 17
+		}
+		return 0
+	},
+	[]rune{'E'},
+)
+
+const Keyword_HEADERSemicolon_Idx = 3
+
+var Keyword_HEADERSemicolon = core.NewTokenType(
+	Keyword_HEADERSemicolon_Idx,
+	"HEADER;",
+	"HEADER;",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "HEADER;") {
+			return 7
+		}
+		return 0
+	},
+	[]rune{'H'},
+)
+
+const Keyword_ENDSECSemicolon_Idx = 4
+
+var Keyword_ENDSECSemicolon = core.NewTokenType(
+	Keyword_ENDSECSemicolon_Idx,
+	"ENDSEC;",
+	"ENDSEC;",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "ENDSEC;") {
+			return 7
+		}
+		return 0
+	},
+	[]rune{'E'},
+)
+
+const Keyword_LeftParen_Idx = 5
+
+var Keyword_LeftParen = core.NewTokenType(
+	Keyword_LeftParen_Idx,
+	"(",
+	"(",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "(") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{'('},
+)
+
+const Keyword_RightParen_Idx = 6
+
+var Keyword_RightParen = core.NewTokenType(
+	Keyword_RightParen_Idx,
+	")",
+	")",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], ")") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{')'},
+)
+
+const Keyword_Semicolon_Idx = 7
+
+var Keyword_Semicolon = core.NewTokenType(
+	Keyword_Semicolon_Idx,
+	";",
+	";",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], ";") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{';'},
+)
+
+const Keyword_Comma_Idx = 8
+
+var Keyword_Comma = core.NewTokenType(
+	Keyword_Comma_Idx,
+	",",
+	",",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], ",") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{','},
+)
+
+const Keyword_Dollar_Idx = 9
+
+var Keyword_Dollar = core.NewTokenType(
+	Keyword_Dollar_Idx,
+	"$",
+	"$",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "$") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{'$'},
+)
+
+const Keyword_Asterisk_Idx = 10
+
+var Keyword_Asterisk = core.NewTokenType(
+	Keyword_Asterisk_Idx,
+	"*",
+	"*",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "*") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{'*'},
+)
+
+const Keyword_DATA_Idx = 11
+
+var Keyword_DATA = core.NewTokenType(
+	Keyword_DATA_Idx,
+	"DATA",
+	"DATA",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "DATA") {
+			return 4
+		}
+		return 0
+	},
+	[]rune{'D'},
+)
+
+const Keyword_Equals_Idx = 12
+
+var Keyword_Equals = core.NewTokenType(
+	Keyword_Equals_Idx,
+	"=",
+	"=",
+	core.TokenKindKeyword,
+	func(text string, offset int) int {
+		if strings.HasPrefix(text[offset:], "=") {
+			return 1
+		}
+		return 0
+	},
+	[]rune{'='},
+)
+
 const Token_KEYWORD_Idx = 13
 
 var Token_KEYWORD = core.NewTokenType(
 	Token_KEYWORD_Idx,
 	"KEYWORD",
 	"KEYWORD",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -255,6 +217,23 @@ var Token_KEYWORD = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				start := index
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_KEYWORD_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index != start {
+					acceptedIndex = index
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -327,6 +306,7 @@ var Token_KEYWORD_Next = [][]int{
 var Token_KEYWORD_Accepting = [3]bool{
 	2: true,
 }
+var Token_KEYWORD_Loop2 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true, 71: true, 72: true, 73: true, 74: true, 75: true, 76: true, 77: true, 78: true, 79: true, 80: true, 81: true, 82: true, 83: true, 84: true, 85: true, 86: true, 87: true, 88: true, 89: true, 90: true, 95: true}
 
 const Token_REAL_Idx = 14
 
@@ -334,10 +314,7 @@ var Token_REAL = core.NewTokenType(
 	Token_REAL_Idx,
 	"REAL",
 	"REAL",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -346,6 +323,49 @@ var Token_REAL = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_REAL_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index == length {
+					break loop
+				}
+			case 3:
+				start := index
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_REAL_Loop3[c] {
+						break
+					}
+					index++
+				}
+				if index != start {
+					acceptedIndex = index
+				}
+				if index == length {
+					break loop
+				}
+			case 6:
+				start := index
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_REAL_Loop6[c] {
+						break
+					}
+					index++
+				}
+				if index != start {
+					acceptedIndex = index
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -487,6 +507,9 @@ var Token_REAL_Accepting = [7]bool{
 	3: true,
 	6: true,
 }
+var Token_REAL_Loop2 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true}
+var Token_REAL_Loop3 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true}
+var Token_REAL_Loop6 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true}
 
 const Token_INTEGER_Idx = 15
 
@@ -494,10 +517,7 @@ var Token_INTEGER = core.NewTokenType(
 	Token_INTEGER_Idx,
 	"INTEGER",
 	"INTEGER",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -506,6 +526,23 @@ var Token_INTEGER = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				start := index
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_INTEGER_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index != start {
+					acceptedIndex = index
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -578,6 +615,7 @@ var Token_INTEGER_Next = [][]int{
 var Token_INTEGER_Accepting = [3]bool{
 	2: true,
 }
+var Token_INTEGER_Loop2 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true}
 
 const Token_STRING_Idx = 16
 
@@ -585,10 +623,7 @@ var Token_STRING = core.NewTokenType(
 	Token_STRING_Idx,
 	"STRING",
 	"STRING",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -597,6 +632,19 @@ var Token_STRING = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 1:
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_STRING_Loop1[c] {
+						break
+					}
+					index++
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -1111,6 +1159,7 @@ var Token_STRING_Next = [][]int{
 var Token_STRING_Accepting = [29]bool{
 	2: true,
 }
+var Token_STRING_Loop1 = [128]bool{32: true, 33: true, 34: true, 35: true, 36: true, 37: true, 38: true, 40: true, 41: true, 42: true, 43: true, 44: true, 45: true, 46: true, 47: true, 48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 58: true, 59: true, 60: true, 61: true, 62: true, 63: true, 64: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true, 71: true, 72: true, 73: true, 74: true, 75: true, 76: true, 77: true, 78: true, 79: true, 80: true, 81: true, 82: true, 83: true, 84: true, 85: true, 86: true, 87: true, 88: true, 89: true, 90: true, 91: true, 93: true, 94: true, 95: true, 96: true, 97: true, 98: true, 99: true, 100: true, 101: true, 102: true, 103: true, 104: true, 105: true, 106: true, 107: true, 108: true, 109: true, 110: true, 111: true, 112: true, 113: true, 114: true, 115: true, 116: true, 117: true, 118: true, 119: true, 120: true, 121: true, 122: true, 123: true, 124: true, 125: true, 126: true}
 
 const Token_ENTITY_INSTANCE_NAME_Idx = 17
 
@@ -1118,10 +1167,7 @@ var Token_ENTITY_INSTANCE_NAME = core.NewTokenType(
 	Token_ENTITY_INSTANCE_NAME_Idx,
 	"ENTITY_INSTANCE_NAME",
 	"ENTITY_INSTANCE_NAME",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -1130,6 +1176,23 @@ var Token_ENTITY_INSTANCE_NAME = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				start := index
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_ENTITY_INSTANCE_NAME_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index != start {
+					acceptedIndex = index
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -1202,6 +1265,7 @@ var Token_ENTITY_INSTANCE_NAME_Next = [][]int{
 var Token_ENTITY_INSTANCE_NAME_Accepting = [3]bool{
 	2: true,
 }
+var Token_ENTITY_INSTANCE_NAME_Loop2 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true}
 
 const Token_ENUMERATION_Idx = 18
 
@@ -1209,10 +1273,7 @@ var Token_ENUMERATION = core.NewTokenType(
 	Token_ENUMERATION_Idx,
 	"ENUMERATION",
 	"ENUMERATION",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -1221,6 +1282,19 @@ var Token_ENUMERATION = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_ENUMERATION_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -1310,6 +1384,7 @@ var Token_ENUMERATION_Next = [][]int{
 var Token_ENUMERATION_Accepting = [4]bool{
 	3: true,
 }
+var Token_ENUMERATION_Loop2 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true, 71: true, 72: true, 73: true, 74: true, 75: true, 76: true, 77: true, 78: true, 79: true, 80: true, 81: true, 82: true, 83: true, 84: true, 85: true, 86: true, 87: true, 88: true, 89: true, 90: true, 95: true}
 
 const Token_BINARY_Idx = 19
 
@@ -1317,10 +1392,7 @@ var Token_BINARY = core.NewTokenType(
 	Token_BINARY_Idx,
 	"BINARY",
 	"BINARY",
-	0,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -1329,6 +1401,19 @@ var Token_BINARY = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_BINARY_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -1418,6 +1503,7 @@ var Token_BINARY_Next = [][]int{
 var Token_BINARY_Accepting = [4]bool{
 	3: true,
 }
+var Token_BINARY_Loop2 = [128]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true}
 
 const Token_COMMENTS_Idx = 20
 
@@ -1425,10 +1511,7 @@ var Token_COMMENTS = core.NewTokenType(
 	Token_COMMENTS_Idx,
 	"COMMENTS",
 	"COMMENTS",
-	core.SkippedGroup,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -1437,6 +1520,30 @@ var Token_COMMENTS = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 2:
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_COMMENTS_Loop2[c] {
+						break
+					}
+					index++
+				}
+				if index == length {
+					break loop
+				}
+			case 3:
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_COMMENTS_Loop3[c] {
+						break
+					}
+					index++
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -1543,6 +1650,8 @@ var Token_COMMENTS_Next = [][]int{
 var Token_COMMENTS_Accepting = [5]bool{
 	4: true,
 }
+var Token_COMMENTS_Loop2 = [128]bool{0: true, 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true, 13: true, 14: true, 15: true, 16: true, 17: true, 18: true, 19: true, 20: true, 21: true, 22: true, 23: true, 24: true, 25: true, 26: true, 27: true, 28: true, 29: true, 30: true, 31: true, 32: true, 33: true, 34: true, 35: true, 36: true, 37: true, 38: true, 39: true, 40: true, 41: true, 43: true, 44: true, 45: true, 46: true, 47: true, 48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 58: true, 59: true, 60: true, 61: true, 62: true, 63: true, 64: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true, 71: true, 72: true, 73: true, 74: true, 75: true, 76: true, 77: true, 78: true, 79: true, 80: true, 81: true, 82: true, 83: true, 84: true, 85: true, 86: true, 87: true, 88: true, 89: true, 90: true, 91: true, 92: true, 93: true, 94: true, 95: true, 96: true, 97: true, 98: true, 99: true, 100: true, 101: true, 102: true, 103: true, 104: true, 105: true, 106: true, 107: true, 108: true, 109: true, 110: true, 111: true, 112: true, 113: true, 114: true, 115: true, 116: true, 117: true, 118: true, 119: true, 120: true, 121: true, 122: true, 123: true, 124: true, 125: true, 126: true, 127: true}
+var Token_COMMENTS_Loop3 = [128]bool{42: true}
 
 const Token_WHITESPACE_Idx = 21
 
@@ -1550,10 +1659,7 @@ var Token_WHITESPACE = core.NewTokenType(
 	Token_WHITESPACE_Idx,
 	"WHITESPACE",
 	"WHITESPACE",
-	core.SkippedGroup,
 	core.TokenKindToken,
-	0,
-	false,
 	func(s string, offset int) int {
 		input := s[offset:]
 		length := len(input)
@@ -1562,6 +1668,23 @@ var Token_WHITESPACE = core.NewTokenType(
 		index := 0
 	loop:
 		for index < length {
+			switch state {
+			case 1:
+				start := index
+				for index < length {
+					c := input[index]
+					if c >= utf8.RuneSelf || !Token_WHITESPACE_Loop1[c] {
+						break
+					}
+					index++
+				}
+				if index != start {
+					acceptedIndex = index
+				}
+				if index == length {
+					break loop
+				}
+			}
 			r, runeSize := utf8.DecodeRuneInString(input[index:])
 			switch state {
 			case 0:
@@ -1617,29 +1740,36 @@ var Token_WHITESPACE_Next = [][]int{
 var Token_WHITESPACE_Accepting = [2]bool{
 	1: true,
 }
+var Token_WHITESPACE_Loop1 = [128]bool{9: true, 10: true, 12: true, 13: true, 32: true}
 
-func NewLexer() lexer.Lexer {
-	return lexer.NewDefaultLexer(
-		Keyword_Dollar,
-		Keyword_LeftParen,
-		Keyword_RightParen,
-		Keyword_Asterisk,
-		Keyword_Comma,
-		Keyword_Semicolon,
-		Keyword_Equals,
-		Keyword_DATA,
-		Keyword_ENDDashISODash10303Dash21Semicolon,
-		Keyword_ENDSECSemicolon,
-		Keyword_HEADERSemicolon,
-		Keyword_ISODash10303Dash21Semicolon,
-		Token_KEYWORD,
-		Token_REAL,
-		Token_INTEGER,
-		Token_STRING,
-		Token_ENTITY_INSTANCE_NAME,
-		Token_ENUMERATION,
-		Token_BINARY,
-		Token_COMMENTS,
-		Token_WHITESPACE,
+const (
+	TokenMode_default = 0
+)
+
+func NewLexer(sc *service.Container) lexer.Lexer {
+	modes := make([]*lexer.TokenMode, 1)
+	modes[TokenMode_default] = lexer.NewTokenMode("default",
+		lexer.UseTokenType(Keyword_ISODash10303Dash21Semicolon),
+		lexer.UseTokenType(Keyword_ENDDashISODash10303Dash21Semicolon),
+		lexer.UseTokenType(Keyword_HEADERSemicolon),
+		lexer.UseTokenType(Keyword_ENDSECSemicolon),
+		lexer.UseTokenType(Keyword_LeftParen),
+		lexer.UseTokenType(Keyword_RightParen),
+		lexer.UseTokenType(Keyword_Semicolon),
+		lexer.UseTokenType(Keyword_Comma),
+		lexer.UseTokenType(Keyword_Dollar),
+		lexer.UseTokenType(Keyword_Asterisk),
+		lexer.UseTokenType(Keyword_DATA),
+		lexer.UseTokenType(Keyword_Equals),
+		lexer.UseTokenType(Token_KEYWORD),
+		lexer.UseTokenType(Token_REAL),
+		lexer.UseTokenType(Token_INTEGER),
+		lexer.UseTokenType(Token_STRING),
+		lexer.UseTokenType(Token_ENTITY_INSTANCE_NAME),
+		lexer.UseTokenType(Token_ENUMERATION),
+		lexer.UseTokenType(Token_BINARY),
+		lexer.UseTokenType(Token_COMMENTS).WithModifier(core.SkippedModifier),
+		lexer.UseTokenType(Token_WHITESPACE).WithModifier(core.SkippedModifier),
 	)
+	return lexer.NewDefaultLexer(sc, TokenMode_default, modes...)
 }

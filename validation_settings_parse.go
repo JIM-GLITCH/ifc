@@ -117,7 +117,7 @@ func legacyLayerEnabled(raw map[string]any, keys ...string) bool {
 
 func ApplyValidationSettings(sc *service.Container, raw any) ValidationSettings {
 	settings := ParseValidationSettings(raw)
-	if store, err := service.Get[*ValidationSettingsStore](sc); err == nil && store != nil {
+	if store, err := sc.Get[*ValidationSettingsStore](); err == nil && store != nil {
 		store.Set(settings)
 	}
 	return settings

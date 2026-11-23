@@ -87,7 +87,7 @@ END-ISO-10303-21;`)
 		t.Fatal("IFCDIRECTION completion item not found")
 	}
 
-	server := service.MustGet[lsp.Server](fixture.Services())
+	server := fixture.Services().MustGet[lsp.Server]()
 	resolved, err := server.ResolveCompletionItem(doc.Ctx(), direction)
 	if err != nil {
 		t.Fatalf("ResolveCompletionItem: %v", err)

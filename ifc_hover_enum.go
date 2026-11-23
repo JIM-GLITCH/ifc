@@ -5,19 +5,20 @@ import (
 	"strings"
 
 	core "typefox.dev/fastbelt"
+	"typefox.dev/fastbelt/textdoc"
 	"typefox.dev/lsp"
 )
 
-func enumHover(first, second *core.Token) *lsp.Hover {
+func enumHover(first, second *core.Token, handle textdoc.Handle) *lsp.Hover {
 	for _, token := range []*core.Token{first, second} {
-		if hover := enumHoverToken(token); hover != nil {
+		if hover := enumHoverToken(token, handle); hover != nil {
 			return hover
 		}
 	}
 	return nil
 }
 
-func enumHoverToken(token *core.Token) *lsp.Hover {
+func enumHoverToken(token *core.Token, handle textdoc.Handle) *lsp.Hover {
 	if token == nil || token.Type != Token_ENUMERATION {
 		return nil
 	}
@@ -55,7 +56,7 @@ func enumHoverToken(token *core.Token) *lsp.Hover {
 			Kind:  lsp.Markdown,
 			Value: b.String(),
 		},
-		Range: token.Segment().Range.LspRange(),
+		Range: token.TextRange().LspRange(handle),
 	}
 }
 

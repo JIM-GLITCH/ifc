@@ -3,7 +3,7 @@
 package ifc
 
 import (
-	"sync"
+	"context"
 	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/parser"
 	"typefox.dev/fastbelt/util/service"
@@ -20,7 +20,7 @@ type CompletionParser struct {
 func NewCompletionParser(sc *service.Container) *CompletionParser {
 	return &CompletionParser{
 		sc:  sc,
-		atn: sync.OnceValue(BuildATN),
+		atn: ATN,
 	}
 }
 
@@ -28,12 +28,12 @@ func NewCompletionParser(sc *service.Container) *CompletionParser {
 // the document's tokens up to the cursor) and returns the recorded
 // snapshots and rule stack. The completion provider feeds that result into
 // the ATN simulator.
-func (p *CompletionParser) Parse(tokens []core.Token) *parser.CompletionParseResult {
-	messages := service.MustGet[parser.ErrorMessageProvider](p.sc)
-	recovery := service.MustGet[parser.ErrorRecoveryStrategy](p.sc)
-	lookahead := service.MustGet[IfcParserLookahead](p.sc)
+func (p *CompletionParser) Parse(ctx context.Context, _ *core.Document, tokens []core.Token) *parser.CompletionParseResult {
+	messages := p.sc.MustGet[parser.ErrorMessageProvider]()
+	recovery := p.sc.MustGet[parser.ErrorRecoveryStrategy]()
+	lookahead := p.sc.MustGet[IfcParserLookahead]()
 	cp := &CompletionParser{sc: p.sc, atn: p.atn, lookahead: lookahead}
-	cp.state = parser.NewParserState(tokens, p.atn(), recovery, messages)
+	cp.state = parser.NewParserState(ctx, tokens, p.atn(), recovery, messages)
 	cp.cp = parser.NewCompletionParserState(cp.state)
 	cp.ParseEXCHANGE_FILE()
 	return cp.cp.Result(tokens)
@@ -46,21 +46,17 @@ func (p *CompletionParser) ParseEXCHANGE_FILE() {
 		p.state.Consume(Keyword_ISODash10303Dash21Semicolon)
 	}
 	{
-		p.cp.MarkAssignment("HeaderSection")
 		p.state.EnterRule(EXCHANGE_FILE__LoopEntry)
 		p.ParseHEADER_SECTION()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
 		p.cp.RecordSnapshot(EXCHANGE_FILE__LoopEntry)
 		p.state.Sync(EXCHANGE_FILE__LoopEntry)
 		for p.lookahead.EXCHANGE_FILEDataSectionsLoop(p.state) {
-			p.cp.MarkAssignment("DataSections")
 			p.state.EnterRule(EXCHANGE_FILE__Basic_2)
 			p.ParseDATA_SECTION()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 			p.cp.RecordSnapshot(EXCHANGE_FILE__LoopEntry)
 			p.state.Sync(EXCHANGE_FILE__LoopEntry)
 		}
@@ -77,35 +73,27 @@ func (p *CompletionParser) ParseHEADER_SECTION() {
 		p.state.Consume(Keyword_HEADERSemicolon)
 	}
 	{
-		p.cp.MarkAssignment("HeaderEntityList")
 		p.state.EnterRule(HEADER_SECTION__Basic_1)
 		p.ParseHEADER_ENTITY()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
-		p.cp.MarkAssignment("HeaderEntityList")
 		p.state.EnterRule(HEADER_SECTION__Basic_2)
 		p.ParseHEADER_ENTITY()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
-		p.cp.MarkAssignment("HeaderEntityList")
 		p.state.EnterRule(HEADER_SECTION__LoopEntry)
 		p.ParseHEADER_ENTITY()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
 		p.cp.RecordSnapshot(HEADER_SECTION__LoopEntry)
 		p.state.Sync(HEADER_SECTION__LoopEntry)
 		for p.lookahead.HEADER_SECTIONHeaderEntityListLoop(p.state) {
-			p.cp.MarkAssignment("HeaderEntityList")
 			p.state.EnterRule(HEADER_SECTION__Basic_4)
 			p.ParseHEADER_ENTITY()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 			p.cp.RecordSnapshot(HEADER_SECTION__LoopEntry)
 			p.state.Sync(HEADER_SECTION__LoopEntry)
 		}
@@ -119,9 +107,7 @@ func (p *CompletionParser) ParseHEADER_ENTITY() {
 	p.cp.EnterRule("HEADER_ENTITY", HEADER_ENTITY__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Keyword")
 		p.state.Consume(Token_KEYWORD)
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_LeftParen)
@@ -130,11 +116,9 @@ func (p *CompletionParser) ParseHEADER_ENTITY() {
 		p.cp.RecordSnapshot(HEADER_ENTITY__Basic_2)
 		p.state.Sync(HEADER_ENTITY__Basic_2)
 		if p.lookahead.HEADER_ENTITYParameterListOptional(p.state) {
-			p.cp.MarkAssignment("ParameterList")
 			p.state.EnterRule(HEADER_ENTITY__Basic_1)
 			p.ParsePARAMETER_LIST()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 		}
 	}
 	{
@@ -149,11 +133,9 @@ func (p *CompletionParser) ParsePARAMETER_LIST() {
 	p.cp.EnterRule("PARAMETER_LIST", PARAMETER_LIST__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Parameters")
 		p.state.EnterRule(PARAMETER_LIST__LoopEntry)
 		p.ParsePARAMETER()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	p.cp.RecordSnapshot(PARAMETER_LIST__LoopEntry)
 	p.state.Sync(PARAMETER_LIST__LoopEntry)
@@ -162,11 +144,9 @@ func (p *CompletionParser) ParsePARAMETER_LIST() {
 			p.state.Consume(Keyword_Comma)
 		}
 		{
-			p.cp.MarkAssignment("Parameters")
 			p.state.EnterRule(PARAMETER_LIST__Basic_2)
 			p.ParsePARAMETER()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 		}
 		p.cp.RecordSnapshot(PARAMETER_LIST__LoopEntry)
 		p.state.Sync(PARAMETER_LIST__LoopEntry)
@@ -204,19 +184,15 @@ func (p *CompletionParser) ParseTYPED_PARAMETER() {
 	p.cp.EnterRule("TYPED_PARAMETER", TYPED_PARAMETER__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Keyword")
 		p.state.Consume(Token_KEYWORD)
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_LeftParen)
 	}
 	{
-		p.cp.MarkAssignment("Parameter")
 		p.state.EnterRule(TYPED_PARAMETER_RightParen)
 		p.ParsePARAMETER()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_RightParen)
@@ -284,9 +260,7 @@ func (p *CompletionParser) ParseDEFAULT_PARAMETER() {
 	p.cp.EnterRule("DEFAULT_PARAMETER", DEFAULT_PARAMETER__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Keyword_Dollar)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -294,9 +268,7 @@ func (p *CompletionParser) ParseINTEGER_LITERAL() {
 	p.cp.EnterRule("INTEGER_LITERAL", INTEGER_LITERAL__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Token_INTEGER)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -304,9 +276,7 @@ func (p *CompletionParser) ParseREAL_LITERAL() {
 	p.cp.EnterRule("REAL_LITERAL", REAL_LITERAL__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Token_REAL)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -314,9 +284,7 @@ func (p *CompletionParser) ParseSTRING_LITERAL() {
 	p.cp.EnterRule("STRING_LITERAL", STRING_LITERAL__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Token_STRING)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -324,9 +292,7 @@ func (p *CompletionParser) ParseENUMERATION_LITERAL() {
 	p.cp.EnterRule("ENUMERATION_LITERAL", ENUMERATION_LITERAL__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Token_ENUMERATION)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -334,9 +300,7 @@ func (p *CompletionParser) ParseBINARY_LITERAL() {
 	p.cp.EnterRule("BINARY_LITERAL", BINARY_LITERAL__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Token_BINARY)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -344,9 +308,7 @@ func (p *CompletionParser) ParseENTITY_REFERENCE() {
 	p.cp.EnterRule("ENTITY_REFERENCE", ENTITY_REFERENCE__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Token_ENTITY_INSTANCE_NAME)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -354,9 +316,7 @@ func (p *CompletionParser) ParseOMITTED_PARAMETER() {
 	p.cp.EnterRule("OMITTED_PARAMETER", OMITTED_PARAMETER__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Value")
 		p.state.Consume(Keyword_Asterisk)
-		p.cp.ClearAssignment()
 	}
 }
 
@@ -370,11 +330,9 @@ func (p *CompletionParser) ParseLIST() {
 	p.state.Sync(LIST__Basic_3)
 	if p.lookahead.LISTOptional(p.state) {
 		{
-			p.cp.MarkAssignment("Parameters")
 			p.state.EnterRule(LIST__LoopEntry)
 			p.ParsePARAMETER()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 		}
 		p.cp.RecordSnapshot(LIST__LoopEntry)
 		p.state.Sync(LIST__LoopEntry)
@@ -383,11 +341,9 @@ func (p *CompletionParser) ParseLIST() {
 				p.state.Consume(Keyword_Comma)
 			}
 			{
-				p.cp.MarkAssignment("Parameters")
 				p.state.EnterRule(LIST__Basic_2)
 				p.ParsePARAMETER()
 				p.state.ExitRule()
-				p.cp.ClearAssignment()
 			}
 			p.cp.RecordSnapshot(LIST__LoopEntry)
 			p.state.Sync(LIST__LoopEntry)
@@ -411,11 +367,9 @@ func (p *CompletionParser) ParseDATA_SECTION() {
 			p.state.Consume(Keyword_LeftParen)
 		}
 		{
-			p.cp.MarkAssignment("DataParameters")
 			p.state.EnterRule(DATA_SECTION_RightParen)
 			p.ParsePARAMETER_LIST()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 		}
 		{
 			p.state.Consume(Keyword_RightParen)
@@ -428,11 +382,9 @@ func (p *CompletionParser) ParseDATA_SECTION() {
 		p.cp.RecordSnapshot(DATA_SECTION__LoopEntry)
 		p.state.Sync(DATA_SECTION__LoopEntry)
 		for p.lookahead.DATA_SECTIONEntityInstancesLoop(p.state) {
-			p.cp.MarkAssignment("EntityInstances")
 			p.state.EnterRule(DATA_SECTION__Basic_4)
 			p.ParseENTITY_INSTANCE()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 			p.cp.RecordSnapshot(DATA_SECTION__LoopEntry)
 			p.state.Sync(DATA_SECTION__LoopEntry)
 		}
@@ -467,19 +419,15 @@ func (p *CompletionParser) ParseSIMPLE_ENTITY_INSTANCE() {
 	p.cp.EnterRule("SIMPLE_ENTITY_INSTANCE", SIMPLE_ENTITY_INSTANCE__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Name")
 		p.state.Consume(Token_ENTITY_INSTANCE_NAME)
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_Equals)
 	}
 	{
-		p.cp.MarkAssignment("Record")
 		p.state.EnterRule(SIMPLE_ENTITY_INSTANCE_Semicolon)
 		p.ParseSIMPLE_RECORD()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_Semicolon)
@@ -490,19 +438,15 @@ func (p *CompletionParser) ParseCOMPLEX_ENTITY_INSTANCE() {
 	p.cp.EnterRule("COMPLEX_ENTITY_INSTANCE", COMPLEX_ENTITY_INSTANCE__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Name")
 		p.state.Consume(Token_ENTITY_INSTANCE_NAME)
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_Equals)
 	}
 	{
-		p.cp.MarkAssignment("Record")
 		p.state.EnterRule(COMPLEX_ENTITY_INSTANCE_Semicolon)
 		p.ParseSUBSUPER_RECORD()
 		p.state.ExitRule()
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_Semicolon)
@@ -513,9 +457,7 @@ func (p *CompletionParser) ParseSIMPLE_RECORD() {
 	p.cp.EnterRule("SIMPLE_RECORD", SIMPLE_RECORD__Start)
 	defer p.cp.ExitRule()
 	{
-		p.cp.MarkAssignment("Keyword")
 		p.state.Consume(Token_KEYWORD)
-		p.cp.ClearAssignment()
 	}
 	{
 		p.state.Consume(Keyword_LeftParen)
@@ -524,11 +466,9 @@ func (p *CompletionParser) ParseSIMPLE_RECORD() {
 		p.cp.RecordSnapshot(SIMPLE_RECORD__Basic_2)
 		p.state.Sync(SIMPLE_RECORD__Basic_2)
 		if p.lookahead.SIMPLE_RECORDParametersOptional(p.state) {
-			p.cp.MarkAssignment("Parameters")
 			p.state.EnterRule(SIMPLE_RECORD__Basic_1)
 			p.ParsePARAMETER_LIST()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 		}
 	}
 	{
@@ -544,11 +484,9 @@ func (p *CompletionParser) ParseSUBSUPER_RECORD() {
 	}
 	{
 		for ok := true; ok; ok = p.lookahead.SUBSUPER_RECORDRecordsLoop(p.state) {
-			p.cp.MarkAssignment("Records")
 			p.state.EnterRule(SUBSUPER_RECORD__Basic_1)
 			p.ParseSIMPLE_RECORD()
 			p.state.ExitRule()
-			p.cp.ClearAssignment()
 			p.cp.RecordSnapshot(SUBSUPER_RECORD__LoopBack)
 			p.state.Sync(SUBSUPER_RECORD__LoopBack)
 		}

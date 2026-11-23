@@ -12,28 +12,28 @@ const (
 )
 
 var HEADER_ENTITYParameterListOptional = parser.LL1Lookahead{
-	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_KEYWORD, Token_REAL, Token_INTEGER, Token_STRING, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_BINARY},
-	Lookup: []int{1: 1, 2: 1, 4: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1},
+	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_BINARY, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_INTEGER, Token_KEYWORD, Token_REAL, Token_STRING},
+	Lookup: []int{5: 1, 9: 1, 10: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1},
 }
 
 var LISTOptional = parser.LL1Lookahead{
-	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_KEYWORD, Token_REAL, Token_INTEGER, Token_STRING, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_BINARY},
-	Lookup: []int{1: 1, 2: 1, 4: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1},
+	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_BINARY, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_INTEGER, Token_KEYWORD, Token_REAL, Token_STRING},
+	Lookup: []int{5: 1, 9: 1, 10: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1},
 }
 
 var PARAMETERAlternatives = parser.LL1Lookahead{
-	Types:  []*core.TokenType{Token_KEYWORD, Keyword_Dollar, Keyword_LeftParen, Token_REAL, Token_INTEGER, Token_STRING, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_BINARY, Keyword_Asterisk},
-	Lookup: []int{1: 2, 2: 2, 4: 3, 13: 1, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2},
+	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_BINARY, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_INTEGER, Token_KEYWORD, Token_REAL, Token_STRING},
+	Lookup: []int{5: 2, 9: 2, 10: 3, 13: 1, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2},
 }
 
 var SIMPLE_RECORDParametersOptional = parser.LL1Lookahead{
-	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_KEYWORD, Token_REAL, Token_INTEGER, Token_STRING, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_BINARY},
-	Lookup: []int{1: 1, 2: 1, 4: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1},
+	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Keyword_Asterisk, Token_BINARY, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_INTEGER, Token_KEYWORD, Token_REAL, Token_STRING},
+	Lookup: []int{5: 1, 9: 1, 10: 1, 13: 1, 14: 1, 15: 1, 16: 1, 17: 1, 18: 1, 19: 1},
 }
 
 var UNTYPED_PARAMETERAlternatives = parser.LL1Lookahead{
-	Types:  []*core.TokenType{Keyword_Dollar, Token_INTEGER, Token_REAL, Token_STRING, Token_ENUMERATION, Token_BINARY, Keyword_LeftParen, Token_ENTITY_INSTANCE_NAME},
-	Lookup: []int{1: 1, 2: 7, 14: 3, 15: 2, 16: 4, 17: 8, 18: 5, 19: 6},
+	Types:  []*core.TokenType{Keyword_Dollar, Keyword_LeftParen, Token_BINARY, Token_ENTITY_INSTANCE_NAME, Token_ENUMERATION, Token_INTEGER, Token_REAL, Token_STRING},
+	Lookup: []int{5: 7, 9: 1, 14: 3, 15: 2, 16: 4, 17: 8, 18: 5, 19: 6},
 }
 
 // IfcParserLookahead abstracts every lookahead/prediction decision performed by

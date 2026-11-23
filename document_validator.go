@@ -25,7 +25,7 @@ func NewIfcDocumentValidator(sc *service.Container) workspace.DocumentValidator 
 	}
 }
 
-func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document, level string) []*core.Diagnostic {
+func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document) []*core.Diagnostic {
 	pop := BuildPopulation(ctx, doc)
 	ctx = WithPopulation(ctx, pop)
 	ctx = WithEntityEvalCache(ctx)
@@ -36,12 +36,12 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 	// validator's preamble), followed by the entity validation walk. The walk
 	// re-validates only the entities a change can reach and reuses the cached
 	// diagnostics of the rest.
-	source := validationDiagnosticSource(v.sc, doc)
+	source := validationDiagnosticSource(doc)
 	diags := make([]*core.Diagnostic, 0, 64)
 	diags = append(diags, workspace.CreateLexerDiagnostics(doc, source)...)
 	diags = append(diags, workspace.CreateParserDiagnostics(doc, source)...)
 	diags = append(diags, workspace.CreateLinkerDiagnostics(doc, source)...)
-	diags = append(diags, v.validateEntities(ctx, doc, level, source, settings)...)
+	diags = append(diags, v.validateEntities(ctx, doc, source, settings)...)
 
 	if doc != nil && doc.Root != nil && !documentHasParseErrors(doc) {
 		var accept core.ValidationAcceptor = func(d *core.Diagnostic) {
@@ -59,16 +59,10 @@ func (v *IfcDocumentValidator) Validate(ctx context.Context, doc *core.Document,
 }
 
 // validationDiagnosticSource mirrors the fastbelt default validator's source
-// resolution: the document's language id, falling back to the workspace
-// language id.
-func validationDiagnosticSource(sc *service.Container, doc *core.Document) string {
+// resolution: the document's language id.
+func validationDiagnosticSource(doc *core.Document) string {
 	if doc != nil && doc.TextDoc != nil {
-		if source := doc.TextDoc.LanguageID(); source != "" {
-			return source
-		}
-	}
-	if languageID, err := service.Get[workspace.LanguageID](sc); err == nil {
-		return string(languageID)
+		return doc.TextDoc.LanguageID()
 	}
 	return ""
 }

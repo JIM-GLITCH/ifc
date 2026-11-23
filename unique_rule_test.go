@@ -30,7 +30,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustUniqueRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	var found int
 	for _, d := range diagnostics {
 		if d.Code == "ifc-unique" && strings.Contains(d.Message, "GlobalId") {
@@ -62,7 +62,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustUniqueRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-unique" {
 			t.Fatalf("unexpected UNIQUE diagnostic: %s", d.Message)
@@ -91,7 +91,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustUniqueRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-unique" {
 			t.Fatalf("case-differing GlobalIds must not collide: %s", d.Message)
@@ -119,7 +119,7 @@ END-ISO-10303-21;`
 	doc.AssertNoParseErrors()
 
 	validator := serviceMustUniqueRuleValidator(sc)
-	diagnostics := validator.Validate(context.Background(), doc.Document, "test")
+	diagnostics := validator.Validate(context.Background(), doc.Document)
 	var found bool
 	for _, d := range diagnostics {
 		if d.Code == "ifc-unique-aggregate" {
@@ -133,5 +133,5 @@ END-ISO-10303-21;`
 }
 
 func serviceMustUniqueRuleValidator(sc *service.Container) workspace.DocumentValidator {
-	return service.MustGet[workspace.DocumentValidator](sc)
+	return sc.MustGet[workspace.DocumentValidator]()
 }

@@ -67,10 +67,15 @@ function pushValidationSettingsToServer(lc: LanguageClient): Thenable<void> {
 }
 
 async function startLanguageClient(context: vscode.ExtensionContext): Promise<LanguageClient> {
+    const serverEnv = { ...process.env };
+    if (process.env.IFC_PPROF) {
+        serverEnv.IFC_PPROF = process.env.IFC_PPROF;
+    }
     const serverOptions: ServerOptions = {
         command: context.asAbsolutePath(path.join('dist', 'server' + (process.platform === 'win32' ? '.exe' : ''))),
         args: [],
-        transport: TransportKind.stdio
+        transport: TransportKind.stdio,
+        options: { env: serverEnv }
     };
 
     const clientOptions: LanguageClientOptions = {

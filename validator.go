@@ -4,6 +4,7 @@ import (
 	"context"
 
 	core "typefox.dev/fastbelt"
+	"typefox.dev/fastbelt/util/service"
 )
 
 func validateEntityInstance(ctx context.Context, owner core.AstNode, recordKeyword string, keywordToken *core.Token, params []PARAMETER, accept core.ValidationAcceptor) {
@@ -77,7 +78,7 @@ func validateEntityWhereConstraints(ctx context.Context, owner core.AstNode, rec
 	validateEntityWhereRules(ctx, owner, recordKeyword, simple, params, accept)
 }
 
-func (i *SIMPLE_ENTITY_INSTANCEImpl) Validate(ctx context.Context, _ string, accept core.ValidationAcceptor) {
+func (i *SIMPLE_ENTITY_INSTANCEImpl) Validate(ctx context.Context, _ *service.Container, accept core.ValidationAcceptor) {
 	record := i.Record()
 	if record == nil {
 		return
@@ -89,7 +90,7 @@ func (i *SIMPLE_ENTITY_INSTANCEImpl) Validate(ctx context.Context, _ string, acc
 	validateEntityInstance(ctx, i, record.Keyword(), record.KeywordToken(), params, accept)
 }
 
-func (i *COMPLEX_ENTITY_INSTANCEImpl) Validate(ctx context.Context, _ string, accept core.ValidationAcceptor) {
+func (i *COMPLEX_ENTITY_INSTANCEImpl) Validate(ctx context.Context, _ *service.Container, accept core.ValidationAcceptor) {
 	record := i.Record()
 	if record == nil {
 		return

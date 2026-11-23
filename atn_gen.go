@@ -4,6 +4,8 @@ package ifc
 
 import (
 	"sync"
+
+	core "typefox.dev/fastbelt"
 	"typefox.dev/fastbelt/parser"
 )
 
@@ -200,713 +202,611 @@ func ATN() *parser.RuntimeATN {
 	})
 	return atn
 }
+
+// BuildATN builds the ATN of the grammar from the tables below.
 func BuildATN() *parser.RuntimeATN {
-	states := make([]*parser.RuntimeATNState, 181)
-	states[EXCHANGE_FILE__Start] = parser.NewATNState(EXCHANGE_FILE__Start, parser.ATNRuleStart, true)
-	states[EXCHANGE_FILE__Stop] = parser.NewATNState(EXCHANGE_FILE__Stop, parser.ATNRuleStop, false)
-	states[HEADER_SECTION__Start] = parser.NewATNState(HEADER_SECTION__Start, parser.ATNRuleStart, true)
-	states[HEADER_SECTION__Stop] = parser.NewATNState(HEADER_SECTION__Stop, parser.ATNRuleStop, false)
-	states[HEADER_ENTITY__Start] = parser.NewATNState(HEADER_ENTITY__Start, parser.ATNRuleStart, true)
-	states[HEADER_ENTITY__Stop] = parser.NewATNState(HEADER_ENTITY__Stop, parser.ATNRuleStop, false)
-	states[PARAMETER_LIST__Start] = parser.NewATNState(PARAMETER_LIST__Start, parser.ATNRuleStart, true)
-	states[PARAMETER_LIST__Stop] = parser.NewATNState(PARAMETER_LIST__Stop, parser.ATNRuleStop, false)
-	states[PARAMETER__Start] = parser.NewATNState(PARAMETER__Start, parser.ATNRuleStart, true)
-	states[PARAMETER__Stop] = parser.NewATNState(PARAMETER__Stop, parser.ATNRuleStop, false)
-	states[TYPED_PARAMETER__Start] = parser.NewATNState(TYPED_PARAMETER__Start, parser.ATNRuleStart, true)
-	states[TYPED_PARAMETER__Stop] = parser.NewATNState(TYPED_PARAMETER__Stop, parser.ATNRuleStop, false)
-	states[UNTYPED_PARAMETER__Start] = parser.NewATNState(UNTYPED_PARAMETER__Start, parser.ATNRuleStart, true)
-	states[UNTYPED_PARAMETER__Stop] = parser.NewATNState(UNTYPED_PARAMETER__Stop, parser.ATNRuleStop, false)
-	states[DEFAULT_PARAMETER__Start] = parser.NewATNState(DEFAULT_PARAMETER__Start, parser.ATNRuleStart, true)
-	states[DEFAULT_PARAMETER__Stop] = parser.NewATNState(DEFAULT_PARAMETER__Stop, parser.ATNRuleStop, false)
-	states[INTEGER_LITERAL__Start] = parser.NewATNState(INTEGER_LITERAL__Start, parser.ATNRuleStart, true)
-	states[INTEGER_LITERAL__Stop] = parser.NewATNState(INTEGER_LITERAL__Stop, parser.ATNRuleStop, false)
-	states[REAL_LITERAL__Start] = parser.NewATNState(REAL_LITERAL__Start, parser.ATNRuleStart, true)
-	states[REAL_LITERAL__Stop] = parser.NewATNState(REAL_LITERAL__Stop, parser.ATNRuleStop, false)
-	states[STRING_LITERAL__Start] = parser.NewATNState(STRING_LITERAL__Start, parser.ATNRuleStart, true)
-	states[STRING_LITERAL__Stop] = parser.NewATNState(STRING_LITERAL__Stop, parser.ATNRuleStop, false)
-	states[ENUMERATION_LITERAL__Start] = parser.NewATNState(ENUMERATION_LITERAL__Start, parser.ATNRuleStart, true)
-	states[ENUMERATION_LITERAL__Stop] = parser.NewATNState(ENUMERATION_LITERAL__Stop, parser.ATNRuleStop, false)
-	states[BINARY_LITERAL__Start] = parser.NewATNState(BINARY_LITERAL__Start, parser.ATNRuleStart, true)
-	states[BINARY_LITERAL__Stop] = parser.NewATNState(BINARY_LITERAL__Stop, parser.ATNRuleStop, false)
-	states[ENTITY_REFERENCE__Start] = parser.NewATNState(ENTITY_REFERENCE__Start, parser.ATNRuleStart, true)
-	states[ENTITY_REFERENCE__Stop] = parser.NewATNState(ENTITY_REFERENCE__Stop, parser.ATNRuleStop, false)
-	states[OMITTED_PARAMETER__Start] = parser.NewATNState(OMITTED_PARAMETER__Start, parser.ATNRuleStart, true)
-	states[OMITTED_PARAMETER__Stop] = parser.NewATNState(OMITTED_PARAMETER__Stop, parser.ATNRuleStop, false)
-	states[LIST__Start] = parser.NewATNState(LIST__Start, parser.ATNRuleStart, true)
-	states[LIST__Stop] = parser.NewATNState(LIST__Stop, parser.ATNRuleStop, false)
-	states[DATA_SECTION__Start] = parser.NewATNState(DATA_SECTION__Start, parser.ATNRuleStart, true)
-	states[DATA_SECTION__Stop] = parser.NewATNState(DATA_SECTION__Stop, parser.ATNRuleStop, false)
-	states[ENTITY_INSTANCE__Start] = parser.NewATNState(ENTITY_INSTANCE__Start, parser.ATNRuleStart, true)
-	states[ENTITY_INSTANCE__Stop] = parser.NewATNState(ENTITY_INSTANCE__Stop, parser.ATNRuleStop, false)
-	states[SIMPLE_ENTITY_INSTANCE__Start] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE__Start, parser.ATNRuleStart, true)
-	states[SIMPLE_ENTITY_INSTANCE__Stop] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE__Stop, parser.ATNRuleStop, false)
-	states[COMPLEX_ENTITY_INSTANCE__Start] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE__Start, parser.ATNRuleStart, true)
-	states[COMPLEX_ENTITY_INSTANCE__Stop] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE__Stop, parser.ATNRuleStop, false)
-	states[SIMPLE_RECORD__Start] = parser.NewATNState(SIMPLE_RECORD__Start, parser.ATNRuleStart, true)
-	states[SIMPLE_RECORD__Stop] = parser.NewATNState(SIMPLE_RECORD__Stop, parser.ATNRuleStop, false)
-	states[SUBSUPER_RECORD__Start] = parser.NewATNState(SUBSUPER_RECORD__Start, parser.ATNRuleStart, true)
-	states[SUBSUPER_RECORD__Stop] = parser.NewATNState(SUBSUPER_RECORD__Stop, parser.ATNRuleStop, false)
-	states[EXCHANGE_FILE_ISODash10303Dash21Semicolon] = parser.NewATNState(EXCHANGE_FILE_ISODash10303Dash21Semicolon, parser.ATNBasic, false)
-	states[EXCHANGE_FILE__Basic_0] = parser.NewATNState(EXCHANGE_FILE__Basic_0, parser.ATNBasic, true)
-	states[EXCHANGE_FILE__Basic_1] = parser.NewATNState(EXCHANGE_FILE__Basic_1, parser.ATNBasic, true)
-	states[EXCHANGE_FILE__Basic_2] = parser.NewATNState(EXCHANGE_FILE__Basic_2, parser.ATNBasic, true)
-	states[EXCHANGE_FILE__LoopEntry] = parser.NewATNState(EXCHANGE_FILE__LoopEntry, parser.ATNLoopEntry, true).SetDecision(0)
-	states[EXCHANGE_FILE__LoopEnd] = parser.NewATNState(EXCHANGE_FILE__LoopEnd, parser.ATNLoopEnd, true)
-	states[EXCHANGE_FILE__LoopBack] = parser.NewATNState(EXCHANGE_FILE__LoopBack, parser.ATNLoopBack, true)
-	states[EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon] = parser.NewATNState(EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon, parser.ATNBasic, false)
-	states[EXCHANGE_FILE__Basic_3] = parser.NewATNState(EXCHANGE_FILE__Basic_3, parser.ATNBasic, true)
-	states[HEADER_SECTION_HEADERSemicolon] = parser.NewATNState(HEADER_SECTION_HEADERSemicolon, parser.ATNBasic, false)
-	states[HEADER_SECTION__Basic_0] = parser.NewATNState(HEADER_SECTION__Basic_0, parser.ATNBasic, true)
-	states[HEADER_SECTION__Basic_1] = parser.NewATNState(HEADER_SECTION__Basic_1, parser.ATNBasic, true)
-	states[HEADER_SECTION__Basic_2] = parser.NewATNState(HEADER_SECTION__Basic_2, parser.ATNBasic, true)
-	states[HEADER_SECTION__Basic_3] = parser.NewATNState(HEADER_SECTION__Basic_3, parser.ATNBasic, true)
-	states[HEADER_SECTION__Basic_4] = parser.NewATNState(HEADER_SECTION__Basic_4, parser.ATNBasic, true)
-	states[HEADER_SECTION__LoopEntry] = parser.NewATNState(HEADER_SECTION__LoopEntry, parser.ATNLoopEntry, true).SetDecision(1)
-	states[HEADER_SECTION__LoopEnd] = parser.NewATNState(HEADER_SECTION__LoopEnd, parser.ATNLoopEnd, true)
-	states[HEADER_SECTION__LoopBack] = parser.NewATNState(HEADER_SECTION__LoopBack, parser.ATNLoopBack, true)
-	states[HEADER_SECTION_ENDSECSemicolon] = parser.NewATNState(HEADER_SECTION_ENDSECSemicolon, parser.ATNBasic, false)
-	states[HEADER_SECTION__Basic_5] = parser.NewATNState(HEADER_SECTION__Basic_5, parser.ATNBasic, true)
-	states[HEADER_ENTITY_Keyword_KEYWORD] = parser.NewATNState(HEADER_ENTITY_Keyword_KEYWORD, parser.ATNBasic, false)
-	states[HEADER_ENTITY_LeftParen] = parser.NewATNState(HEADER_ENTITY_LeftParen, parser.ATNBasic, false)
-	states[HEADER_ENTITY__Basic_0] = parser.NewATNState(HEADER_ENTITY__Basic_0, parser.ATNBasic, true)
-	states[HEADER_ENTITY__Basic_1] = parser.NewATNState(HEADER_ENTITY__Basic_1, parser.ATNBasic, true)
-	states[HEADER_ENTITY__Basic_2] = parser.NewATNState(HEADER_ENTITY__Basic_2, parser.ATNBasic, true).SetDecision(2)
-	states[HEADER_ENTITY_RightParen] = parser.NewATNState(HEADER_ENTITY_RightParen, parser.ATNBasic, false)
-	states[HEADER_ENTITY_Semicolon] = parser.NewATNState(HEADER_ENTITY_Semicolon, parser.ATNBasic, false)
-	states[HEADER_ENTITY__Basic_3] = parser.NewATNState(HEADER_ENTITY__Basic_3, parser.ATNBasic, true)
-	states[PARAMETER_LIST__Basic_0] = parser.NewATNState(PARAMETER_LIST__Basic_0, parser.ATNBasic, true)
-	states[PARAMETER_LIST_Comma] = parser.NewATNState(PARAMETER_LIST_Comma, parser.ATNBasic, false)
-	states[PARAMETER_LIST__Basic_1] = parser.NewATNState(PARAMETER_LIST__Basic_1, parser.ATNBasic, true)
-	states[PARAMETER_LIST__Basic_2] = parser.NewATNState(PARAMETER_LIST__Basic_2, parser.ATNBasic, true)
-	states[PARAMETER_LIST__LoopEntry] = parser.NewATNState(PARAMETER_LIST__LoopEntry, parser.ATNLoopEntry, true).SetDecision(3)
-	states[PARAMETER_LIST__LoopEnd] = parser.NewATNState(PARAMETER_LIST__LoopEnd, parser.ATNLoopEnd, true)
-	states[PARAMETER_LIST__LoopBack] = parser.NewATNState(PARAMETER_LIST__LoopBack, parser.ATNLoopBack, true)
-	states[PARAMETER__Basic_0] = parser.NewATNState(PARAMETER__Basic_0, parser.ATNBasic, true)
-	states[PARAMETER__Basic_1] = parser.NewATNState(PARAMETER__Basic_1, parser.ATNBasic, true)
-	states[PARAMETER__Basic_2] = parser.NewATNState(PARAMETER__Basic_2, parser.ATNBasic, true)
-	states[PARAMETER__Basic_3] = parser.NewATNState(PARAMETER__Basic_3, parser.ATNBasic, true)
-	states[PARAMETER__Basic_4] = parser.NewATNState(PARAMETER__Basic_4, parser.ATNBasic, true)
-	states[PARAMETER__Basic_5] = parser.NewATNState(PARAMETER__Basic_5, parser.ATNBasic, true)
-	states[PARAMETER__Basic_6] = parser.NewATNState(PARAMETER__Basic_6, parser.ATNBasic, true).SetDecision(4)
-	states[PARAMETER__BlockEnd] = parser.NewATNState(PARAMETER__BlockEnd, parser.ATNBlockEnd, true)
-	states[TYPED_PARAMETER_Keyword_KEYWORD] = parser.NewATNState(TYPED_PARAMETER_Keyword_KEYWORD, parser.ATNBasic, false)
-	states[TYPED_PARAMETER_LeftParen] = parser.NewATNState(TYPED_PARAMETER_LeftParen, parser.ATNBasic, false)
-	states[TYPED_PARAMETER__Basic_0] = parser.NewATNState(TYPED_PARAMETER__Basic_0, parser.ATNBasic, true)
-	states[TYPED_PARAMETER_RightParen] = parser.NewATNState(TYPED_PARAMETER_RightParen, parser.ATNBasic, false)
-	states[TYPED_PARAMETER__Basic_1] = parser.NewATNState(TYPED_PARAMETER__Basic_1, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_0] = parser.NewATNState(UNTYPED_PARAMETER__Basic_0, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_1] = parser.NewATNState(UNTYPED_PARAMETER__Basic_1, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_2] = parser.NewATNState(UNTYPED_PARAMETER__Basic_2, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_3] = parser.NewATNState(UNTYPED_PARAMETER__Basic_3, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_4] = parser.NewATNState(UNTYPED_PARAMETER__Basic_4, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_5] = parser.NewATNState(UNTYPED_PARAMETER__Basic_5, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_6] = parser.NewATNState(UNTYPED_PARAMETER__Basic_6, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_7] = parser.NewATNState(UNTYPED_PARAMETER__Basic_7, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_8] = parser.NewATNState(UNTYPED_PARAMETER__Basic_8, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_9] = parser.NewATNState(UNTYPED_PARAMETER__Basic_9, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_10] = parser.NewATNState(UNTYPED_PARAMETER__Basic_10, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_11] = parser.NewATNState(UNTYPED_PARAMETER__Basic_11, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_12] = parser.NewATNState(UNTYPED_PARAMETER__Basic_12, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_13] = parser.NewATNState(UNTYPED_PARAMETER__Basic_13, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_14] = parser.NewATNState(UNTYPED_PARAMETER__Basic_14, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_15] = parser.NewATNState(UNTYPED_PARAMETER__Basic_15, parser.ATNBasic, true)
-	states[UNTYPED_PARAMETER__Basic_16] = parser.NewATNState(UNTYPED_PARAMETER__Basic_16, parser.ATNBasic, true).SetDecision(5)
-	states[UNTYPED_PARAMETER__BlockEnd] = parser.NewATNState(UNTYPED_PARAMETER__BlockEnd, parser.ATNBlockEnd, true)
-	states[DEFAULT_PARAMETER_Value_Dollar] = parser.NewATNState(DEFAULT_PARAMETER_Value_Dollar, parser.ATNBasic, false)
-	states[DEFAULT_PARAMETER__Basic] = parser.NewATNState(DEFAULT_PARAMETER__Basic, parser.ATNBasic, true)
-	states[INTEGER_LITERAL_Value_INTEGER] = parser.NewATNState(INTEGER_LITERAL_Value_INTEGER, parser.ATNBasic, false)
-	states[INTEGER_LITERAL__Basic] = parser.NewATNState(INTEGER_LITERAL__Basic, parser.ATNBasic, true)
-	states[REAL_LITERAL_Value_REAL] = parser.NewATNState(REAL_LITERAL_Value_REAL, parser.ATNBasic, false)
-	states[REAL_LITERAL__Basic] = parser.NewATNState(REAL_LITERAL__Basic, parser.ATNBasic, true)
-	states[STRING_LITERAL_Value_STRING] = parser.NewATNState(STRING_LITERAL_Value_STRING, parser.ATNBasic, false)
-	states[STRING_LITERAL__Basic] = parser.NewATNState(STRING_LITERAL__Basic, parser.ATNBasic, true)
-	states[ENUMERATION_LITERAL_Value_ENUMERATION] = parser.NewATNState(ENUMERATION_LITERAL_Value_ENUMERATION, parser.ATNBasic, false)
-	states[ENUMERATION_LITERAL__Basic] = parser.NewATNState(ENUMERATION_LITERAL__Basic, parser.ATNBasic, true)
-	states[BINARY_LITERAL_Value_BINARY] = parser.NewATNState(BINARY_LITERAL_Value_BINARY, parser.ATNBasic, false)
-	states[BINARY_LITERAL__Basic] = parser.NewATNState(BINARY_LITERAL__Basic, parser.ATNBasic, true)
-	states[ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME] = parser.NewATNState(ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME, parser.ATNBasic, false)
-	states[ENTITY_REFERENCE__Basic] = parser.NewATNState(ENTITY_REFERENCE__Basic, parser.ATNBasic, true)
-	states[OMITTED_PARAMETER_Value_Asterisk] = parser.NewATNState(OMITTED_PARAMETER_Value_Asterisk, parser.ATNBasic, false)
-	states[OMITTED_PARAMETER__Basic] = parser.NewATNState(OMITTED_PARAMETER__Basic, parser.ATNBasic, true)
-	states[LIST_LeftParen] = parser.NewATNState(LIST_LeftParen, parser.ATNBasic, false)
-	states[LIST__Basic_0] = parser.NewATNState(LIST__Basic_0, parser.ATNBasic, true)
-	states[LIST_Comma] = parser.NewATNState(LIST_Comma, parser.ATNBasic, false)
-	states[LIST__Basic_1] = parser.NewATNState(LIST__Basic_1, parser.ATNBasic, true)
-	states[LIST__Basic_2] = parser.NewATNState(LIST__Basic_2, parser.ATNBasic, true)
-	states[LIST__LoopEntry] = parser.NewATNState(LIST__LoopEntry, parser.ATNLoopEntry, true).SetDecision(6)
-	states[LIST__LoopEnd] = parser.NewATNState(LIST__LoopEnd, parser.ATNLoopEnd, true)
-	states[LIST__LoopBack] = parser.NewATNState(LIST__LoopBack, parser.ATNLoopBack, true)
-	states[LIST__Basic_3] = parser.NewATNState(LIST__Basic_3, parser.ATNBasic, true).SetDecision(7)
-	states[LIST_RightParen] = parser.NewATNState(LIST_RightParen, parser.ATNBasic, false)
-	states[LIST__Basic_4] = parser.NewATNState(LIST__Basic_4, parser.ATNBasic, true)
-	states[DATA_SECTION_DATA] = parser.NewATNState(DATA_SECTION_DATA, parser.ATNBasic, false)
-	states[DATA_SECTION_LeftParen] = parser.NewATNState(DATA_SECTION_LeftParen, parser.ATNBasic, false)
-	states[DATA_SECTION__Basic_0] = parser.NewATNState(DATA_SECTION__Basic_0, parser.ATNBasic, true)
-	states[DATA_SECTION_RightParen] = parser.NewATNState(DATA_SECTION_RightParen, parser.ATNBasic, false)
-	states[DATA_SECTION__Basic_1] = parser.NewATNState(DATA_SECTION__Basic_1, parser.ATNBasic, true)
-	states[DATA_SECTION__Basic_2] = parser.NewATNState(DATA_SECTION__Basic_2, parser.ATNBasic, true).SetDecision(8)
-	states[DATA_SECTION_Semicolon] = parser.NewATNState(DATA_SECTION_Semicolon, parser.ATNBasic, false)
-	states[DATA_SECTION__Basic_3] = parser.NewATNState(DATA_SECTION__Basic_3, parser.ATNBasic, true)
-	states[DATA_SECTION__Basic_4] = parser.NewATNState(DATA_SECTION__Basic_4, parser.ATNBasic, true)
-	states[DATA_SECTION__LoopEntry] = parser.NewATNState(DATA_SECTION__LoopEntry, parser.ATNLoopEntry, true).SetDecision(9)
-	states[DATA_SECTION__LoopEnd] = parser.NewATNState(DATA_SECTION__LoopEnd, parser.ATNLoopEnd, true)
-	states[DATA_SECTION__LoopBack] = parser.NewATNState(DATA_SECTION__LoopBack, parser.ATNLoopBack, true)
-	states[DATA_SECTION_ENDSECSemicolon] = parser.NewATNState(DATA_SECTION_ENDSECSemicolon, parser.ATNBasic, false)
-	states[DATA_SECTION__Basic_5] = parser.NewATNState(DATA_SECTION__Basic_5, parser.ATNBasic, true)
-	states[ENTITY_INSTANCE__Basic_0] = parser.NewATNState(ENTITY_INSTANCE__Basic_0, parser.ATNBasic, true)
-	states[ENTITY_INSTANCE__Basic_1] = parser.NewATNState(ENTITY_INSTANCE__Basic_1, parser.ATNBasic, true)
-	states[ENTITY_INSTANCE__Basic_2] = parser.NewATNState(ENTITY_INSTANCE__Basic_2, parser.ATNBasic, true)
-	states[ENTITY_INSTANCE__Basic_3] = parser.NewATNState(ENTITY_INSTANCE__Basic_3, parser.ATNBasic, true)
-	states[ENTITY_INSTANCE__Basic_4] = parser.NewATNState(ENTITY_INSTANCE__Basic_4, parser.ATNBasic, true).SetDecision(10)
-	states[ENTITY_INSTANCE__BlockEnd] = parser.NewATNState(ENTITY_INSTANCE__BlockEnd, parser.ATNBlockEnd, true)
-	states[SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME, parser.ATNBasic, false)
-	states[SIMPLE_ENTITY_INSTANCE_Equals] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE_Equals, parser.ATNBasic, false)
-	states[SIMPLE_ENTITY_INSTANCE__Basic_0] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE__Basic_0, parser.ATNBasic, true)
-	states[SIMPLE_ENTITY_INSTANCE_Semicolon] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE_Semicolon, parser.ATNBasic, false)
-	states[SIMPLE_ENTITY_INSTANCE__Basic_1] = parser.NewATNState(SIMPLE_ENTITY_INSTANCE__Basic_1, parser.ATNBasic, true)
-	states[COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME, parser.ATNBasic, false)
-	states[COMPLEX_ENTITY_INSTANCE_Equals] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE_Equals, parser.ATNBasic, false)
-	states[COMPLEX_ENTITY_INSTANCE__Basic_0] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE__Basic_0, parser.ATNBasic, true)
-	states[COMPLEX_ENTITY_INSTANCE_Semicolon] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE_Semicolon, parser.ATNBasic, false)
-	states[COMPLEX_ENTITY_INSTANCE__Basic_1] = parser.NewATNState(COMPLEX_ENTITY_INSTANCE__Basic_1, parser.ATNBasic, true)
-	states[SIMPLE_RECORD_Keyword_KEYWORD] = parser.NewATNState(SIMPLE_RECORD_Keyword_KEYWORD, parser.ATNBasic, false)
-	states[SIMPLE_RECORD_LeftParen] = parser.NewATNState(SIMPLE_RECORD_LeftParen, parser.ATNBasic, false)
-	states[SIMPLE_RECORD__Basic_0] = parser.NewATNState(SIMPLE_RECORD__Basic_0, parser.ATNBasic, true)
-	states[SIMPLE_RECORD__Basic_1] = parser.NewATNState(SIMPLE_RECORD__Basic_1, parser.ATNBasic, true)
-	states[SIMPLE_RECORD__Basic_2] = parser.NewATNState(SIMPLE_RECORD__Basic_2, parser.ATNBasic, true).SetDecision(11)
-	states[SIMPLE_RECORD_RightParen] = parser.NewATNState(SIMPLE_RECORD_RightParen, parser.ATNBasic, false)
-	states[SIMPLE_RECORD__Basic_3] = parser.NewATNState(SIMPLE_RECORD__Basic_3, parser.ATNBasic, true)
-	states[SUBSUPER_RECORD_LeftParen] = parser.NewATNState(SUBSUPER_RECORD_LeftParen, parser.ATNBasic, false)
-	states[SUBSUPER_RECORD__Basic_0] = parser.NewATNState(SUBSUPER_RECORD__Basic_0, parser.ATNBasic, true)
-	states[SUBSUPER_RECORD__Basic_1] = parser.NewATNState(SUBSUPER_RECORD__Basic_1, parser.ATNBasic, true)
-	states[SUBSUPER_RECORD__LoopBack] = parser.NewATNState(SUBSUPER_RECORD__LoopBack, parser.ATNLoopBack, true).SetDecision(12)
-	states[SUBSUPER_RECORD__LoopEnd] = parser.NewATNState(SUBSUPER_RECORD__LoopEnd, parser.ATNLoopEnd, true)
-	states[SUBSUPER_RECORD_RightParen] = parser.NewATNState(SUBSUPER_RECORD_RightParen, parser.ATNBasic, false)
-	states[SUBSUPER_RECORD__Basic_2] = parser.NewATNState(SUBSUPER_RECORD__Basic_2, parser.ATNBasic, true)
-	states[EXCHANGE_FILE__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE_ISODash10303Dash21Semicolon]),
-	)
-	states[HEADER_SECTION__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_SECTION_HEADERSemicolon]),
-	)
-	states[HEADER_ENTITY__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_ENTITY_Keyword_KEYWORD]),
-	)
-	states[PARAMETER_LIST__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER_LIST__Basic_0]),
-	)
-	states[PARAMETER__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER__Basic_6]),
-	)
-	states[TYPED_PARAMETER__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[TYPED_PARAMETER_Keyword_KEYWORD]),
-	)
-	states[UNTYPED_PARAMETER__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_16]),
-	)
-	states[DEFAULT_PARAMETER__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[DEFAULT_PARAMETER_Value_Dollar]),
-	)
-	states[INTEGER_LITERAL__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[INTEGER_LITERAL_Value_INTEGER]),
-	)
-	states[REAL_LITERAL__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[REAL_LITERAL_Value_REAL]),
-	)
-	states[STRING_LITERAL__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[STRING_LITERAL_Value_STRING]),
-	)
-	states[ENUMERATION_LITERAL__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENUMERATION_LITERAL_Value_ENUMERATION]),
-	)
-	states[BINARY_LITERAL__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[BINARY_LITERAL_Value_BINARY]),
-	)
-	states[ENTITY_REFERENCE__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME]),
-	)
-	states[OMITTED_PARAMETER__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[OMITTED_PARAMETER_Value_Asterisk]),
-	)
-	states[LIST__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST_LeftParen]),
-	)
-	states[DATA_SECTION__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION_DATA]),
-	)
-	states[ENTITY_INSTANCE__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_INSTANCE__Basic_4]),
-	)
-	states[SIMPLE_ENTITY_INSTANCE__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME]),
-	)
-	states[COMPLEX_ENTITY_INSTANCE__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME]),
-	)
-	states[SIMPLE_RECORD__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[SIMPLE_RECORD_Keyword_KEYWORD]),
-	)
-	states[SUBSUPER_RECORD__Start].AppendTransitions(
-		parser.NewEpsilonTransition(states[SUBSUPER_RECORD_LeftParen]),
-	)
-	states[EXCHANGE_FILE_ISODash10303Dash21Semicolon].AppendTransitions(
-		parser.NewAtomTransition(states[EXCHANGE_FILE__Basic_0], Keyword_ISODash10303Dash21Semicolon, nil),
-	)
-	states[EXCHANGE_FILE__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[HEADER_SECTION__Start], states[EXCHANGE_FILE__LoopEntry], nil),
-	)
-	states[EXCHANGE_FILE__Basic_1].AppendTransitions(
-		parser.NewRuleTransition(states[DATA_SECTION__Start], states[EXCHANGE_FILE__Basic_2], nil),
-	)
-	states[EXCHANGE_FILE__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE__LoopBack]),
-	)
-	states[EXCHANGE_FILE__LoopEntry].AppendTransitions(
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE__Basic_1]),
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE__LoopEnd]),
-	)
-	states[EXCHANGE_FILE__LoopEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon]),
-	)
-	states[EXCHANGE_FILE__LoopBack].AppendTransitions(
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE__LoopEntry]),
-	)
-	states[EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon].AppendTransitions(
-		parser.NewAtomTransition(states[EXCHANGE_FILE__Basic_3], Keyword_ENDDashISODash10303Dash21Semicolon, nil),
-	)
-	states[EXCHANGE_FILE__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[EXCHANGE_FILE__Stop]),
-	)
-	states[HEADER_SECTION_HEADERSemicolon].AppendTransitions(
-		parser.NewAtomTransition(states[HEADER_SECTION__Basic_0], Keyword_HEADERSemicolon, nil),
-	)
-	states[HEADER_SECTION__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[HEADER_ENTITY__Start], states[HEADER_SECTION__Basic_1], nil),
-	)
-	states[HEADER_SECTION__Basic_1].AppendTransitions(
-		parser.NewRuleTransition(states[HEADER_ENTITY__Start], states[HEADER_SECTION__Basic_2], nil),
-	)
-	states[HEADER_SECTION__Basic_2].AppendTransitions(
-		parser.NewRuleTransition(states[HEADER_ENTITY__Start], states[HEADER_SECTION__LoopEntry], nil),
-	)
-	states[HEADER_SECTION__Basic_3].AppendTransitions(
-		parser.NewRuleTransition(states[HEADER_ENTITY__Start], states[HEADER_SECTION__Basic_4], nil),
-	)
-	states[HEADER_SECTION__Basic_4].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_SECTION__LoopBack]),
-	)
-	states[HEADER_SECTION__LoopEntry].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_SECTION__Basic_3]),
-		parser.NewEpsilonTransition(states[HEADER_SECTION__LoopEnd]),
-	)
-	states[HEADER_SECTION__LoopEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_SECTION_ENDSECSemicolon]),
-	)
-	states[HEADER_SECTION__LoopBack].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_SECTION__LoopEntry]),
-	)
-	states[HEADER_SECTION_ENDSECSemicolon].AppendTransitions(
-		parser.NewAtomTransition(states[HEADER_SECTION__Basic_5], Keyword_ENDSECSemicolon, nil),
-	)
-	states[HEADER_SECTION__Basic_5].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_SECTION__Stop]),
-	)
-	states[HEADER_ENTITY_Keyword_KEYWORD].AppendTransitions(
-		parser.NewAtomTransition(states[HEADER_ENTITY_LeftParen], Token_KEYWORD, nil),
-	)
-	states[HEADER_ENTITY_LeftParen].AppendTransitions(
-		parser.NewAtomTransition(states[HEADER_ENTITY__Basic_2], Keyword_LeftParen, nil),
-	)
-	states[HEADER_ENTITY__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER_LIST__Start], states[HEADER_ENTITY__Basic_1], nil),
-	)
-	states[HEADER_ENTITY__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_ENTITY_RightParen]),
-	)
-	states[HEADER_ENTITY__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_ENTITY__Basic_0]),
-		parser.NewEpsilonTransition(states[HEADER_ENTITY__Basic_1]),
-	)
-	states[HEADER_ENTITY_RightParen].AppendTransitions(
-		parser.NewAtomTransition(states[HEADER_ENTITY_Semicolon], Keyword_RightParen, nil),
-	)
-	states[HEADER_ENTITY_Semicolon].AppendTransitions(
-		parser.NewAtomTransition(states[HEADER_ENTITY__Basic_3], Keyword_Semicolon, nil),
-	)
-	states[HEADER_ENTITY__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[HEADER_ENTITY__Stop]),
-	)
-	states[PARAMETER_LIST__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER__Start], states[PARAMETER_LIST__LoopEntry], nil),
-	)
-	states[PARAMETER_LIST_Comma].AppendTransitions(
-		parser.NewAtomTransition(states[PARAMETER_LIST__Basic_1], Keyword_Comma, nil),
-	)
-	states[PARAMETER_LIST__Basic_1].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER__Start], states[PARAMETER_LIST__Basic_2], nil),
-	)
-	states[PARAMETER_LIST__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER_LIST__LoopBack]),
-	)
-	states[PARAMETER_LIST__LoopEntry].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER_LIST_Comma]),
-		parser.NewEpsilonTransition(states[PARAMETER_LIST__LoopEnd]),
-	)
-	states[PARAMETER_LIST__LoopEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER_LIST__Stop]),
-	)
-	states[PARAMETER_LIST__LoopBack].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER_LIST__LoopEntry]),
-	)
-	states[PARAMETER__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[TYPED_PARAMETER__Start], states[PARAMETER__Basic_1], nil),
-	)
-	states[PARAMETER__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER__BlockEnd]),
-	)
-	states[PARAMETER__Basic_2].AppendTransitions(
-		parser.NewRuleTransition(states[UNTYPED_PARAMETER__Start], states[PARAMETER__Basic_3], nil),
-	)
-	states[PARAMETER__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER__BlockEnd]),
-	)
-	states[PARAMETER__Basic_4].AppendTransitions(
-		parser.NewRuleTransition(states[OMITTED_PARAMETER__Start], states[PARAMETER__Basic_5], nil),
-	)
-	states[PARAMETER__Basic_5].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER__BlockEnd]),
-	)
-	states[PARAMETER__Basic_6].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER__Basic_0]),
-		parser.NewEpsilonTransition(states[PARAMETER__Basic_2]),
-		parser.NewEpsilonTransition(states[PARAMETER__Basic_4]),
-	)
-	states[PARAMETER__BlockEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[PARAMETER__Stop]),
-	)
-	states[TYPED_PARAMETER_Keyword_KEYWORD].AppendTransitions(
-		parser.NewAtomTransition(states[TYPED_PARAMETER_LeftParen], Token_KEYWORD, nil),
-	)
-	states[TYPED_PARAMETER_LeftParen].AppendTransitions(
-		parser.NewAtomTransition(states[TYPED_PARAMETER__Basic_0], Keyword_LeftParen, nil),
-	)
-	states[TYPED_PARAMETER__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER__Start], states[TYPED_PARAMETER_RightParen], nil),
-	)
-	states[TYPED_PARAMETER_RightParen].AppendTransitions(
-		parser.NewAtomTransition(states[TYPED_PARAMETER__Basic_1], Keyword_RightParen, nil),
-	)
-	states[TYPED_PARAMETER__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[TYPED_PARAMETER__Stop]),
-	)
-	states[UNTYPED_PARAMETER__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[DEFAULT_PARAMETER__Start], states[UNTYPED_PARAMETER__Basic_1], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_2].AppendTransitions(
-		parser.NewRuleTransition(states[INTEGER_LITERAL__Start], states[UNTYPED_PARAMETER__Basic_3], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_4].AppendTransitions(
-		parser.NewRuleTransition(states[REAL_LITERAL__Start], states[UNTYPED_PARAMETER__Basic_5], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_5].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_6].AppendTransitions(
-		parser.NewRuleTransition(states[STRING_LITERAL__Start], states[UNTYPED_PARAMETER__Basic_7], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_7].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_8].AppendTransitions(
-		parser.NewRuleTransition(states[ENUMERATION_LITERAL__Start], states[UNTYPED_PARAMETER__Basic_9], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_9].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_10].AppendTransitions(
-		parser.NewRuleTransition(states[BINARY_LITERAL__Start], states[UNTYPED_PARAMETER__Basic_11], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_11].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_12].AppendTransitions(
-		parser.NewRuleTransition(states[LIST__Start], states[UNTYPED_PARAMETER__Basic_13], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_13].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_14].AppendTransitions(
-		parser.NewRuleTransition(states[ENTITY_REFERENCE__Start], states[UNTYPED_PARAMETER__Basic_15], nil),
-	)
-	states[UNTYPED_PARAMETER__Basic_15].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__BlockEnd]),
-	)
-	states[UNTYPED_PARAMETER__Basic_16].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_0]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_2]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_4]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_6]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_8]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_10]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_12]),
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Basic_14]),
-	)
-	states[UNTYPED_PARAMETER__BlockEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[UNTYPED_PARAMETER__Stop]),
-	)
-	states[DEFAULT_PARAMETER_Value_Dollar].AppendTransitions(
-		parser.NewAtomTransition(states[DEFAULT_PARAMETER__Basic], Keyword_Dollar, nil),
-	)
-	states[DEFAULT_PARAMETER__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[DEFAULT_PARAMETER__Stop]),
-	)
-	states[INTEGER_LITERAL_Value_INTEGER].AppendTransitions(
-		parser.NewAtomTransition(states[INTEGER_LITERAL__Basic], Token_INTEGER, nil),
-	)
-	states[INTEGER_LITERAL__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[INTEGER_LITERAL__Stop]),
-	)
-	states[REAL_LITERAL_Value_REAL].AppendTransitions(
-		parser.NewAtomTransition(states[REAL_LITERAL__Basic], Token_REAL, nil),
-	)
-	states[REAL_LITERAL__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[REAL_LITERAL__Stop]),
-	)
-	states[STRING_LITERAL_Value_STRING].AppendTransitions(
-		parser.NewAtomTransition(states[STRING_LITERAL__Basic], Token_STRING, nil),
-	)
-	states[STRING_LITERAL__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[STRING_LITERAL__Stop]),
-	)
-	states[ENUMERATION_LITERAL_Value_ENUMERATION].AppendTransitions(
-		parser.NewAtomTransition(states[ENUMERATION_LITERAL__Basic], Token_ENUMERATION, nil),
-	)
-	states[ENUMERATION_LITERAL__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENUMERATION_LITERAL__Stop]),
-	)
-	states[BINARY_LITERAL_Value_BINARY].AppendTransitions(
-		parser.NewAtomTransition(states[BINARY_LITERAL__Basic], Token_BINARY, nil),
-	)
-	states[BINARY_LITERAL__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[BINARY_LITERAL__Stop]),
-	)
-	states[ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME].AppendTransitions(
-		parser.NewAtomTransition(states[ENTITY_REFERENCE__Basic], Token_ENTITY_INSTANCE_NAME, &parser.CompletionHint{Field: "ENTITY_REFERENCE.Value"}),
-	)
-	states[ENTITY_REFERENCE__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_REFERENCE__Stop]),
-	)
-	states[OMITTED_PARAMETER_Value_Asterisk].AppendTransitions(
-		parser.NewAtomTransition(states[OMITTED_PARAMETER__Basic], Keyword_Asterisk, nil),
-	)
-	states[OMITTED_PARAMETER__Basic].AppendTransitions(
-		parser.NewEpsilonTransition(states[OMITTED_PARAMETER__Stop]),
-	)
-	states[LIST_LeftParen].AppendTransitions(
-		parser.NewAtomTransition(states[LIST__Basic_3], Keyword_LeftParen, nil),
-	)
-	states[LIST__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER__Start], states[LIST__LoopEntry], nil),
-	)
-	states[LIST_Comma].AppendTransitions(
-		parser.NewAtomTransition(states[LIST__Basic_1], Keyword_Comma, nil),
-	)
-	states[LIST__Basic_1].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER__Start], states[LIST__Basic_2], nil),
-	)
-	states[LIST__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST__LoopBack]),
-	)
-	states[LIST__LoopEntry].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST_Comma]),
-		parser.NewEpsilonTransition(states[LIST__LoopEnd]),
-	)
-	states[LIST__LoopEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST_RightParen]),
-	)
-	states[LIST__LoopBack].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST__LoopEntry]),
-	)
-	states[LIST__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST__Basic_0]),
-		parser.NewEpsilonTransition(states[LIST__LoopEnd]),
-	)
-	states[LIST_RightParen].AppendTransitions(
-		parser.NewAtomTransition(states[LIST__Basic_4], Keyword_RightParen, nil),
-	)
-	states[LIST__Basic_4].AppendTransitions(
-		parser.NewEpsilonTransition(states[LIST__Stop]),
-	)
-	states[DATA_SECTION_DATA].AppendTransitions(
-		parser.NewAtomTransition(states[DATA_SECTION__Basic_2], Keyword_DATA, nil),
-	)
-	states[DATA_SECTION_LeftParen].AppendTransitions(
-		parser.NewAtomTransition(states[DATA_SECTION__Basic_0], Keyword_LeftParen, nil),
-	)
-	states[DATA_SECTION__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER_LIST__Start], states[DATA_SECTION_RightParen], nil),
-	)
-	states[DATA_SECTION_RightParen].AppendTransitions(
-		parser.NewAtomTransition(states[DATA_SECTION__Basic_1], Keyword_RightParen, nil),
-	)
-	states[DATA_SECTION__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION_Semicolon]),
-	)
-	states[DATA_SECTION__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION_LeftParen]),
-		parser.NewEpsilonTransition(states[DATA_SECTION__Basic_1]),
-	)
-	states[DATA_SECTION_Semicolon].AppendTransitions(
-		parser.NewAtomTransition(states[DATA_SECTION__LoopEntry], Keyword_Semicolon, nil),
-	)
-	states[DATA_SECTION__Basic_3].AppendTransitions(
-		parser.NewRuleTransition(states[ENTITY_INSTANCE__Start], states[DATA_SECTION__Basic_4], nil),
-	)
-	states[DATA_SECTION__Basic_4].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION__LoopBack]),
-	)
-	states[DATA_SECTION__LoopEntry].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION__Basic_3]),
-		parser.NewEpsilonTransition(states[DATA_SECTION__LoopEnd]),
-	)
-	states[DATA_SECTION__LoopEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION_ENDSECSemicolon]),
-	)
-	states[DATA_SECTION__LoopBack].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION__LoopEntry]),
-	)
-	states[DATA_SECTION_ENDSECSemicolon].AppendTransitions(
-		parser.NewAtomTransition(states[DATA_SECTION__Basic_5], Keyword_ENDSECSemicolon, nil),
-	)
-	states[DATA_SECTION__Basic_5].AppendTransitions(
-		parser.NewEpsilonTransition(states[DATA_SECTION__Stop]),
-	)
-	states[ENTITY_INSTANCE__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[SIMPLE_ENTITY_INSTANCE__Start], states[ENTITY_INSTANCE__Basic_1], nil),
-	)
-	states[ENTITY_INSTANCE__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_INSTANCE__BlockEnd]),
-	)
-	states[ENTITY_INSTANCE__Basic_2].AppendTransitions(
-		parser.NewRuleTransition(states[COMPLEX_ENTITY_INSTANCE__Start], states[ENTITY_INSTANCE__Basic_3], nil),
-	)
-	states[ENTITY_INSTANCE__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_INSTANCE__BlockEnd]),
-	)
-	states[ENTITY_INSTANCE__Basic_4].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_INSTANCE__Basic_0]),
-		parser.NewEpsilonTransition(states[ENTITY_INSTANCE__Basic_2]),
-	)
-	states[ENTITY_INSTANCE__BlockEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[ENTITY_INSTANCE__Stop]),
-	)
-	states[SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME].AppendTransitions(
-		parser.NewAtomTransition(states[SIMPLE_ENTITY_INSTANCE_Equals], Token_ENTITY_INSTANCE_NAME, nil),
-	)
-	states[SIMPLE_ENTITY_INSTANCE_Equals].AppendTransitions(
-		parser.NewAtomTransition(states[SIMPLE_ENTITY_INSTANCE__Basic_0], Keyword_Equals, nil),
-	)
-	states[SIMPLE_ENTITY_INSTANCE__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[SIMPLE_RECORD__Start], states[SIMPLE_ENTITY_INSTANCE_Semicolon], nil),
-	)
-	states[SIMPLE_ENTITY_INSTANCE_Semicolon].AppendTransitions(
-		parser.NewAtomTransition(states[SIMPLE_ENTITY_INSTANCE__Basic_1], Keyword_Semicolon, nil),
-	)
-	states[SIMPLE_ENTITY_INSTANCE__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[SIMPLE_ENTITY_INSTANCE__Stop]),
-	)
-	states[COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME].AppendTransitions(
-		parser.NewAtomTransition(states[COMPLEX_ENTITY_INSTANCE_Equals], Token_ENTITY_INSTANCE_NAME, nil),
-	)
-	states[COMPLEX_ENTITY_INSTANCE_Equals].AppendTransitions(
-		parser.NewAtomTransition(states[COMPLEX_ENTITY_INSTANCE__Basic_0], Keyword_Equals, nil),
-	)
-	states[COMPLEX_ENTITY_INSTANCE__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[SUBSUPER_RECORD__Start], states[COMPLEX_ENTITY_INSTANCE_Semicolon], nil),
-	)
-	states[COMPLEX_ENTITY_INSTANCE_Semicolon].AppendTransitions(
-		parser.NewAtomTransition(states[COMPLEX_ENTITY_INSTANCE__Basic_1], Keyword_Semicolon, nil),
-	)
-	states[COMPLEX_ENTITY_INSTANCE__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[COMPLEX_ENTITY_INSTANCE__Stop]),
-	)
-	states[SIMPLE_RECORD_Keyword_KEYWORD].AppendTransitions(
-		parser.NewAtomTransition(states[SIMPLE_RECORD_LeftParen], Token_KEYWORD, nil),
-	)
-	states[SIMPLE_RECORD_LeftParen].AppendTransitions(
-		parser.NewAtomTransition(states[SIMPLE_RECORD__Basic_2], Keyword_LeftParen, nil),
-	)
-	states[SIMPLE_RECORD__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[PARAMETER_LIST__Start], states[SIMPLE_RECORD__Basic_1], nil),
-	)
-	states[SIMPLE_RECORD__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[SIMPLE_RECORD_RightParen]),
-	)
-	states[SIMPLE_RECORD__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[SIMPLE_RECORD__Basic_0]),
-		parser.NewEpsilonTransition(states[SIMPLE_RECORD__Basic_1]),
-	)
-	states[SIMPLE_RECORD_RightParen].AppendTransitions(
-		parser.NewAtomTransition(states[SIMPLE_RECORD__Basic_3], Keyword_RightParen, nil),
-	)
-	states[SIMPLE_RECORD__Basic_3].AppendTransitions(
-		parser.NewEpsilonTransition(states[SIMPLE_RECORD__Stop]),
-	)
-	states[SUBSUPER_RECORD_LeftParen].AppendTransitions(
-		parser.NewAtomTransition(states[SUBSUPER_RECORD__Basic_0], Keyword_LeftParen, nil),
-	)
-	states[SUBSUPER_RECORD__Basic_0].AppendTransitions(
-		parser.NewRuleTransition(states[SIMPLE_RECORD__Start], states[SUBSUPER_RECORD__Basic_1], nil),
-	)
-	states[SUBSUPER_RECORD__Basic_1].AppendTransitions(
-		parser.NewEpsilonTransition(states[SUBSUPER_RECORD__LoopBack]),
-	)
-	states[SUBSUPER_RECORD__LoopBack].AppendTransitions(
-		parser.NewEpsilonTransition(states[SUBSUPER_RECORD__Basic_0]),
-		parser.NewEpsilonTransition(states[SUBSUPER_RECORD__LoopEnd]),
-	)
-	states[SUBSUPER_RECORD__LoopEnd].AppendTransitions(
-		parser.NewEpsilonTransition(states[SUBSUPER_RECORD_RightParen]),
-	)
-	states[SUBSUPER_RECORD_RightParen].AppendTransitions(
-		parser.NewAtomTransition(states[SUBSUPER_RECORD__Basic_2], Keyword_RightParen, nil),
-	)
-	states[SUBSUPER_RECORD__Basic_2].AppendTransitions(
-		parser.NewEpsilonTransition(states[SUBSUPER_RECORD__Stop]),
-	)
-	decisionStates := make([]*parser.RuntimeATNState, 13)
-	decisionStates[0] = states[EXCHANGE_FILE__LoopEntry]
-	decisionStates[1] = states[HEADER_SECTION__LoopEntry]
-	decisionStates[2] = states[HEADER_ENTITY__Basic_2]
-	decisionStates[3] = states[PARAMETER_LIST__LoopEntry]
-	decisionStates[4] = states[PARAMETER__Basic_6]
-	decisionStates[5] = states[UNTYPED_PARAMETER__Basic_16]
-	decisionStates[6] = states[LIST__LoopEntry]
-	decisionStates[7] = states[LIST__Basic_3]
-	decisionStates[8] = states[DATA_SECTION__Basic_2]
-	decisionStates[9] = states[DATA_SECTION__LoopEntry]
-	decisionStates[10] = states[ENTITY_INSTANCE__Basic_4]
-	decisionStates[11] = states[SIMPLE_RECORD__Basic_2]
-	decisionStates[12] = states[SUBSUPER_RECORD__LoopBack]
-	decisionMap := make([]*parser.RuntimeATNState, 13)
-	decisionMap[0] = states[EXCHANGE_FILE__LoopEntry]
-	decisionMap[1] = states[HEADER_SECTION__LoopEntry]
-	decisionMap[2] = states[HEADER_ENTITY__Basic_2]
-	decisionMap[3] = states[PARAMETER_LIST__LoopEntry]
-	decisionMap[4] = states[PARAMETER__Basic_6]
-	decisionMap[5] = states[UNTYPED_PARAMETER__Basic_16]
-	decisionMap[6] = states[LIST__LoopEntry]
-	decisionMap[7] = states[LIST__Basic_3]
-	decisionMap[8] = states[DATA_SECTION__Basic_2]
-	decisionMap[9] = states[DATA_SECTION__LoopEntry]
-	decisionMap[10] = states[ENTITY_INSTANCE__Basic_4]
-	decisionMap[11] = states[SIMPLE_RECORD__Basic_2]
-	decisionMap[12] = states[SUBSUPER_RECORD__LoopBack]
-	return parser.NewRuntimeATN(states, decisionStates, decisionMap)
+	return parser.NewRuntimeATNFromTables(parser.ATNTables{
+		States:         atnStateTable[:],
+		Transitions:    atnTransitionTable[:],
+		DecisionStates: atnDecisionTable[:],
+		TokenTypes: []*core.TokenType{
+			Keyword_ISODash10303Dash21Semicolon_Idx:        Keyword_ISODash10303Dash21Semicolon,
+			Keyword_ENDDashISODash10303Dash21Semicolon_Idx: Keyword_ENDDashISODash10303Dash21Semicolon,
+			Keyword_HEADERSemicolon_Idx:                    Keyword_HEADERSemicolon,
+			Keyword_ENDSECSemicolon_Idx:                    Keyword_ENDSECSemicolon,
+			Keyword_LeftParen_Idx:                          Keyword_LeftParen,
+			Keyword_RightParen_Idx:                         Keyword_RightParen,
+			Keyword_Semicolon_Idx:                          Keyword_Semicolon,
+			Keyword_Comma_Idx:                              Keyword_Comma,
+			Keyword_Dollar_Idx:                             Keyword_Dollar,
+			Keyword_Asterisk_Idx:                           Keyword_Asterisk,
+			Keyword_DATA_Idx:                               Keyword_DATA,
+			Keyword_Equals_Idx:                             Keyword_Equals,
+			Token_KEYWORD_Idx:                              Token_KEYWORD,
+			Token_REAL_Idx:                                 Token_REAL,
+			Token_INTEGER_Idx:                              Token_INTEGER,
+			Token_STRING_Idx:                               Token_STRING,
+			Token_ENTITY_INSTANCE_NAME_Idx:                 Token_ENTITY_INSTANCE_NAME,
+			Token_ENUMERATION_Idx:                          Token_ENUMERATION,
+			Token_BINARY_Idx:                               Token_BINARY,
+		},
+		CompletionHints: atnCompletionHintTable[:],
+		RuleCalls:       atnRuleCallTable[:],
+	})
+}
+
+var atnStateTable = [...]parser.ATNStateEntry{
+	EXCHANGE_FILE__Start:                              {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__Stop:                               {Type: parser.ATNRuleStop, Decision: -1},
+	HEADER_SECTION__Start:                             {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Stop:                              {Type: parser.ATNRuleStop, Decision: -1},
+	HEADER_ENTITY__Start:                              {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_ENTITY__Stop:                               {Type: parser.ATNRuleStop, Decision: -1},
+	PARAMETER_LIST__Start:                             {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER_LIST__Stop:                              {Type: parser.ATNRuleStop, Decision: -1},
+	PARAMETER__Start:                                  {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Stop:                                   {Type: parser.ATNRuleStop, Decision: -1},
+	TYPED_PARAMETER__Start:                            {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	TYPED_PARAMETER__Stop:                             {Type: parser.ATNRuleStop, Decision: -1},
+	UNTYPED_PARAMETER__Start:                          {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Stop:                           {Type: parser.ATNRuleStop, Decision: -1},
+	DEFAULT_PARAMETER__Start:                          {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DEFAULT_PARAMETER__Stop:                           {Type: parser.ATNRuleStop, Decision: -1},
+	INTEGER_LITERAL__Start:                            {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	INTEGER_LITERAL__Stop:                             {Type: parser.ATNRuleStop, Decision: -1},
+	REAL_LITERAL__Start:                               {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	REAL_LITERAL__Stop:                                {Type: parser.ATNRuleStop, Decision: -1},
+	STRING_LITERAL__Start:                             {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	STRING_LITERAL__Stop:                              {Type: parser.ATNRuleStop, Decision: -1},
+	ENUMERATION_LITERAL__Start:                        {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENUMERATION_LITERAL__Stop:                         {Type: parser.ATNRuleStop, Decision: -1},
+	BINARY_LITERAL__Start:                             {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	BINARY_LITERAL__Stop:                              {Type: parser.ATNRuleStop, Decision: -1},
+	ENTITY_REFERENCE__Start:                           {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_REFERENCE__Stop:                            {Type: parser.ATNRuleStop, Decision: -1},
+	OMITTED_PARAMETER__Start:                          {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	OMITTED_PARAMETER__Stop:                           {Type: parser.ATNRuleStop, Decision: -1},
+	LIST__Start:                                       {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST__Stop:                                        {Type: parser.ATNRuleStop, Decision: -1},
+	DATA_SECTION__Start:                               {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION__Stop:                                {Type: parser.ATNRuleStop, Decision: -1},
+	ENTITY_INSTANCE__Start:                            {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_INSTANCE__Stop:                             {Type: parser.ATNRuleStop, Decision: -1},
+	SIMPLE_ENTITY_INSTANCE__Start:                     {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_ENTITY_INSTANCE__Stop:                      {Type: parser.ATNRuleStop, Decision: -1},
+	COMPLEX_ENTITY_INSTANCE__Start:                    {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	COMPLEX_ENTITY_INSTANCE__Stop:                     {Type: parser.ATNRuleStop, Decision: -1},
+	SIMPLE_RECORD__Start:                              {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD__Stop:                               {Type: parser.ATNRuleStop, Decision: -1},
+	SUBSUPER_RECORD__Start:                            {Type: parser.ATNRuleStart, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD__Stop:                             {Type: parser.ATNRuleStop, Decision: -1},
+	EXCHANGE_FILE_ISODash10303Dash21Semicolon:         {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__Basic_0:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__Basic_1:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__Basic_2:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__LoopEntry:                          {Type: parser.ATNLoopEntry, EpsilonOnly: true, Decision: 0, Transitions: 2},
+	EXCHANGE_FILE__LoopEnd:                            {Type: parser.ATNLoopEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__LoopBack:                           {Type: parser.ATNLoopBack, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon:  {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	EXCHANGE_FILE__Basic_3:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION_HEADERSemicolon:                    {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Basic_0:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Basic_1:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Basic_2:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Basic_3:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Basic_4:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__LoopEntry:                         {Type: parser.ATNLoopEntry, EpsilonOnly: true, Decision: 1, Transitions: 2},
+	HEADER_SECTION__LoopEnd:                           {Type: parser.ATNLoopEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION__LoopBack:                          {Type: parser.ATNLoopBack, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_SECTION_ENDSECSemicolon:                    {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	HEADER_SECTION__Basic_5:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_ENTITY_Keyword_KEYWORD:                     {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	HEADER_ENTITY_LeftParen:                           {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	HEADER_ENTITY__Basic_0:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_ENTITY__Basic_1:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	HEADER_ENTITY__Basic_2:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 2, Transitions: 2},
+	HEADER_ENTITY_RightParen:                          {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	HEADER_ENTITY_Semicolon:                           {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	HEADER_ENTITY__Basic_3:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER_LIST__Basic_0:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER_LIST_Comma:                              {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	PARAMETER_LIST__Basic_1:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER_LIST__Basic_2:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER_LIST__LoopEntry:                         {Type: parser.ATNLoopEntry, EpsilonOnly: true, Decision: 3, Transitions: 2},
+	PARAMETER_LIST__LoopEnd:                           {Type: parser.ATNLoopEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER_LIST__LoopBack:                          {Type: parser.ATNLoopBack, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_0:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_1:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_2:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_3:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_4:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_5:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	PARAMETER__Basic_6:                                {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 4, Transitions: 3},
+	PARAMETER__BlockEnd:                               {Type: parser.ATNBlockEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	TYPED_PARAMETER_Keyword_KEYWORD:                   {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	TYPED_PARAMETER_LeftParen:                         {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	TYPED_PARAMETER__Basic_0:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	TYPED_PARAMETER_RightParen:                        {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	TYPED_PARAMETER__Basic_1:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_0:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_1:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_2:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_3:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_4:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_5:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_6:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_7:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_8:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_9:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_10:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_11:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_12:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_13:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_14:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_15:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	UNTYPED_PARAMETER__Basic_16:                       {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 5, Transitions: 8},
+	UNTYPED_PARAMETER__BlockEnd:                       {Type: parser.ATNBlockEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DEFAULT_PARAMETER_Value_Dollar:                    {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	DEFAULT_PARAMETER__Basic:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	INTEGER_LITERAL_Value_INTEGER:                     {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	INTEGER_LITERAL__Basic:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	REAL_LITERAL_Value_REAL:                           {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	REAL_LITERAL__Basic:                               {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	STRING_LITERAL_Value_STRING:                       {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	STRING_LITERAL__Basic:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENUMERATION_LITERAL_Value_ENUMERATION:             {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	ENUMERATION_LITERAL__Basic:                        {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	BINARY_LITERAL_Value_BINARY:                       {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	BINARY_LITERAL__Basic:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME:       {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	ENTITY_REFERENCE__Basic:                           {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	OMITTED_PARAMETER_Value_Asterisk:                  {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	OMITTED_PARAMETER__Basic:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST_LeftParen:                                    {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	LIST__Basic_0:                                     {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST_Comma:                                        {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	LIST__Basic_1:                                     {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST__Basic_2:                                     {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST__LoopEntry:                                   {Type: parser.ATNLoopEntry, EpsilonOnly: true, Decision: 6, Transitions: 2},
+	LIST__LoopEnd:                                     {Type: parser.ATNLoopEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST__LoopBack:                                    {Type: parser.ATNLoopBack, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	LIST__Basic_3:                                     {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 7, Transitions: 2},
+	LIST_RightParen:                                   {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	LIST__Basic_4:                                     {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION_DATA:                                 {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	DATA_SECTION_LeftParen:                            {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	DATA_SECTION__Basic_0:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION_RightParen:                           {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	DATA_SECTION__Basic_1:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION__Basic_2:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 8, Transitions: 2},
+	DATA_SECTION_Semicolon:                            {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	DATA_SECTION__Basic_3:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION__Basic_4:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION__LoopEntry:                           {Type: parser.ATNLoopEntry, EpsilonOnly: true, Decision: 9, Transitions: 2},
+	DATA_SECTION__LoopEnd:                             {Type: parser.ATNLoopEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION__LoopBack:                            {Type: parser.ATNLoopBack, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	DATA_SECTION_ENDSECSemicolon:                      {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	DATA_SECTION__Basic_5:                             {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_INSTANCE__Basic_0:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_INSTANCE__Basic_1:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_INSTANCE__Basic_2:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_INSTANCE__Basic_3:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	ENTITY_INSTANCE__Basic_4:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 10, Transitions: 2},
+	ENTITY_INSTANCE__BlockEnd:                         {Type: parser.ATNBlockEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME:  {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SIMPLE_ENTITY_INSTANCE_Equals:                     {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SIMPLE_ENTITY_INSTANCE__Basic_0:                   {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_ENTITY_INSTANCE_Semicolon:                  {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SIMPLE_ENTITY_INSTANCE__Basic_1:                   {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME: {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	COMPLEX_ENTITY_INSTANCE_Equals:                    {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	COMPLEX_ENTITY_INSTANCE__Basic_0:                  {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	COMPLEX_ENTITY_INSTANCE_Semicolon:                 {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	COMPLEX_ENTITY_INSTANCE__Basic_1:                  {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD_Keyword_KEYWORD:                     {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD_LeftParen:                           {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD__Basic_0:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD__Basic_1:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD__Basic_2:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: 11, Transitions: 2},
+	SIMPLE_RECORD_RightParen:                          {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SIMPLE_RECORD__Basic_3:                            {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD_LeftParen:                         {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD__Basic_0:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD__Basic_1:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD__LoopBack:                         {Type: parser.ATNLoopBack, EpsilonOnly: true, Decision: 12, Transitions: 2},
+	SUBSUPER_RECORD__LoopEnd:                          {Type: parser.ATNLoopEnd, EpsilonOnly: true, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD_RightParen:                        {Type: parser.ATNBasic, Decision: -1, Transitions: 1},
+	SUBSUPER_RECORD__Basic_2:                          {Type: parser.ATNBasic, EpsilonOnly: true, Decision: -1, Transitions: 1},
+}
+
+var atnTransitionTable = [...]parser.ATNTransitionEntry{
+	// EXCHANGE_FILE__Start
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE_ISODash10303Dash21Semicolon},
+	// HEADER_SECTION__Start
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION_HEADERSemicolon},
+	// HEADER_ENTITY__Start
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_ENTITY_Keyword_KEYWORD},
+	// PARAMETER_LIST__Start
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER_LIST__Basic_0},
+	// PARAMETER__Start
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__Basic_6},
+	// TYPED_PARAMETER__Start
+	{Kind: parser.ATNEpsilonTransition, Target: TYPED_PARAMETER_Keyword_KEYWORD},
+	// UNTYPED_PARAMETER__Start
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_16},
+	// DEFAULT_PARAMETER__Start
+	{Kind: parser.ATNEpsilonTransition, Target: DEFAULT_PARAMETER_Value_Dollar},
+	// INTEGER_LITERAL__Start
+	{Kind: parser.ATNEpsilonTransition, Target: INTEGER_LITERAL_Value_INTEGER},
+	// REAL_LITERAL__Start
+	{Kind: parser.ATNEpsilonTransition, Target: REAL_LITERAL_Value_REAL},
+	// STRING_LITERAL__Start
+	{Kind: parser.ATNEpsilonTransition, Target: STRING_LITERAL_Value_STRING},
+	// ENUMERATION_LITERAL__Start
+	{Kind: parser.ATNEpsilonTransition, Target: ENUMERATION_LITERAL_Value_ENUMERATION},
+	// BINARY_LITERAL__Start
+	{Kind: parser.ATNEpsilonTransition, Target: BINARY_LITERAL_Value_BINARY},
+	// ENTITY_REFERENCE__Start
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME},
+	// OMITTED_PARAMETER__Start
+	{Kind: parser.ATNEpsilonTransition, Target: OMITTED_PARAMETER_Value_Asterisk},
+	// LIST__Start
+	{Kind: parser.ATNEpsilonTransition, Target: LIST_LeftParen},
+	// DATA_SECTION__Start
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION_DATA},
+	// ENTITY_INSTANCE__Start
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_INSTANCE__Basic_4},
+	// SIMPLE_ENTITY_INSTANCE__Start
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME},
+	// COMPLEX_ENTITY_INSTANCE__Start
+	{Kind: parser.ATNEpsilonTransition, Target: COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME},
+	// SIMPLE_RECORD__Start
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_RECORD_Keyword_KEYWORD},
+	// SUBSUPER_RECORD__Start
+	{Kind: parser.ATNEpsilonTransition, Target: SUBSUPER_RECORD_LeftParen},
+	// EXCHANGE_FILE_ISODash10303Dash21Semicolon
+	{Kind: parser.ATNAtomTransition, Target: EXCHANGE_FILE__Basic_0, Token: Keyword_ISODash10303Dash21Semicolon_Idx},
+	// EXCHANGE_FILE__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: HEADER_SECTION__Start, Follow: EXCHANGE_FILE__LoopEntry, Call: 1},
+	// EXCHANGE_FILE__Basic_1
+	{Kind: parser.ATNRuleTransition, Target: DATA_SECTION__Start, Follow: EXCHANGE_FILE__Basic_2, Call: 2},
+	// EXCHANGE_FILE__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE__LoopBack},
+	// EXCHANGE_FILE__LoopEntry
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE__Basic_1},
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE__LoopEnd},
+	// EXCHANGE_FILE__LoopEnd
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon},
+	// EXCHANGE_FILE__LoopBack
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE__LoopEntry},
+	// EXCHANGE_FILE_ENDDashISODash10303Dash21Semicolon
+	{Kind: parser.ATNAtomTransition, Target: EXCHANGE_FILE__Basic_3, Token: Keyword_ENDDashISODash10303Dash21Semicolon_Idx},
+	// EXCHANGE_FILE__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: EXCHANGE_FILE__Stop},
+	// HEADER_SECTION_HEADERSemicolon
+	{Kind: parser.ATNAtomTransition, Target: HEADER_SECTION__Basic_0, Token: Keyword_HEADERSemicolon_Idx},
+	// HEADER_SECTION__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: HEADER_ENTITY__Start, Follow: HEADER_SECTION__Basic_1, Call: 3},
+	// HEADER_SECTION__Basic_1
+	{Kind: parser.ATNRuleTransition, Target: HEADER_ENTITY__Start, Follow: HEADER_SECTION__Basic_2, Call: 3},
+	// HEADER_SECTION__Basic_2
+	{Kind: parser.ATNRuleTransition, Target: HEADER_ENTITY__Start, Follow: HEADER_SECTION__LoopEntry, Call: 3},
+	// HEADER_SECTION__Basic_3
+	{Kind: parser.ATNRuleTransition, Target: HEADER_ENTITY__Start, Follow: HEADER_SECTION__Basic_4, Call: 4},
+	// HEADER_SECTION__Basic_4
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION__LoopBack},
+	// HEADER_SECTION__LoopEntry
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION__Basic_3},
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION__LoopEnd},
+	// HEADER_SECTION__LoopEnd
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION_ENDSECSemicolon},
+	// HEADER_SECTION__LoopBack
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION__LoopEntry},
+	// HEADER_SECTION_ENDSECSemicolon
+	{Kind: parser.ATNAtomTransition, Target: HEADER_SECTION__Basic_5, Token: Keyword_ENDSECSemicolon_Idx},
+	// HEADER_SECTION__Basic_5
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_SECTION__Stop},
+	// HEADER_ENTITY_Keyword_KEYWORD
+	{Kind: parser.ATNAtomTransition, Target: HEADER_ENTITY_LeftParen, Token: Token_KEYWORD_Idx},
+	// HEADER_ENTITY_LeftParen
+	{Kind: parser.ATNAtomTransition, Target: HEADER_ENTITY__Basic_2, Token: Keyword_LeftParen_Idx},
+	// HEADER_ENTITY__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER_LIST__Start, Follow: HEADER_ENTITY__Basic_1, Call: 5},
+	// HEADER_ENTITY__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_ENTITY_RightParen},
+	// HEADER_ENTITY__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_ENTITY__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_ENTITY__Basic_1},
+	// HEADER_ENTITY_RightParen
+	{Kind: parser.ATNAtomTransition, Target: HEADER_ENTITY_Semicolon, Token: Keyword_RightParen_Idx},
+	// HEADER_ENTITY_Semicolon
+	{Kind: parser.ATNAtomTransition, Target: HEADER_ENTITY__Basic_3, Token: Keyword_Semicolon_Idx},
+	// HEADER_ENTITY__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: HEADER_ENTITY__Stop},
+	// PARAMETER_LIST__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER__Start, Follow: PARAMETER_LIST__LoopEntry, Call: 6},
+	// PARAMETER_LIST_Comma
+	{Kind: parser.ATNAtomTransition, Target: PARAMETER_LIST__Basic_1, Token: Keyword_Comma_Idx},
+	// PARAMETER_LIST__Basic_1
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER__Start, Follow: PARAMETER_LIST__Basic_2, Call: 6},
+	// PARAMETER_LIST__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER_LIST__LoopBack},
+	// PARAMETER_LIST__LoopEntry
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER_LIST_Comma},
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER_LIST__LoopEnd},
+	// PARAMETER_LIST__LoopEnd
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER_LIST__Stop},
+	// PARAMETER_LIST__LoopBack
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER_LIST__LoopEntry},
+	// PARAMETER__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: TYPED_PARAMETER__Start, Follow: PARAMETER__Basic_1, Call: 7},
+	// PARAMETER__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__BlockEnd},
+	// PARAMETER__Basic_2
+	{Kind: parser.ATNRuleTransition, Target: UNTYPED_PARAMETER__Start, Follow: PARAMETER__Basic_3, Call: 8},
+	// PARAMETER__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__BlockEnd},
+	// PARAMETER__Basic_4
+	{Kind: parser.ATNRuleTransition, Target: OMITTED_PARAMETER__Start, Follow: PARAMETER__Basic_5, Call: 9},
+	// PARAMETER__Basic_5
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__BlockEnd},
+	// PARAMETER__Basic_6
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__Basic_2},
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__Basic_4},
+	// PARAMETER__BlockEnd
+	{Kind: parser.ATNEpsilonTransition, Target: PARAMETER__Stop},
+	// TYPED_PARAMETER_Keyword_KEYWORD
+	{Kind: parser.ATNAtomTransition, Target: TYPED_PARAMETER_LeftParen, Token: Token_KEYWORD_Idx},
+	// TYPED_PARAMETER_LeftParen
+	{Kind: parser.ATNAtomTransition, Target: TYPED_PARAMETER__Basic_0, Token: Keyword_LeftParen_Idx},
+	// TYPED_PARAMETER__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER__Start, Follow: TYPED_PARAMETER_RightParen, Call: 10},
+	// TYPED_PARAMETER_RightParen
+	{Kind: parser.ATNAtomTransition, Target: TYPED_PARAMETER__Basic_1, Token: Keyword_RightParen_Idx},
+	// TYPED_PARAMETER__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: TYPED_PARAMETER__Stop},
+	// UNTYPED_PARAMETER__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: DEFAULT_PARAMETER__Start, Follow: UNTYPED_PARAMETER__Basic_1, Call: 11},
+	// UNTYPED_PARAMETER__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_2
+	{Kind: parser.ATNRuleTransition, Target: INTEGER_LITERAL__Start, Follow: UNTYPED_PARAMETER__Basic_3, Call: 12},
+	// UNTYPED_PARAMETER__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_4
+	{Kind: parser.ATNRuleTransition, Target: REAL_LITERAL__Start, Follow: UNTYPED_PARAMETER__Basic_5, Call: 13},
+	// UNTYPED_PARAMETER__Basic_5
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_6
+	{Kind: parser.ATNRuleTransition, Target: STRING_LITERAL__Start, Follow: UNTYPED_PARAMETER__Basic_7, Call: 14},
+	// UNTYPED_PARAMETER__Basic_7
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_8
+	{Kind: parser.ATNRuleTransition, Target: ENUMERATION_LITERAL__Start, Follow: UNTYPED_PARAMETER__Basic_9, Call: 15},
+	// UNTYPED_PARAMETER__Basic_9
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_10
+	{Kind: parser.ATNRuleTransition, Target: BINARY_LITERAL__Start, Follow: UNTYPED_PARAMETER__Basic_11, Call: 16},
+	// UNTYPED_PARAMETER__Basic_11
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_12
+	{Kind: parser.ATNRuleTransition, Target: LIST__Start, Follow: UNTYPED_PARAMETER__Basic_13, Call: 17},
+	// UNTYPED_PARAMETER__Basic_13
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_14
+	{Kind: parser.ATNRuleTransition, Target: ENTITY_REFERENCE__Start, Follow: UNTYPED_PARAMETER__Basic_15, Call: 18},
+	// UNTYPED_PARAMETER__Basic_15
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__BlockEnd},
+	// UNTYPED_PARAMETER__Basic_16
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_2},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_4},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_6},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_8},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_10},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_12},
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Basic_14},
+	// UNTYPED_PARAMETER__BlockEnd
+	{Kind: parser.ATNEpsilonTransition, Target: UNTYPED_PARAMETER__Stop},
+	// DEFAULT_PARAMETER_Value_Dollar
+	{Kind: parser.ATNAtomTransition, Target: DEFAULT_PARAMETER__Basic, Token: Keyword_Dollar_Idx},
+	// DEFAULT_PARAMETER__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: DEFAULT_PARAMETER__Stop},
+	// INTEGER_LITERAL_Value_INTEGER
+	{Kind: parser.ATNAtomTransition, Target: INTEGER_LITERAL__Basic, Token: Token_INTEGER_Idx},
+	// INTEGER_LITERAL__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: INTEGER_LITERAL__Stop},
+	// REAL_LITERAL_Value_REAL
+	{Kind: parser.ATNAtomTransition, Target: REAL_LITERAL__Basic, Token: Token_REAL_Idx},
+	// REAL_LITERAL__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: REAL_LITERAL__Stop},
+	// STRING_LITERAL_Value_STRING
+	{Kind: parser.ATNAtomTransition, Target: STRING_LITERAL__Basic, Token: Token_STRING_Idx},
+	// STRING_LITERAL__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: STRING_LITERAL__Stop},
+	// ENUMERATION_LITERAL_Value_ENUMERATION
+	{Kind: parser.ATNAtomTransition, Target: ENUMERATION_LITERAL__Basic, Token: Token_ENUMERATION_Idx},
+	// ENUMERATION_LITERAL__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: ENUMERATION_LITERAL__Stop},
+	// BINARY_LITERAL_Value_BINARY
+	{Kind: parser.ATNAtomTransition, Target: BINARY_LITERAL__Basic, Token: Token_BINARY_Idx},
+	// BINARY_LITERAL__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: BINARY_LITERAL__Stop},
+	// ENTITY_REFERENCE_Value_ENTITY_INSTANCE_NAME
+	{Kind: parser.ATNAtomTransition, Target: ENTITY_REFERENCE__Basic, Token: Token_ENTITY_INSTANCE_NAME_Idx, Hint: 1},
+	// ENTITY_REFERENCE__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_REFERENCE__Stop},
+	// OMITTED_PARAMETER_Value_Asterisk
+	{Kind: parser.ATNAtomTransition, Target: OMITTED_PARAMETER__Basic, Token: Keyword_Asterisk_Idx},
+	// OMITTED_PARAMETER__Basic
+	{Kind: parser.ATNEpsilonTransition, Target: OMITTED_PARAMETER__Stop},
+	// LIST_LeftParen
+	{Kind: parser.ATNAtomTransition, Target: LIST__Basic_3, Token: Keyword_LeftParen_Idx},
+	// LIST__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER__Start, Follow: LIST__LoopEntry, Call: 6},
+	// LIST_Comma
+	{Kind: parser.ATNAtomTransition, Target: LIST__Basic_1, Token: Keyword_Comma_Idx},
+	// LIST__Basic_1
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER__Start, Follow: LIST__Basic_2, Call: 6},
+	// LIST__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: LIST__LoopBack},
+	// LIST__LoopEntry
+	{Kind: parser.ATNEpsilonTransition, Target: LIST_Comma},
+	{Kind: parser.ATNEpsilonTransition, Target: LIST__LoopEnd},
+	// LIST__LoopEnd
+	{Kind: parser.ATNEpsilonTransition, Target: LIST_RightParen},
+	// LIST__LoopBack
+	{Kind: parser.ATNEpsilonTransition, Target: LIST__LoopEntry},
+	// LIST__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: LIST__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: LIST__LoopEnd},
+	// LIST_RightParen
+	{Kind: parser.ATNAtomTransition, Target: LIST__Basic_4, Token: Keyword_RightParen_Idx},
+	// LIST__Basic_4
+	{Kind: parser.ATNEpsilonTransition, Target: LIST__Stop},
+	// DATA_SECTION_DATA
+	{Kind: parser.ATNAtomTransition, Target: DATA_SECTION__Basic_2, Token: Keyword_DATA_Idx},
+	// DATA_SECTION_LeftParen
+	{Kind: parser.ATNAtomTransition, Target: DATA_SECTION__Basic_0, Token: Keyword_LeftParen_Idx},
+	// DATA_SECTION__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER_LIST__Start, Follow: DATA_SECTION_RightParen, Call: 19},
+	// DATA_SECTION_RightParen
+	{Kind: parser.ATNAtomTransition, Target: DATA_SECTION__Basic_1, Token: Keyword_RightParen_Idx},
+	// DATA_SECTION__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION_Semicolon},
+	// DATA_SECTION__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION_LeftParen},
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION__Basic_1},
+	// DATA_SECTION_Semicolon
+	{Kind: parser.ATNAtomTransition, Target: DATA_SECTION__LoopEntry, Token: Keyword_Semicolon_Idx},
+	// DATA_SECTION__Basic_3
+	{Kind: parser.ATNRuleTransition, Target: ENTITY_INSTANCE__Start, Follow: DATA_SECTION__Basic_4, Call: 20},
+	// DATA_SECTION__Basic_4
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION__LoopBack},
+	// DATA_SECTION__LoopEntry
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION__Basic_3},
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION__LoopEnd},
+	// DATA_SECTION__LoopEnd
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION_ENDSECSemicolon},
+	// DATA_SECTION__LoopBack
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION__LoopEntry},
+	// DATA_SECTION_ENDSECSemicolon
+	{Kind: parser.ATNAtomTransition, Target: DATA_SECTION__Basic_5, Token: Keyword_ENDSECSemicolon_Idx},
+	// DATA_SECTION__Basic_5
+	{Kind: parser.ATNEpsilonTransition, Target: DATA_SECTION__Stop},
+	// ENTITY_INSTANCE__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: SIMPLE_ENTITY_INSTANCE__Start, Follow: ENTITY_INSTANCE__Basic_1, Call: 21},
+	// ENTITY_INSTANCE__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_INSTANCE__BlockEnd},
+	// ENTITY_INSTANCE__Basic_2
+	{Kind: parser.ATNRuleTransition, Target: COMPLEX_ENTITY_INSTANCE__Start, Follow: ENTITY_INSTANCE__Basic_3, Call: 22},
+	// ENTITY_INSTANCE__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_INSTANCE__BlockEnd},
+	// ENTITY_INSTANCE__Basic_4
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_INSTANCE__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_INSTANCE__Basic_2},
+	// ENTITY_INSTANCE__BlockEnd
+	{Kind: parser.ATNEpsilonTransition, Target: ENTITY_INSTANCE__Stop},
+	// SIMPLE_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME
+	{Kind: parser.ATNAtomTransition, Target: SIMPLE_ENTITY_INSTANCE_Equals, Token: Token_ENTITY_INSTANCE_NAME_Idx},
+	// SIMPLE_ENTITY_INSTANCE_Equals
+	{Kind: parser.ATNAtomTransition, Target: SIMPLE_ENTITY_INSTANCE__Basic_0, Token: Keyword_Equals_Idx},
+	// SIMPLE_ENTITY_INSTANCE__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: SIMPLE_RECORD__Start, Follow: SIMPLE_ENTITY_INSTANCE_Semicolon, Call: 23},
+	// SIMPLE_ENTITY_INSTANCE_Semicolon
+	{Kind: parser.ATNAtomTransition, Target: SIMPLE_ENTITY_INSTANCE__Basic_1, Token: Keyword_Semicolon_Idx},
+	// SIMPLE_ENTITY_INSTANCE__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_ENTITY_INSTANCE__Stop},
+	// COMPLEX_ENTITY_INSTANCE_Name_ENTITY_INSTANCE_NAME
+	{Kind: parser.ATNAtomTransition, Target: COMPLEX_ENTITY_INSTANCE_Equals, Token: Token_ENTITY_INSTANCE_NAME_Idx},
+	// COMPLEX_ENTITY_INSTANCE_Equals
+	{Kind: parser.ATNAtomTransition, Target: COMPLEX_ENTITY_INSTANCE__Basic_0, Token: Keyword_Equals_Idx},
+	// COMPLEX_ENTITY_INSTANCE__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: SUBSUPER_RECORD__Start, Follow: COMPLEX_ENTITY_INSTANCE_Semicolon, Call: 24},
+	// COMPLEX_ENTITY_INSTANCE_Semicolon
+	{Kind: parser.ATNAtomTransition, Target: COMPLEX_ENTITY_INSTANCE__Basic_1, Token: Keyword_Semicolon_Idx},
+	// COMPLEX_ENTITY_INSTANCE__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: COMPLEX_ENTITY_INSTANCE__Stop},
+	// SIMPLE_RECORD_Keyword_KEYWORD
+	{Kind: parser.ATNAtomTransition, Target: SIMPLE_RECORD_LeftParen, Token: Token_KEYWORD_Idx},
+	// SIMPLE_RECORD_LeftParen
+	{Kind: parser.ATNAtomTransition, Target: SIMPLE_RECORD__Basic_2, Token: Keyword_LeftParen_Idx},
+	// SIMPLE_RECORD__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: PARAMETER_LIST__Start, Follow: SIMPLE_RECORD__Basic_1, Call: 25},
+	// SIMPLE_RECORD__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_RECORD_RightParen},
+	// SIMPLE_RECORD__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_RECORD__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_RECORD__Basic_1},
+	// SIMPLE_RECORD_RightParen
+	{Kind: parser.ATNAtomTransition, Target: SIMPLE_RECORD__Basic_3, Token: Keyword_RightParen_Idx},
+	// SIMPLE_RECORD__Basic_3
+	{Kind: parser.ATNEpsilonTransition, Target: SIMPLE_RECORD__Stop},
+	// SUBSUPER_RECORD_LeftParen
+	{Kind: parser.ATNAtomTransition, Target: SUBSUPER_RECORD__Basic_0, Token: Keyword_LeftParen_Idx},
+	// SUBSUPER_RECORD__Basic_0
+	{Kind: parser.ATNRuleTransition, Target: SIMPLE_RECORD__Start, Follow: SUBSUPER_RECORD__Basic_1, Call: 26},
+	// SUBSUPER_RECORD__Basic_1
+	{Kind: parser.ATNEpsilonTransition, Target: SUBSUPER_RECORD__LoopBack},
+	// SUBSUPER_RECORD__LoopBack
+	{Kind: parser.ATNEpsilonTransition, Target: SUBSUPER_RECORD__Basic_0},
+	{Kind: parser.ATNEpsilonTransition, Target: SUBSUPER_RECORD__LoopEnd},
+	// SUBSUPER_RECORD__LoopEnd
+	{Kind: parser.ATNEpsilonTransition, Target: SUBSUPER_RECORD_RightParen},
+	// SUBSUPER_RECORD_RightParen
+	{Kind: parser.ATNAtomTransition, Target: SUBSUPER_RECORD__Basic_2, Token: Keyword_RightParen_Idx},
+	// SUBSUPER_RECORD__Basic_2
+	{Kind: parser.ATNEpsilonTransition, Target: SUBSUPER_RECORD__Stop},
+}
+
+var atnDecisionTable = [...]int32{
+	0:  EXCHANGE_FILE__LoopEntry,
+	1:  HEADER_SECTION__LoopEntry,
+	2:  HEADER_ENTITY__Basic_2,
+	3:  PARAMETER_LIST__LoopEntry,
+	4:  PARAMETER__Basic_6,
+	5:  UNTYPED_PARAMETER__Basic_16,
+	6:  LIST__LoopEntry,
+	7:  LIST__Basic_3,
+	8:  DATA_SECTION__Basic_2,
+	9:  DATA_SECTION__LoopEntry,
+	10: ENTITY_INSTANCE__Basic_4,
+	11: SIMPLE_RECORD__Basic_2,
+	12: SUBSUPER_RECORD__LoopBack,
+}
+
+// atnCompletionHintTable and atnRuleCallTable are referenced by their
+// index plus one from atnTransitionTable.
+var atnCompletionHintTable = [...]parser.CompletionHint{
+	{Owner: "ENTITY_REFERENCE", Property: "Value"},
+}
+
+var atnRuleCallTable = [...]parser.RuleCallInfo{
+	{Field: "headerSection", Type: "HEADER_SECTION"},
+	{Field: "dataSections", List: true, Type: "DATA_SECTION", Repeated: true},
+	{Field: "headerEntityList", List: true, Type: "HEADER_ENTITY"},
+	{Field: "headerEntityList", List: true, Type: "HEADER_ENTITY", Repeated: true},
+	{Field: "parameterList", Type: "PARAMETER_LIST"},
+	{Field: "parameters", List: true, Type: "PARAMETER"},
+	{Type: "TYPED_PARAMETER"},
+	{Type: "UNTYPED_PARAMETER"},
+	{Type: "OMITTED_PARAMETER"},
+	{Field: "parameter", Type: "PARAMETER"},
+	{Type: "DEFAULT_PARAMETER"},
+	{Type: "INTEGER_LITERAL"},
+	{Type: "REAL_LITERAL"},
+	{Type: "STRING_LITERAL"},
+	{Type: "ENUMERATION_LITERAL"},
+	{Type: "BINARY_LITERAL"},
+	{Type: "LIST"},
+	{Type: "ENTITY_REFERENCE"},
+	{Field: "dataParameters", Type: "PARAMETER_LIST"},
+	{Field: "entityInstances", List: true, Type: "ENTITY_INSTANCE", Repeated: true},
+	{Type: "SIMPLE_ENTITY_INSTANCE"},
+	{Type: "COMPLEX_ENTITY_INSTANCE"},
+	{Field: "record", Type: "SIMPLE_RECORD"},
+	{Field: "record", Type: "SUBSUPER_RECORD"},
+	{Field: "parameters", Type: "PARAMETER_LIST"},
+	{Field: "records", List: true, Type: "SIMPLE_RECORD", Repeated: true},
 }

@@ -22,7 +22,7 @@ func NewIfcInlayHintProvider(sc *service.Container) *IfcInlayHintProvider {
 }
 
 func (p *IfcInlayHintProvider) HandleInlayHintRequest(ctx context.Context, params *lsp.InlayHintParams) ([]lsp.InlayHint, error) {
-	documentManager := service.MustGet[workspace.DocumentManager](p.sc)
+	documentManager := p.sc.MustGet[workspace.DocumentManager]()
 	doc := documentManager.Get(core.ParseURI(string(params.TextDocument.URI)))
 	if doc == nil || doc.TextDoc == nil {
 		return nil, nil
@@ -86,7 +86,7 @@ func ifcArgumentHint(doc *core.Document, arg *core.Token, argIndex int, sigParam
 	if argIndex >= len(sigParams) {
 		return lsp.InlayHint{}, false
 	}
-	start := int(arg.TextSegment.Indices.Start)
+	start := int(arg.TextRange().Start)
 	if start < rangeStart || start > rangeEnd {
 		return lsp.InlayHint{}, false
 	}

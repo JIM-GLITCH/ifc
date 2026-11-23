@@ -58,7 +58,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	if !hasDiagnosticCode(diagnostics, "ifc-aggregate-bounds") {
 		t.Fatalf("expected ifc-aggregate-bounds for empty LIST [1:3], got %v", diagnostics)
 	}
@@ -82,7 +82,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	if !hasDiagnosticCode(diagnostics, "ifc-aggregate-bounds") {
 		t.Fatalf("expected ifc-aggregate-bounds for 4 elements in LIST [1:3], got %v", diagnostics)
 	}
@@ -107,7 +107,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-aggregate-bounds" {
 			t.Fatalf("unexpected aggregate bounds diagnostic: %s", d.Message)
@@ -133,7 +133,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	found := false
 	for _, d := range diagnostics {
 		if d.Code == "ifc-aggregate-bounds" && strings.Contains(d.Message, "at least 2") {

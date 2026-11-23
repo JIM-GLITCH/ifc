@@ -56,7 +56,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-type-where" {
 			t.Fatalf("unexpected ifc-type-where on optional $: %s", d.Message)
@@ -82,7 +82,7 @@ END-ISO-10303-21;`
 	doc := fixture.Parse(source)
 	doc.AssertNoParseErrors()
 
-	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document, "test")
+	diagnostics := serviceMustDocumentValidator(sc).Validate(context.Background(), doc.Document)
 	for _, d := range diagnostics {
 		if d.Code == "ifc-param-required" || d.Code == "ifc-param-derived" || d.Code == "ifc-entity-where" || d.Code == "ifc-type-where" || d.Code == evalUnknownCode {
 			t.Fatalf("unexpected diagnostic (%s): %s", d.Code, d.Message)
