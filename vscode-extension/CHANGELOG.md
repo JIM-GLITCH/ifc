@@ -4,6 +4,12 @@ All notable changes to the Ifc language server and VS Code extension are documen
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Inlay hints** — `textDocument/inlayHint` shows the EXPRESS attribute name inline before each positional argument of an entity instance, e.g. `#2=IFCAXIS2PLACEMENT3D(⟪Location:⟫#1, ⟪Axis:⟫$, ⟪RefDirection:⟫$)`. Parameter names come from the same schema metadata as signature help; commas inside nested lists, typed parameters and nested entity calls do not split arguments, and header entities (`FILE_DESCRIPTION`, …) are ignored. Hints can be toggled via `editor.inlayHints.enabled`.
+
 ## [0.0.15] - 2026-11-22
 
 ### Added

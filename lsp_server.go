@@ -15,6 +15,7 @@ type IfcLanguageServer struct {
 	*server.DefaultLanguageServer
 	sc            *service.Container
 	signatureHelp *IfcSignatureHelpProvider
+	inlayHint     *IfcInlayHintProvider
 }
 
 func NewIfcLanguageServer(sc *service.Container) lsp.Server {
@@ -26,6 +27,7 @@ func NewIfcLanguageServer(sc *service.Container) lsp.Server {
 		DefaultLanguageServer: base,
 		sc:                    sc,
 		signatureHelp:         NewIfcSignatureHelpProvider(sc),
+		inlayHint:             NewIfcInlayHintProvider(sc),
 	}
 }
 
@@ -56,6 +58,7 @@ func (s *IfcLanguageServer) Initialize(ctx context.Context, params *lsp.ParamIni
 			TriggerCharacters:   []string{"(", ","},
 			RetriggerCharacters: []string{","},
 		}
+		result.Capabilities.InlayHintProvider = &lsp.InlayHintRegistrationOptions{}
 	}
 	return result, nil
 }
@@ -83,6 +86,21 @@ func (s *IfcLanguageServer) SignatureHelp(ctx context.Context, params *lsp.Signa
 	var providerErr error
 	if err := lock.Read(ctx, func(ctx context.Context) {
 		result, providerErr = s.signatureHelp.HandleSignatureHelpRequest(ctx, params)
+	}); err != nil {
+		return nil, err
+	}
+	return result, providerErr
+}
+
+func (s *IfcLanguageServer) InlayHint(ctx context.Context, params *lsp.InlayHintParams) ([]lsp.InlayHint, error) {
+	lock, err := service.Get[workspace.Lock](s.sc)
+	if err != nil {
+		return nil, err
+	}
+	var result []lsp.InlayHint
+	var providerErr error
+	if err := lock.Read(ctx, func(ctx context.Context) {
+		result, providerErr = s.inlayHint.HandleInlayHintRequest(ctx, params)
 	}); err != nil {
 		return nil, err
 	}
